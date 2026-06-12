@@ -1,0 +1,93 @@
+\noindent
+\appendix
+
+
+\chapter*{Appendix A: }
+\addcontentsline{toc}{chapter}{Appendix A: }
+\section*{A.1: Face Movement}
+\subsection{Forward \& Stop}
+\begin{minted}[mathescape]{python}
+    if (isMoving):
+        if (pitch_direction == "d" and not(stopped)):
+            USART_SEND('S')
+            stopped = True
+        if (pitch_direction == "c" and stopped):
+            isMoving = False
+            stopped = False
+            alarm_time = 0
+    else:
+        if (pitch_direction == "d"):
+            if (time_start_down == 0 and face_exist):
+                time_start_down = time.time()
+        if (time.time() - time_start_down > 2 and time.time() - time_start_down < 2.5 and face_exist):
+            GPIO.output(BUZZER_PIN, GPIO.HIGH)
+        else:
+            GPIO.output(BUZZER_PIN, GPIO.LOW)  
+        if(time_start_down and pitch_direction == "c"):
+            if (time.time() - time_start_down > 2 and face_exist):
+                isMoving = True
+                USART_SEND('F')
+            time_start_down = 0
+            alarm_time = 0
+\end{minted}
+
+\subsection{Right}
+\begin{minted}[mathescape]{python}
+    if (right):
+        GPIO.output(RIGHT_PIN, GPIO.HIGH)
+    else:
+        GPIO.output(RIGHT_PIN, GPIO.LOW)
+    if (yaw_direction == "r" and pitch_direction == "c" and not(right)):
+        right = True
+        GPIO.output(RIGHT_PIN, GPIO.HIGH)
+        USART_SEND('R')
+    if (yaw_direction == "c"):
+        right = False
+\end{minted}
+
+\subsection{Left}
+\begin{minted}[mathescape]{python}
+    if (yaw_direction == "l" and pitch_direction == "c" and not(left)):
+        left = True
+        USART_SEND('L')
+    if (yaw_direction == "c"):
+        left = False
+    if (right or left):
+        center = True
+\end{minted}
+
+\subsection{center}
+\begin{minted}[mathescape]{python}
+    if (center and not(right) and not(left)):
+        USART_SEND('C')
+        center = False
+\end{minted}
+
+\subsection{Toggle System (ON / OFF)}
+\begin{minted}[mathescape]{python}
+    if (pitch_direction == "u"):
+        if (time_start_up == 0):
+            time_start_up = time.time()
+             
+    if (time_start_up and pitch_direction == "c"):
+        if (time.time() - time_start_up > 2):
+            USART_SEND('T')
+            print("Toggled detection")
+            isMoving = False
+            alarm_happened = False
+            GPIO.output(BUZZER_PIN, GPIO.LOW)
+            can_detect = not(can_detect)
+        time_start_up = 0
+\end{minted}
+
+\subsection{Alarm}
+\begin{minted}[mathescape]{python}
+    if (pitch_direction == "d" and alarm_time == 0 and face_exist):
+        alarm_time = time.time()
+    if (alarm_time and time.time() - alarm_time >= alarm_duration):
+        USART_SEND('A')
+        alarm_happened = True
+        can_detect = False
+        time_start_down = 0
+        alarm_time = 0
+\end{minted}
