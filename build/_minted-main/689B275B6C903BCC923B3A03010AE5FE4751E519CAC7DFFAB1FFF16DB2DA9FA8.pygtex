@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+    \PYG{k}{if} \PYG{p}{(}\PYG{n}{center} \PYG{o+ow}{and} \PYG{o+ow}{not}\PYG{p}{(}\PYG{n}{right}\PYG{p}{)} \PYG{o+ow}{and} \PYG{o+ow}{not}\PYG{p}{(}\PYG{n}{left}\PYG{p}{)):}
+        \PYG{n}{USART\PYGZus{}SEND}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}C\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{center} \PYG{o}{=} \PYG{k+kc}{False}
+\end{Verbatim}

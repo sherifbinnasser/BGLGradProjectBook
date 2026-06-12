@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+    \PYG{k}{if} \PYG{p}{(}\PYG{n}{yaw\PYGZus{}direction} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}l\PYGZdq{}} \PYG{o+ow}{and} \PYG{n}{pitch\PYGZus{}direction} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}c\PYGZdq{}} \PYG{o+ow}{and} \PYG{o+ow}{not}\PYG{p}{(}\PYG{n}{left}\PYG{p}{)):}
+        \PYG{n}{left} \PYG{o}{=} \PYG{k+kc}{True}
+        \PYG{n}{USART\PYGZus{}SEND}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}L\PYGZsq{}}\PYG{p}{)}
+    \PYG{k}{if} \PYG{p}{(}\PYG{n}{yaw\PYGZus{}direction} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}c\PYGZdq{}}\PYG{p}{):}
+        \PYG{n}{left} \PYG{o}{=} \PYG{k+kc}{False}
+    \PYG{k}{if} \PYG{p}{(}\PYG{n}{right} \PYG{o+ow}{or} \PYG{n}{left}\PYG{p}{):}
+        \PYG{n}{center} \PYG{o}{=} \PYG{k+kc}{True}
+\end{Verbatim}

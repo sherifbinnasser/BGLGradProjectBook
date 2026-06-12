@@ -9,32 +9,51 @@
 \usepackage[T1]{fontenc}
 \usepackage{textgreek} 
 \usepackage{wrapfig}
-\usepackage{minted}
+\usepackage[outputdir=build]{minted}
 \usepackage[super]{nth}
 
 \input{PackagesAndSettings}
 
-
 \begin{document}
-%\frontmatter
-{
-\pagenumbering{roman}
 
+% إدراج صفحة العنوان (بدون ترقيم أو إدراج في الشريط الجانبي عادةً)
+\phantomsection
+\addcontentsline{toc}{chapter}{Cover Page} % إدراج الغلاف في القائمة الجانبية
 \include{TitlePage}
 
+% --- العناصر التمهيدية (Front Matter) ---
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Acknowledgment}
 \include{Acknowledgment}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
 \include{Abstract}
 
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Figures}
 \listoffigures
+
+%\phantomsection
+%\addcontentsline{toc}{chapter}{List of Tables}
 %\listoftables
-\include{listofabbreviations}
+
+% \phantomsection
+% \addcontentsline{toc}{chapter}{List of Abbreviations}
+% \include{listofabbreviations}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Table of Contents}
 \tableofcontents
 
+% \phantomsection
+% \addcontentsline{toc}{chapter}{Glossary}
+% \printglossary[type=\acronymtype]
 
+\clearpage
 
-\printglossary[type=\acronymtype]
-
-}
+% --- الفصول الرئيسية للمشروع (Main Chapters) ---
 
 \include{chapters/chapter1}
 \include{chapters/chapter2}
@@ -42,11 +61,15 @@
 \include{chapters/chapter4}
 \include{chapters/chapter5}
 
+% --- المراجع والملحقات ---
+
+\clearpage
+\phantomsection
 \addcontentsline{toc}{chapter}{References}
 \renewcommand{\bibname}{References}
 \bibliographystyle{IEEEtran}
 \bibliography{References.bib}
+
 \include{Appendices}
 
-
-\end{document} 
+\end{document}

@@ -1,0 +1,47 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Cover Page}{1}{section*.1}%
+\contentsline {chapter}{Acknowledgment}{1}{section*.2}%
+\contentsline {chapter}{Abstract}{2}{section*.3}%
+\contentsline {chapter}{List of Figures}{3}{section*.4}%
+\contentsline {chapter}{Table of Contents}{3}{section*.5}%
+\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Related Work}{6}{chapter.2}%
+\contentsline {chapter}{\numberline {3}Methodology}{7}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introduction}{7}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Phase 1: Data Acquisition}{7}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}The Data Collection Campaign at University Hospital}{8}{subsection.3.2.1}%
+\contentsline {subsubsection}{Medical Equipment Provided by Faculty}{8}{section*.6}%
+\contentsline {subsubsection}{Hospital Environment and Ethics}{8}{section*.7}%
+\contentsline {subsection}{\numberline {3.2.2}Our Android Application: DiabetesCollector}{9}{subsection.3.2.2}%
+\contentsline {subsubsection}{How the App was Built}{9}{section*.8}%
+\contentsline {subsubsection}{Using the Camera (CameraX API)}{9}{section*.9}%
+\contentsline {subsection}{\numberline {3.2.3}Patient Profiles and Ground Truth Entry}{9}{subsection.3.2.3}%
+\contentsline {subsubsection}{Entering Demographic Information}{9}{section*.10}%
+\contentsline {subsubsection}{Logging the Reference Glucose Level}{10}{section*.11}%
+\contentsline {subsubsection}{Tracking Different Phone Hardware}{11}{section*.13}%
+\contentsline {subsection}{\numberline {3.2.4}Handling Data without Overlaps (UUID Strategy)}{12}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}The Signal Recording Process (The 20-Second Rule)}{12}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}Exporting and Merging the Final Dataset}{13}{subsection.3.2.6}%
+\contentsline {subsubsection}{File Structure on the Phone}{13}{section*.15}%
+\contentsline {subsubsection}{The Metadata CSV File}{15}{section*.17}%
+\contentsline {subsubsection}{Final Dataset Aggregation}{15}{section*.19}%
+\contentsline {section}{\numberline {3.3}Phase 2: Data Preprocessing and Structuring}{16}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Video Orientation Normalization}{16}{subsection.3.3.1}%
+\contentsline {subsubsection}{The Challenge with Standard Video Editors}{16}{section*.20}%
+\contentsline {subsubsection}{The Automated FFmpeg Command-Line Solution}{16}{section*.21}%
+\contentsline {subsection}{\numberline {3.3.2}Hierarchical Dataset Re-organization}{17}{subsection.3.3.2}%
+\contentsline {subsubsection}{Individual Patient CSV Schema Specification}{18}{section*.22}%
+\contentsline {subsection}{\numberline {3.3.3}Quality Control and Data Filtering}{19}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Automation Python Script for Restructuring}{19}{subsection.3.3.4}%
+\contentsline {section}{\numberline {3.4}Phase 3: rPPG Extraction}{20}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{21}{section.3.5}%
+\contentsline {chapter}{\numberline {4}Results}{22}{chapter.4}%
+\contentsline {chapter}{\numberline {5}Conclusion}{23}{chapter.5}%
+\contentsline {chapter}{References}{24}{section*.24}%
+\contentsline {chapter}{Appendix A: }{25}{appendix*.26}%
+\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{25}{subsection.Alph0.0.1}%
+\contentsline {subsection}{\numberline {.0.2}Right}{26}{subsection.Alph0.0.2}%
+\contentsline {subsection}{\numberline {.0.3}Left}{26}{subsection.Alph0.0.3}%
+\contentsline {subsection}{\numberline {.0.4}center}{26}{subsection.Alph0.0.4}%
+\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{27}{subsection.Alph0.0.5}%
+\contentsline {subsection}{\numberline {.0.6}Alarm}{27}{subsection.Alph0.0.6}%
