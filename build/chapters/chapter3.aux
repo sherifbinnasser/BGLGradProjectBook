@@ -58,22 +58,38 @@
 \newlabel{sec:phase3_extraction}{{3.4}{21}{Phase 3: rPPG Extraction}{section.3.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}Raw Temporal RGB Extraction}{22}{subsection.3.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}Frame Rate Normalization Strategies}{22}{subsection.3.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{23}{subsection.3.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{24}{subsection.3.4.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces Distribution of Patient Records Across Glycemic Tiers}}{24}{table.caption.24}\protected@file@percent }
-\newlabel{tab:glucose_distribution}{{3.3}{24}{Distribution of Patient Records Across Glycemic Tiers}{table.caption.24}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{25}{subsection.3.4.5}\protected@file@percent }
-\@writefile{lol}{\contentsline {listing}{\numberline {2}{\ignorespaces Comprehensive Python Engine for Full-Frame rPPG Extraction and Signal Conditioning}}{25}{listing.2}\protected@file@percent }
-\newlabel{lst:signal_processing_script}{{2}{25}{Comprehensive Python Engine for Full-Frame rPPG Extraction and Signal Conditioning}{listing.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.6}Experimental Results and Visualization}{27}{subsection.3.4.6}\protected@file@percent }
-\@writefile{lol}{\contentsline {listing}{\numberline {3}{\ignorespaces Python Script for Clean rPPG Waveform Visualization and Analysis}}{27}{listing.3}\protected@file@percent }
-\newlabel{lst:plot_script}{{3}{27}{Python Script for Clean rPPG Waveform Visualization and Analysis}{listing.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}}{28}{figure.caption.25}\protected@file@percent }
-\newlabel{fig:ppg_signal_output}{{3.4}{28}{Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1}{figure.caption.25}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{29}{section.3.5}\protected@file@percent }
-\newlabel{sec:phase4_modeling}{{3.5}{29}{Phase 4: AI Modeling}{section.3.5}{}}
+\newlabel{fig:raw_20}{{3.4a}{24}{Raw 20 FPS Configuration (Total Length: 400 Signal Points)}{figure.caption.24}{}}
+\newlabel{sub@fig:raw_20}{{a}{24}{Raw 20 FPS Configuration (Total Length: 400 Signal Points)}{figure.caption.24}{}}
+\newlabel{fig:raw_25}{{3.4b}{24}{Raw 25 FPS Configuration (Total Length: 500 Signal Points)}{figure.caption.24}{}}
+\newlabel{sub@fig:raw_25}{{b}{24}{Raw 25 FPS Configuration (Total Length: 500 Signal Points)}{figure.caption.24}{}}
+\newlabel{fig:raw_30}{{3.4c}{24}{Raw 30 FPS Configuration (Total Length: 600 Signal Points)}{figure.caption.24}{}}
+\newlabel{sub@fig:raw_30}{{c}{24}{Raw 30 FPS Configuration (Total Length: 600 Signal Points)}{figure.caption.24}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}}{24}{figure.caption.24}\protected@file@percent }
+\newlabel{fig:raw_rgb_comparison}{{3.4}{24}{Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations}{figure.caption.24}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{25}{subsection.3.4.3}\protected@file@percent }
+\newlabel{fig:filt_20}{{3.5a}{26}{Filtered and Conditioned 20 FPS Structure}{figure.caption.25}{}}
+\newlabel{sub@fig:filt_20}{{a}{26}{Filtered and Conditioned 20 FPS Structure}{figure.caption.25}{}}
+\newlabel{fig:filt_25}{{3.5b}{26}{Filtered and Conditioned 25 FPS Structure}{figure.caption.25}{}}
+\newlabel{sub@fig:filt_25}{{b}{26}{Filtered and Conditioned 25 FPS Structure}{figure.caption.25}{}}
+\newlabel{fig:filt_30}{{3.5c}{26}{Filtered and Conditioned 30 FPS Structure}{figure.caption.25}{}}
+\newlabel{sub@fig:filt_30}{{c}{26}{Filtered and Conditioned 30 FPS Structure}{figure.caption.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}}{26}{figure.caption.25}\protected@file@percent }
+\newlabel{fig:filtered_rgb_comparison}{{3.5}{26}{Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties}{figure.caption.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{27}{subsection.3.4.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces Distribution of Patient Records Across Glycemic Tiers}}{27}{table.caption.26}\protected@file@percent }
+\newlabel{tab:glucose_distribution}{{3.3}{27}{Distribution of Patient Records Across Glycemic Tiers}{table.caption.26}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{27}{subsection.3.4.5}\protected@file@percent }
+\@writefile{lol}{\contentsline {listing}{\numberline {2}{\ignorespaces Comprehensive Python Engine for Full-Frame rPPG Extraction and Signal Conditioning}}{28}{listing.2}\protected@file@percent }
+\newlabel{lst:signal_processing_script}{{2}{28}{Comprehensive Python Engine for Full-Frame rPPG Extraction and Signal Conditioning}{listing.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.6}Experimental Results and Visualization}{30}{subsection.3.4.6}\protected@file@percent }
+\@writefile{lol}{\contentsline {listing}{\numberline {3}{\ignorespaces Python Script for Clean rPPG Waveform Visualization and Analysis}}{30}{listing.3}\protected@file@percent }
+\newlabel{lst:plot_script}{{3}{30}{Python Script for Clean rPPG Waveform Visualization and Analysis}{listing.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}}{31}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:ppg_signal_output}{{3.6}{31}{Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1}{figure.caption.27}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{31}{section.3.5}\protected@file@percent }
+\newlabel{sec:phase4_modeling}{{3.5}{31}{Phase 4: AI Modeling}{section.3.5}{}}
 \@setckpt{chapters/chapter3}{
-\setcounter{page}{30}
+\setcounter{page}{32}
 \setcounter{equation}{2}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -88,7 +104,7 @@
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{4}
+\setcounter{figure}{6}
 \setcounter{table}{3}
 \setcounter{lofdepth}{1}
 \setcounter{lotdepth}{1}
@@ -102,7 +118,7 @@
 \setcounter{subtable}{0}
 \setcounter{FancyVerbLine}{23}
 \setcounter{linenumber}{1}
-\setcounter{LN@truepage}{30}
+\setcounter{LN@truepage}{32}
 \setcounter{FV@TrueTabGroupLevel}{0}
 \setcounter{FV@TrueTabCounter}{0}
 \setcounter{FV@HighlightLinesStart}{0}

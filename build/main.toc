@@ -36,18 +36,18 @@
 \contentsline {section}{\numberline {3.4}Phase 3: rPPG Extraction}{21}{section.3.4}%
 \contentsline {subsection}{\numberline {3.4.1}Raw Temporal RGB Extraction}{22}{subsection.3.4.1}%
 \contentsline {subsection}{\numberline {3.4.2}Frame Rate Normalization Strategies}{22}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{23}{subsection.3.4.3}%
-\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{24}{subsection.3.4.4}%
-\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{25}{subsection.3.4.5}%
-\contentsline {subsection}{\numberline {3.4.6}Experimental Results and Visualization}{27}{subsection.3.4.6}%
-\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{29}{section.3.5}%
-\contentsline {chapter}{\numberline {4}Results}{30}{chapter.4}%
-\contentsline {chapter}{\numberline {5}Conclusion}{31}{chapter.5}%
-\contentsline {chapter}{References}{32}{section*.26}%
-\contentsline {chapter}{Appendix A: }{33}{appendix*.28}%
-\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{33}{subsection.Alph0.0.1}%
-\contentsline {subsection}{\numberline {.0.2}Right}{34}{subsection.Alph0.0.2}%
-\contentsline {subsection}{\numberline {.0.3}Left}{34}{subsection.Alph0.0.3}%
-\contentsline {subsection}{\numberline {.0.4}center}{34}{subsection.Alph0.0.4}%
-\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{35}{subsection.Alph0.0.5}%
-\contentsline {subsection}{\numberline {.0.6}Alarm}{35}{subsection.Alph0.0.6}%
+\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{25}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{27}{subsection.3.4.4}%
+\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{27}{subsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.4.6}Experimental Results and Visualization}{30}{subsection.3.4.6}%
+\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{31}{section.3.5}%
+\contentsline {chapter}{\numberline {4}Results}{32}{chapter.4}%
+\contentsline {chapter}{\numberline {5}Conclusion}{33}{chapter.5}%
+\contentsline {chapter}{References}{34}{section*.28}%
+\contentsline {chapter}{Appendix A: }{35}{appendix*.30}%
+\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{35}{subsection.Alph0.0.1}%
+\contentsline {subsection}{\numberline {.0.2}Right}{36}{subsection.Alph0.0.2}%
+\contentsline {subsection}{\numberline {.0.3}Left}{36}{subsection.Alph0.0.3}%
+\contentsline {subsection}{\numberline {.0.4}center}{36}{subsection.Alph0.0.4}%
+\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{37}{subsection.Alph0.0.5}%
+\contentsline {subsection}{\numberline {.0.6}Alarm}{37}{subsection.Alph0.0.6}%

@@ -26,6 +26,34 @@ To establish an optimal sampling benchmark, our team rigorously tested three dif
 
 The empirical evaluation of these methods demonstrated that the physical variations across all three temporal options were virtually negligible. Because the difference between the native recording speeds is only 10 FPS, the core physiological parameters—such as the calculated Heart Rate (HR)—remained perfectly invariant with a delta of zero. Consequently, \textbf{20 FPS was officially selected as our absolute dataset standard}. This downsampling approach preserves the original, un-interpolated biological data points while completely avoiding artificial data artifacts caused by upsampling interpolation.
 
+To document the raw behavioral tracking across these tested sampling boundaries, Figure~\ref{fig:raw_rgb_comparison} contrasts the raw, unfiltered $R, G, B$ signal lengths extracted across the 20 FPS, 25 FPS, and 30 FPS analytical configurations. By stacking the waveforms vertically, the proportional scaling of the data arrays (400, 500, and 600 indices respectively) remains clearly discernible.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/chapter3/20-rgb.png}
+        \caption{Raw 20 FPS Configuration (Total Length: 400 Signal Points)}
+        \label{fig:raw_20}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/chapter3/25-rgb.png}
+        \caption{Raw 25 FPS Configuration (Total Length: 500 Signal Points)}
+        \label{fig:raw_25}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/chapter3/30-rgb.png}
+        \caption{Raw 30 FPS Configuration (Total Length: 600 Signal Points)}
+        \label{fig:raw_30}
+    \end{subfigure}
+    \caption{Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}
+    \label{fig:raw_rgb_comparison}
+\end{figure}
+
 \subsection{Digital Signal Detrending, Normalization, and Filtering}
 Capillary blood signals extracted from mobile hardware are inherently buried under intensive high-frequency noise, respiratory baseline drifts, and high-amplitude somatic motion artifacts. To isolate the pure cardiac pulse waveform, a robust signal conditioning architecture was developed using \texttt{SciPy} mathematical engines. The sequential signal processing steps applied to each raw channel are as follows:
 
@@ -38,6 +66,34 @@ Capillary blood signals extracted from mobile hardware are inherently buried und
     where $\mu$ is the signal mean and $\sigma$ represents the standard deviation.
     \item \textbf{Butterworth Bandpass Filtering:} Passing the standardized signal through a 4th-order digital Butterworth bandpass filter (0.5 Hz to 8.0 Hz) to eliminate non-cardiac noise frequencies.
 \end{itemize}
+
+The highly constructive impact of this filtering stack is visually evaluated in Figure~\ref{fig:filtered_rgb_comparison}. Following spatial detrending and bandpass application, the DC component offset is entirely resolved, and the physiological systolic-diastolic oscillations are cleanly exposed across all sampling conditions with maximum amplitude clarity in the Green channel array.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/chapter3/20-rgb-filter.png}
+        \caption{Filtered and Conditioned 20 FPS Structure}
+        \label{fig:filt_20}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/chapter3/25-rgb-filter.png}
+        \caption{Filtered and Conditioned 25 FPS Structure}
+        \label{fig:filt_25}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/chapter3/30-rgb-filter.png}
+        \caption{Filtered and Conditioned 30 FPS Structure}
+        \label{fig:filt_30}
+    \end{subfigure}
+    \caption{Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}
+    \label{fig:filtered_rgb_comparison}
+\end{figure}
 
 \subsection{Stratified Dataset Splitting}
 To prepare our processed arrays for machine learning and deep learning regression modeling, a highly controlled data splitting strategy was mandatory. Splitting medical datasets randomly often introduces catastrophic class imbalances, where certain critical blood glucose ranges might be completely missing from the training or testing subsets.

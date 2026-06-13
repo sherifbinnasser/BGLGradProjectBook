@@ -5,6 +5,8 @@
 \contentsline {figure}{\numberline {3.1}{\ignorespaces The New Record Form interface where patient demographics and Accu-Chek readings are entered.}}{12}{figure.caption.12}%
 \contentsline {figure}{\numberline {3.2}{\ignorespaces The user interfaces designed for checking the finger alignment and executing the 20-second signal capture sequence.}}{14}{figure.caption.14}%
 \contentsline {figure}{\numberline {3.3}{\ignorespaces Data management screens showing local storage monitoring and the final data export engine workflow.}}{15}{figure.caption.16}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}}{28}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}}{24}{figure.caption.24}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}}{26}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}}{31}{figure.caption.27}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
