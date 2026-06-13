@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/VoidLinux) (preloaded format=pdflatex 2026.6.12)  13 JUN 2026 00:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/VoidLinux) (preloaded format=pdflatex 2026.6.12)  13 JUN 2026 14:23
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1305,19 +1305,19 @@ Package caption Info: End \AtBeginDocument code.
 \openout2 = `TitlePage.aux'.
 
 (./TitlePage.tex
-<figures/Aswan Faculty of Engineering Logo.png, id=136, 975.645pt x 977.6525pt>
+<figures/Aswan University Logo.png, id=136, 419.5675pt x 599.23875pt>
+File: figures/Aswan University Logo.png Graphic file (type png)
+<use figures/Aswan University Logo.png>
+Package pdftex.def Info: figures/Aswan University Logo.png  used on input line 
+6.
+(pdftex.def)             Requested size: 113.80971pt x 122.34183pt.
+<figures/Aswan Faculty of Engineering Logo.png, id=138, 975.645pt x 977.6525pt>
 
 File: figures/Aswan Faculty of Engineering Logo.png Graphic file (type png)
 <use figures/Aswan Faculty of Engineering Logo.png>
 Package pdftex.def Info: figures/Aswan Faculty of Engineering Logo.png  used on
- input line 6.
-(pdftex.def)             Requested size: 113.79718pt x 113.80756pt.
-<figures/Aswan University Logo.png, id=138, 419.5675pt x 599.23875pt>
-File: figures/Aswan University Logo.png Graphic file (type png)
-<use figures/Aswan University Logo.png>
-Package pdftex.def Info: figures/Aswan University Logo.png  used on input line 
-11.
-(pdftex.def)             Requested size: 100.15407pt x 122.34183pt.
+ input line 11.
+(pdftex.def)             Requested size: 100.14568pt x 113.80756pt.
 
 
 [1
@@ -1326,8 +1326,8 @@ Package pdftex.def Info: figures/Aswan University Logo.png  used on input line
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf-dist/fonts
-/enc/dvips/cm-super/cm-super-t1.enc} <./figures/Aswan Faculty of Engineering Lo
-go.png> <./figures/Aswan University Logo.png>])
+/enc/dvips/cm-super/cm-super-t1.enc} <./figures/Aswan University Logo.png> <./f
+igures/Aswan Faculty of Engineering Logo.png>])
 \openout2 = `Acknowledgment.aux'.
 
  (./Acknowledgment.tex
@@ -1446,7 +1446,7 @@ Chapter 2.
 
  (./chapters/chapter3.tex
 Chapter 3.
-
+(./chapters/chapter3-phases/phase1.tex
 
 [7
 
@@ -1463,7 +1463,7 @@ Chapter 3.
 File: figures/chapter3/new_record_form.png Graphic file (type png)
 <use figures/chapter3/new_record_form.png>
 Package pdftex.def Info: figures/chapter3/new_record_form.png  used on input li
-ne 67.
+ne 49.
 (pdftex.def)             Requested size: 204.85846pt x 443.8587pt.
 
 
@@ -1474,13 +1474,13 @@ ne 67.
 File: figures/chapter3/camera_preview.png Graphic file (type png)
 <use figures/chapter3/camera_preview.png>
 Package pdftex.def Info: figures/chapter3/camera_preview.png  used on input lin
-e 89.
+e 71.
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
 <figures/chapter3/recording_in_progress.png, id=258, 722.7pt x 1565.85pt>
 File: figures/chapter3/recording_in_progress.png Graphic file (type png)
 <use figures/chapter3/recording_in_progress.png>
 Package pdftex.def Info: figures/chapter3/recording_in_progress.png  used on in
-put line 96.
+put line 78.
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
 
 
@@ -1492,17 +1492,18 @@ ogress.png>]
 File: figures/chapter3/all_data_list.png Graphic file (type png)
 <use figures/chapter3/all_data_list.png>
 Package pdftex.def Info: figures/chapter3/all_data_list.png  used on input line
- 127.
+ 111.
 (pdftex.def)             Requested size: 184.37135pt x 385.49884pt.
 <figures/chapter3/exporting.png, id=275, 722.7pt x 1565.85pt>
 File: figures/chapter3/exporting.png Graphic file (type png)
 <use figures/chapter3/exporting.png>
-Package pdftex.def Info: figures/chapter3/exporting.png  used on input line 134
+Package pdftex.def Info: figures/chapter3/exporting.png  used on input line 118
 .
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
 
 
-[14 <./figures/chapter3/all_data_list.png> <./figures/chapter3/exporting.png>]
+[14 <./figures/chapter3/all_data_list.png> <./figures/chapter3/exporting.png>])
+(./chapters/chapter3-phases/phase2.tex
 
 [15]
 
@@ -1520,14 +1521,15 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2.
 )
 Package hyperref Info: bookmark level for unknown listing defaults to 0 on inpu
-t line 295.
+t line 116.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+) (./chapters/chapter3-phases/phase3.tex)
+(./chapters/chapter3-phases/phase4.tex
 
-
-[19])
+[19]))
 
 [20]
 
@@ -1637,10 +1639,10 @@ runsystem(rm build//main.pyg)...executed.
 
  ) 
 Here is how much of TeX's memory you used:
- 25595 strings out of 473190
- 458345 string characters out of 5722569
+ 25628 strings out of 473190
+ 459550 string characters out of 5722569
  951650 words of memory out of 5000000
- 48267 multiletter control sequences out of 15000+600000
+ 48287 multiletter control sequences out of 15000+600000
  574114 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,11n,96p,2276b,879s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1657,7 +1659,7 @@ r/share/texmf-dist/fonts/type1/public/cm-super/sfsl1200.pfb></usr/share/texmf-d
 ist/fonts/type1/public/cm-super/sfti1200.pfb></usr/share/texmf-dist/fonts/type1
 /public/cm-super/sftt1095.pfb></usr/share/texmf-dist/fonts/type1/public/cm-supe
 r/sftt1200.pfb>
-Output written on build/main.pdf (28 pages, 3049898 bytes).
+Output written on build/main.pdf (28 pages, 3050827 bytes).
 PDF statistics:
  450 PDF objects out of 1000 (max. 8388607)
  369 compressed objects within 4 object streams

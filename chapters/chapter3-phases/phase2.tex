@@ -1,0 +1,118 @@
+\section{Phase 2: Data Preprocessing and Structuring}
+\label{sec:phase2_preprocessing}
+After completing the data collection campaign at the University Hospital, we succeeded in gathering a raw corpus of patient metadata and video recordings. However, raw data collected in real-world environments is rarely ready for immediate use in deep learning models. 
+
+Before feeding the signals into our neural networks, we executed a rigorous data preprocessing and structuring pipeline. This technical pipeline involved normalizing video spatial orientations, building an automated and clean directory tree, and filtering out noisy or corrupted samples to guarantee high clinical data quality.
+
+\subsection{Video Orientation Normalization}
+During the hospital campaign, team members recorded videos using different smartphones. Due to variations in how phones were held or how their built-in camera sensors handle orientation metadata, some videos were saved in landscape mode, while others were saved in portrait mode. To make the dataset consistent, we needed to make all videos follow a unified \textbf{Portrait format}.
+
+\subsubsection{The Challenge with Standard Video Editors}
+Initially, we tried using standard commercial video software and players, such as VLC Media Player and basic graphical video editors, to rotate the incorrectly oriented videos. However, we discovered a major technical drawback: these tools re-encoded the videos in a way that altered or compressed the raw pixel values. Since our project relies on extracting micro-variations in blood volume from subtle color changes in the pixels (PPG signal), any artificial alteration or compression of pixel values would corrupt our data.
+
+\subsubsection{The Automated FFmpeg Command-Line Solution}
+To solve this issue, we turned to \textbf{FFmpeg}, a powerful, lossless command-line tool for handling multimedia files. By running FFmpeg directly through a Windows Batch (\texttt{.bat}) script, we were able to process and rotate the videos directly without changing or damaging the underlying raw pixel integrity.
+
+To automate this workflow and ensure it fits standard document margins without cutting off long parameters, we executed the multi-line structured command on the target video files as follows:
+
+\begin{verbatim}
+ffmpeg -i input.mp4 -vf "transpose=1" \
+       -c:v libx264 -crf 0 -preset veryslow \
+       -c:a copy output.mp4
+\end{verbatim}
+
+The technical parameters of this command are carefully selected as follows:
+\begin{itemize}
+    \item \texttt{-vf "transpose=1"}: This filter rotates the video exactly 90 degrees clockwise, successfully converting landscape videos into the required unified portrait format.
+    \item \texttt{-crf 0}: Setting the Constant Rate Factor (CRF) to 0 forces the encoder into a completely \textbf{lossless mode}, guaranteeing that not a single pixel value or color detail is modified during the rotation process.
+    \item \texttt{-preset veryslow}: This ensures the highest possible software compression efficiency and layout accuracy, preserving the strict frame-rate consistency necessary for time-series analysis.
+\end{itemize}
+
+\subsection{Hierarchical Dataset Re-organization}
+When files are exported directly from our mobile application, they are packed into large folders containing unorganized data sheets and video files. To make it easier for our team and future Python deep learning scripts to browse the dataset, we decided to convert the exported directory structure into a well-defined hierarchical data tree.
+
+% فتح صفحة مستقلة للهيكل الشجري للمجلدات لتنظيم طباعي ممتاز
+\newpage
+
+The custom cleaned dataset layout was successfully organized into the following structure:
+\begin{verbatim}
+cleaned_data/
+|
+|-- data.csv
+|-- patient1.mp4
+|-- patient2.mp4
+|-- patients_csvs/
+    |-- patient1.csv
+    |-- patient2.csv
+\end{verbatim}
+
+As shown above, the main directory contains the global \texttt{data.csv} file and the raw \texttt{.mp4} recordings directly, while a dedicated subfolder named \texttt{patients\_csvs/} isolated the individual telemetry files for each patient session.
+
+\subsubsection{Individual Patient CSV Schema Specification}
+For each patient session, a separate, isolated CSV file is generated and maintained within the dataset tree. This file records the primary baseline features of the patient along with placeholder columns for the signal processing arrays. Table~\ref{tab:patient_individual_csv} illustrates how the internal attributes and column headers are structured for a single patient sample.
+
+\begin{table}[H]
+\centering
+\caption{Structural Layout and Attributes of an Individual Patient CSV File}
+\label{tab:patient_individual_csv}
+\vspace{0.5em}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\textbf{name} & \textbf{age} & \textbf{gender} & \textbf{glucose\_level} & \textbf{brand} & \textbf{model} & \textbf{device} & \textbf{video\_name} & \textbf{RPPG} & \textbf{x} & \textbf{y} \\ \hline
+patient1 & 27 & Male & 87 & realme & RMX3636 & RE5C7CL1 & patient1.mp4 & & & \\ \hline
+\end{tabular}
+}
+\end{table}
+
+The columns \texttt{RPPG}, \texttt{x}, and \texttt{y} are deliberately left empty at this operational stage. These fields represent the extracted Photoplethysmography waveform arrays and mathematical coordinate tracking matrices, which will be computationally extracted, processed, and saved during the feature engineering pipeline detailed in the subsequent phases.
+
+\subsection{Quality Control and Data Filtering}
+A critical part of preparing datasets for medical or health-tech machine learning models is strict quality control. During our initial collection campaign, we successfully registered a total of \textbf{260 samples}. However, after a rigorous auditing and inspection process, the final size of our verified clean dataset was reduced to \textbf{248 samples}.
+
+This reduction of 12 samples was necessary due to two main real-world challenges:
+\begin{enumerate}
+    \item \textbf{Signal and Video Quality Degradation:} Some 20-second video recordings contained tracking anomalies. For instance, if a patient accidentally moved their finger during the recording, or if the finger pressure was unstable, the light saturation changed dramatically, resulting in a noisy, distorted PPG waveform. These bad samples were completely discarded to protect our model from learning corrupt patterns.
+    \item \textbf{Human Typographical Errors (Typos):} Gathering clinical data over long, continuous shifts at the hospital is physically demanding. Due to human fatigue after hours of testing patients, minor typographical errors occurred—such as accidentally entering a wrong digit or confusing medical values during record submission. 
+\end{enumerate}
+
+Instead of keeping flawed records or guessing the correct data, we took a strict scientific approach and completely removed any sample that had a mismatch or a typing error. By dropping these 12 problematic entries, we ensured that our remaining 248 samples are completely clean, reliable, and highly accurate, providing a solid foundation for training the deep learning networks.
+
+\subsection{Automation Python Script for Restructuring}
+To automate the file management workflow, map the exported raw documents, and structure them into the targeted system paths described, we developed and executed a custom Python utility script. This automation program reads the master configuration matrix, tracks physical asset locations, and securely shifts file placements. The full implementation code used during this phase is presented below:
+
+\begin{listing}[h!]
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, bgcolor=lightgray!10, fontsize=\small, linenos]{python}
+import csv
+import os
+import shutil
+
+# Read the CSV file
+csv_file = 'editor.csv'
+base_path = r'F:\grad project cleaned\diabetes_collector_export_2026-01-22'
+
+try:
+    with open(csv_file, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if len(row) >= 2:
+                old_name = row[0].strip()
+                new_name = row[1].strip()
+                
+                old_path = os.path.join(base_path, old_name)
+                new_path = os.path.join(base_path, new_name)
+                
+                if os.path.exists(old_path):
+                    shutil.move(old_path, new_path)
+                    print(f"Renamed: {old_name} -> {new_name}")
+                else:
+                    print(f"File not found: {old_name}")
+                    
+except FileNotFoundError:
+    print(f"CSV file '{csv_file}' not found")
+except Exception as e:
+    print(f"Error: {e}")
+\end{minted}
+\caption{Python Script for Automated Dataset Hierarchy Restructuring}
+\label{lst:restructure_script}
+\end{listing}
