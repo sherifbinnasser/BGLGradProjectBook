@@ -34,14 +34,19 @@
 \contentsline {subsection}{\numberline {3.3.3}Quality Control and Data Filtering}{19}{subsection.3.3.3}%
 \contentsline {subsection}{\numberline {3.3.4}Automation Python Script for Restructuring}{19}{subsection.3.3.4}%
 \contentsline {section}{\numberline {3.4}Phase 3: rPPG Extraction}{20}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{21}{section.3.5}%
-\contentsline {chapter}{\numberline {4}Results}{22}{chapter.4}%
-\contentsline {chapter}{\numberline {5}Conclusion}{23}{chapter.5}%
-\contentsline {chapter}{References}{24}{section*.24}%
-\contentsline {chapter}{Appendix A: }{25}{appendix*.26}%
-\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{25}{subsection.Alph0.0.1}%
-\contentsline {subsection}{\numberline {.0.2}Right}{26}{subsection.Alph0.0.2}%
-\contentsline {subsection}{\numberline {.0.3}Left}{26}{subsection.Alph0.0.3}%
-\contentsline {subsection}{\numberline {.0.4}center}{26}{subsection.Alph0.0.4}%
-\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{27}{subsection.Alph0.0.5}%
-\contentsline {subsection}{\numberline {.0.6}Alarm}{27}{subsection.Alph0.0.6}%
+\contentsline {subsection}{\numberline {3.4.1}Raw Temporal RGB Extraction}{21}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Frame Rate Normalization Strategies}{21}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{22}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{23}{subsection.3.4.4}%
+\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{24}{subsection.3.4.5}%
+\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{26}{section.3.5}%
+\contentsline {chapter}{\numberline {4}Results}{27}{chapter.4}%
+\contentsline {chapter}{\numberline {5}Conclusion}{28}{chapter.5}%
+\contentsline {chapter}{References}{29}{section*.25}%
+\contentsline {chapter}{Appendix A: }{30}{appendix*.27}%
+\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{30}{subsection.Alph0.0.1}%
+\contentsline {subsection}{\numberline {.0.2}Right}{31}{subsection.Alph0.0.2}%
+\contentsline {subsection}{\numberline {.0.3}Left}{31}{subsection.Alph0.0.3}%
+\contentsline {subsection}{\numberline {.0.4}center}{31}{subsection.Alph0.0.4}%
+\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{32}{subsection.Alph0.0.5}%
+\contentsline {subsection}{\numberline {.0.6}Alarm}{32}{subsection.Alph0.0.6}%

@@ -1,3 +1,90 @@
 \section{Phase 3: rPPG Extraction}
 \label{sec:phase3_extraction}
-\textit{This section will document the computational steps utilized to extract time-series rPPG signals from the raw pixel frames using the green color channel matrix, filling the placeholder arrays described in Table~\ref{tab:patient_individual_csv}.}
+Once the raw video database was securely organized and unified into a standard spatial layout, the core signal processing pipeline was executed. The main objective of this phase is to transform raw spatiotemporal video information into continuous, clean, one-dimensional Photoplethysmography (PPG) waveforms. 
+
+This technical phase encompasses four critical consecutive steps: raw color channel extraction, frame rate normalization analysis, digital signal filtering, and balanced dataset splitting for future machine learning modeling.
+
+\subsection{Raw Temporal RGB Extraction}
+To observe the micro-variations of blood volume pulsing through the capillary tissue, the spatial frame sequences must be reduced to temporal tracking arrays. Instead of isolating a localized geometric Region of Interest (ROI) which may risk dropping crucial cardiac properties due to minor finger movements, a full-frame averaging strategy was implemented.
+
+For each successive video frame, the spatial matrix containing thousands of pixels is compressed into a single, representative absolute mean value for the Red (R), Green (G), and Blue (B) channels. Mathematically, for a frame matrix $F$ of size $M \times N$, the average channel intensity $C_{\text{avg}}$ (where $C \in \{R, G, B\}$) is defined as:
+\begin{equation}
+C_{\text{avg}} = \frac{1}{M \times N} \sum_{i=1}^{M} \sum_{j=1}^{N} F(i, j, C)
+\end{equation}
+
+Given that each patient session consists of a strict 20-second video recorded at a standardized rate of 20 frames per second, this computational reduction yields exactly 400 continuous mathematical points per channel (20 seconds multiplied by 20 FPS equals 400 points), capturing the comprehensive raw rPPG signal.
+
+\subsection{Frame Rate Normalization Strategies}
+A primary technical challenge in multi-device data campaigns is hardware sampling variance. Within our verified corpus of 248 patient videos, a clear hardware split was present: 93 videos were captured at a sampling frequency of 30 FPS, while 155 videos were recorded at 20 FPS. This discrepancy directly alters the frequency distribution during Fourier Transform calculations and destroys model training generalization. 
+
+To establish an optimal sampling benchmark, our team rigorously tested three different standardization strategies evaluated across critical metrics: Signal-to-Noise Ratio (SNR), Heart Rate (HR), and Power Spectrum density:
+\begin{enumerate}
+    \item \textbf{Downsampling (30 FPS to 20 FPS):} Representing the 30 FPS signal onto a 20 FPS scale by decimation, effectively scaling the time-series length by a factor of two-thirds.
+    \item \textbf{Upsampling / Interpolation (20 FPS to 30 FPS):} Utilizing cubic spline interpolation algorithms to reconstruct a 20 FPS signal over a dense 30 FPS matrix by a factor of three-halves.
+    \item \textbf{Combination Tuning (20/30 FPS to 25 FPS):} Shifting both hardware categories into a central 25 FPS frequency via balanced up/down resampling filters.
+\end{enumerate}
+
+The empirical evaluation of these methods demonstrated that the physical variations across all three temporal options were virtually negligible. Because the difference between the native recording speeds is only 10 FPS, the core physiological parameters—such as the calculated Heart Rate (HR)—remained perfectly invariant with a delta of zero. Consequently, \textbf{20 FPS was officially selected as our absolute dataset standard}. This downsampling approach preserves the original, un-interpolated biological data points while completely avoiding artificial data artifacts caused by upsampling interpolation.
+
+\subsection{Digital Signal Detrending, Normalization, and Filtering}
+Capillary blood signals extracted from mobile hardware are inherently buried under intensive high-frequency noise, respiratory baseline drifts, and high-amplitude somatic motion artifacts. To isolate the pure cardiac pulse waveform, a robust signal conditioning architecture was developed using \texttt{SciPy} mathematical engines. The sequential signal processing steps applied to each raw channel are as follows:
+
+\begin{itemize}
+    \item \textbf{Linear Detrending:} Removing slow, non-physiological baseline wanders caused by gradual thermal changes or minor patient pressure variations using linear least-squares adjustments.
+    \item \textbf{Z-Score Normalization:} Standardizing the signal amplitude to zero mean and unit variance, eliminating scale discrepancies between different smartphone camera sensors. The normalized signal $x_{\text{norm}}$ is computed via:
+    \begin{equation}
+    x_{\text{norm}} = \frac{x - \mu}{\sigma}
+    \end{equation}
+    where $\mu$ is the signal mean and $\sigma$ represents the standard deviation.
+    \item \textbf{Butterworth Bandpass Filtering:} Passing the standardized signal through a 4th-order digital Butterworth bandpass filter (0.5 Hz to 8.0 Hz) to eliminate non-cardiac noise frequencies.
+\end{itemize}
+
+\subsection{Stratified Dataset Splitting}
+To prepare our processed arrays for machine learning and deep learning regression modeling, a highly controlled data splitting strategy was mandatory. Splitting medical datasets randomly often introduces catastrophic class imbalances, where certain critical blood glucose ranges might be completely missing from the training or testing subsets.
+
+To prevent this bias, our verified collection of 248 patient records was explicitly stratified into 5 distinct clinical categories based on the ground-truth Accu-Chek measurements. The breakdown of our data distribution across these glycemic tiers is detailed in Table~\ref{tab:glucose_distribution}.
+
+\begin{table}[H]
+\centering
+\caption{Distribution of Patient Records Across Glycemic Tiers}
+\label{tab:glucose_distribution}
+\vspace{0.5em}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Glucose Level Category} & \textbf{Glycemic Range (mg/dL)} & \textbf{Number of Samples} \\ \hline
+Tier 1: Normal / Low & Less than 120 & 87 \\ \hline
+Tier 2: Pre-diabetic & Between 120 and 200 & 101 \\ \hline
+Tier 3: Diabetic Hyper & Between 200 and 300 & 34 \\ \hline
+Tier 4: Critical Hyper & Between 300 and 400 & 15 \\ \hline
+Tier 5: Extreme Emergency & Greater than 400 & 11 \\ \hline
+\textbf{Total Corpus} & \textbf{-} & \textbf{248 Samples} \\ \hline
+\end{tabular}
+\end{table}
+
+A strict Stratified Partitioning Rule of 70\% Training, 15\% Validation, and 15\% Testing was applied uniformly across each of the 5 individual categories. By extracting these identical proportions from each specific tier, we guaranteed that the final structured folders maintain an exact, mirrored representation of the overall dataset distribution. The final operational division yielded 170 samples for the Train subset, 38 samples for the Validation subset, and 40 samples for the Unseen Testing subset, creating an optimal, un-biased foundation for model evaluation.
+
+\subsection{Signal Extraction and Processing Implementation}
+To enforce reproducibility and automate this massive signal extraction matrix, a custom Python utility was written using OpenCV (\texttt{cv2}) and SciPy Signal libraries. The production script automatically ingests the normalized videos, performs spatial frame reduction, normalizes sampling rates, executes the 4th-order Butterworth bandpass filter, and exports structural sequential database tables. 
+
+The complete processing script implemented during this stage is locked in its precise structural position and documented in Listing~\ref{lst:signal_processing_script}, allowing the code text to split and flow naturally across sequential page boundaries without shifting past Phase 4:
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{Comprehensive Python Engine for Full-Frame rPPG Extraction and Signal Conditioning}
+        \label{lst:signal_processing_script}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+
+\inputminted[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{python}{codes/process_signals.py}
+\vspace{1.5em}
