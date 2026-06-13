@@ -88,3 +88,59 @@ The complete processing script implemented during this stage is locked in its pr
     breaklines
 ]{python}{codes/process_signals.py}
 \vspace{1.5em}
+
+\subsection{Experimental Results and Visualization}
+To evaluate the absolute output quality of the conditioning stage, the post-filtered signals were parsed and visualized over a continuous time axis using a tailored programmatic plotting pipeline. 
+
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{Python Script for Clean rPPG Waveform Visualization and Analysis}
+        \label{lst:plot_script}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read CSV for patient sample
+file_path = "filtering/20/patient1.csv"
+df = pd.read_csv(file_path)
+
+# Extract Green-channel PPG data points
+ppg_signal = df['G_value'].values
+
+# Establish Time axis based on standard 20 FPS
+fs = 20  
+time = [i/fs for i in range(len(ppg_signal))]
+
+# Construct the physiological wave plot
+plt.figure(figsize=(12,5))
+plt.plot(time, ppg_signal, color='#1f77b4', linewidth=1.5)
+plt.xlabel("Time (seconds)")
+plt.ylabel("Amplitude")
+plt.title("PPG Signal (Green Method)")
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
+\end{minted}
+\vspace{1.5em}
+
+The execution of this visualization structure on the processed record of Patient 1 provides critical confirmation of data integrity. As visualized in Figure~\ref{fig:ppg_signal_output}, the extracted waveform successfully displays consistent, sharp systolic peaks and diastolic troughs, validating that the underlying biological micro-blushing tracking remains thoroughly intact and clean of arbitrary motion clutter.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/chapter3/ppg_signal_output.png}
+    \caption{Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}
+    \label{fig:ppg_signal_output}
+\end{figure}
