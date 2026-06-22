@@ -1,0 +1,48 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{tensorflow}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{tf}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{tensorflow.keras.layers}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{Input}\PYG{p}{,} \PYG{n}{Conv1D}\PYG{p}{,} \PYG{n}{BatchNormalization}\PYG{p}{,} \PYG{n}{ReLU}\PYG{p}{,} \PYG{n}{Add}\PYG{p}{,} \PYG{n}{GlobalAveragePooling1D}\PYG{p}{,} \PYG{n}{Dense}\PYG{p}{,} \PYG{n}{Dropout}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{tensorflow.keras.models}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{Model}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{residual\PYGZus{}block}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{filters}\PYG{p}{,} \PYG{n}{kernel\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{):}
+    \PYG{n}{shortcut} \PYG{o}{=} \PYG{n}{x}
+    \PYG{c+c1}{\PYGZsh{} First Conv Sub\PYGZhy{}layer}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{Conv1D}\PYG{p}{(}\PYG{n}{filters}\PYG{p}{,} \PYG{n}{kernel\PYGZus{}size}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}same\PYGZsq{}}\PYG{p}{)(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{BatchNormalization}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{ReLU}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Second Conv Sub\PYGZhy{}layer}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{Conv1D}\PYG{p}{(}\PYG{n}{filters}\PYG{p}{,} \PYG{n}{kernel\PYGZus{}size}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}same\PYGZsq{}}\PYG{p}{)(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{BatchNormalization}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Element\PYGZhy{}wise Addition (Skip Connection)}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{Add}\PYG{p}{()([}\PYG{n}{x}\PYG{p}{,} \PYG{n}{shortcut}\PYG{p}{])}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{ReLU}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{x}
+
+\PYG{c+c1}{\PYGZsh{} Input Layer Configuration (3\PYGZhy{}second window)}
+\PYG{n}{inp} \PYG{o}{=} \PYG{n}{Input}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{60}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} Initial Feature Extraction Block}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{Conv1D}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{7}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}same\PYGZsq{}}\PYG{p}{)(}\PYG{n}{inp}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{BatchNormalization}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{ReLU}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 64\PYGZhy{}Filter Residual Blocks Stack}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{residual\PYGZus{}block}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{l+m+mi}{64}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{residual\PYGZus{}block}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{l+m+mi}{64}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Feature Map Expansion Layer}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{Conv1D}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}same\PYGZsq{}}\PYG{p}{)(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{BatchNormalization}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{ReLU}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 128\PYGZhy{}Filter Residual Blocks Stack}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{residual\PYGZus{}block}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{l+m+mi}{128}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{residual\PYGZus{}block}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{l+m+mi}{128}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Spatial Dimensionality Reduction \PYGZam{} Fully Connected Head}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{GlobalAveragePooling1D}\PYG{p}{()(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{Dense}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{n}{activation}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}relu\PYGZsq{}}\PYG{p}{)(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{Dropout}\PYG{p}{(}\PYG{l+m+mf}{0.3}\PYG{p}{)(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{out} \PYG{o}{=} \PYG{n}{Dense}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)(}\PYG{n}{x}\PYG{p}{)} \PYG{c+c1}{\PYGZsh{} Continuous Glucose Level Output}
+
+\PYG{n}{model} \PYG{o}{=} \PYG{n}{Model}\PYG{p}{(}\PYG{n}{inp}\PYG{p}{,} \PYG{n}{out}\PYG{p}{)}
+\end{Verbatim}

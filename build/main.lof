@@ -8,5 +8,7 @@
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}}{24}{figure.caption.24}%
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}}{26}{figure.caption.25}%
 \contentsline {figure}{\numberline {3.6}{\ignorespaces Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}}{31}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces 2D Vector Diagram of the Developed Deep 1D-ResNet Layer Stack including sliding window input and functional residual blocks.}}{33}{figure.caption.28}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}}{38}{figure.caption.29}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }

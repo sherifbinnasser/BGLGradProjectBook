@@ -41,13 +41,17 @@
 \contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{27}{subsection.3.4.5}%
 \contentsline {subsection}{\numberline {3.4.6}Experimental Results and Visualization}{30}{subsection.3.4.6}%
 \contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{31}{section.3.5}%
-\contentsline {chapter}{\numberline {4}Results}{32}{chapter.4}%
-\contentsline {chapter}{\numberline {5}Conclusion}{33}{chapter.5}%
-\contentsline {chapter}{References}{34}{section*.28}%
-\contentsline {chapter}{Appendix A: }{35}{appendix*.30}%
-\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{35}{subsection.Alph0.0.1}%
-\contentsline {subsection}{\numberline {.0.2}Right}{36}{subsection.Alph0.0.2}%
-\contentsline {subsection}{\numberline {.0.3}Left}{36}{subsection.Alph0.0.3}%
-\contentsline {subsection}{\numberline {.0.4}center}{36}{subsection.Alph0.0.4}%
-\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{37}{subsection.Alph0.0.5}%
-\contentsline {subsection}{\numberline {.0.6}Alarm}{37}{subsection.Alph0.0.6}%
+\contentsline {subsection}{\numberline {3.5.1}Temporal Sliding Window and Data Preparation}{32}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}The 1D-ResNet Architecture Core}{32}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Robust Time-Series Data Augmentation Pipeline}{35}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.5.4}Cross-Domain Transfer Learning Optimization}{36}{subsection.3.5.4}%
+\contentsline {chapter}{\numberline {4}Results}{39}{chapter.4}%
+\contentsline {chapter}{\numberline {5}Conclusion}{40}{chapter.5}%
+\contentsline {chapter}{References}{41}{section*.30}%
+\contentsline {chapter}{Appendix A: }{42}{appendix*.32}%
+\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{42}{subsection.Alph0.0.1}%
+\contentsline {subsection}{\numberline {.0.2}Right}{43}{subsection.Alph0.0.2}%
+\contentsline {subsection}{\numberline {.0.3}Left}{43}{subsection.Alph0.0.3}%
+\contentsline {subsection}{\numberline {.0.4}center}{43}{subsection.Alph0.0.4}%
+\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{44}{subsection.Alph0.0.5}%
+\contentsline {subsection}{\numberline {.0.6}Alarm}{44}{subsection.Alph0.0.6}%

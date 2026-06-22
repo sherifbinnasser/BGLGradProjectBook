@@ -1,4 +1,182 @@
-
 \section{Phase 4: AI Modeling}
 \label{sec:phase4_modeling}
-\textit{This section will detail the neural network architectures, hyperparameter tuning, and regression metrics applied to map the processed signals into clinical glucose values.}
+Following the successful extraction and conditioning of the raw continuous rPPG waveforms, the project transitioned into the core computational stage: Artificial Intelligence modeling for non-invasive glucose estimation. Due to the complex, non-linear relationship between peripheral blood volume pulses and blood glucose concentrations, traditional feature-engineering regressions are insufficient.
+
+To capture the subtle temporal micro-features embedded within the dynamic waveforms, our team developed a deep learning framework based on a one-dimensional Residual Network (1D-ResNet). This phase outlines the structural progression of our optimization pipeline, expanding across three core paradigms: baseline network implementation, dynamic time-series data augmentation, and cross-domain Transfer Learning.
+
+\subsection{Temporal Sliding Window and Data Preparation}
+A key pre-processing strategy required for training deep 1D Convolutional networks on physiological signals is the standardization of input shapes. Rather than processing the entire 20-second rPPG array as a single monolithic input, a fixed \textbf{Sliding Window Technique} was deployed.
+
+For each patient signal containing 400 normalized temporal data points, a moving window of size $W = 60$ time-steps (equivalent to exactly 3 seconds of real-time cardiac tracking at 20 FPS) sweeps sequentially across the array. The window steps forward by an increment of 1 point, extracting continuous overlapping frames via:
+\begin{equation}
+X_{\text{window}}^{(i)} = [x_i, x_{i+1}, \dots, x_{i+W-1}]
+\end{equation}
+where each windowed segment is mapped to the continuous ground-truth clinical Accu-Chek measurement $y$ of that specific patient. This temporal slicing effectively boosts the network's local feature visibility and exponentially increases the operational sample size fed into the layers. Following data shaping, a strict deterministic 70\% Training, 15\% Validation, and 15\% Testing partition rule was maintained.
+
+\subsection{The 1D-ResNet Architecture Core}
+The foundational architecture developed for this regression framework is a customized Deep 1D Residual Network (1D-ResNet). Deep networks traditionally suffer from the vanishing gradient problem during backpropagation. To bypass this, the architecture implements \textbf{Skip Connections (Residual Shortcuts)} that add the original input directly to the processed output of the convolutional blocks, preserving the gradients across deep layers.
+
+The visual abstraction of the developed network topology and its computational mapping block sequence is illustrated in Figure~\ref{fig:resnet_core_architecture}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/chapter3/ResNet.png}
+    \captionsetup{font=small, labelfont=bf}
+    \caption{2D Vector Diagram of the Developed Deep 1D-ResNet Layer Stack including sliding window input and functional residual blocks.}
+    \label{fig:resnet_core_architecture}
+\end{figure}
+
+The structural composition and execution logic of the foundational operational layers are locked and detailed in Listing~\ref{lst:resnet_architecture_code}, illustrating the network setup without redundant syntax:
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{Structural Core Layout for the 1D Deep Residual Network Architecture}
+        \label{lst:resnet_architecture_code}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{python}
+import tensorflow as tf
+from tensorflow.keras.layers import Input, Conv1D, BatchNormalization, ReLU, Add, GlobalAveragePooling1D, Dense, Dropout
+from tensorflow.keras.models import Model
+
+def residual_block(x, filters, kernel_size=3):
+    shortcut = x
+    # First Conv Sub-layer
+    x = Conv1D(filters, kernel_size, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+    # Second Conv Sub-layer
+    x = Conv1D(filters, kernel_size, padding='same')(x)
+    x = BatchNormalization()(x)
+    # Element-wise Addition (Skip Connection)
+    x = Add()([x, shortcut])
+    x = ReLU()(x)
+    return x
+
+# Input Layer Configuration (3-second window)
+inp = Input(shape=(60, 1))
+
+# Initial Feature Extraction Block
+x = Conv1D(64, 7, padding='same')(inp)
+x = BatchNormalization()(x)
+x = ReLU()(x)
+
+# 64-Filter Residual Blocks Stack
+x = residual_block(x, 64)
+x = residual_block(x, 64)
+
+# Feature Map Expansion Layer
+x = Conv1D(128, 3, padding='same')(x)
+x = BatchNormalization()(x)
+x = ReLU()(x)
+
+# 128-Filter Residual Blocks Stack
+x = residual_block(x, 128)
+x = residual_block(x, 128)
+
+# Spatial Dimensionality Reduction & Fully Connected Head
+x = GlobalAveragePooling1D()(x)
+x = Dense(64, activation='relu')(x)
+x = Dropout(0.3)(x)
+out = Dense(1)(x) # Continuous Glucose Level Output
+
+model = Model(inp, out)
+\end{minted}
+\vspace{1.5em}
+
+\subsection{Robust Time-Series Data Augmentation Pipeline}
+To strengthen the structural generalization of our 1D-ResNet and mitigate over-fitting caused by limited sample profiles, a robust mathematical \textbf{Data Augmentation Pipeline} was integrated during the data preparation loop. For every original 60-point sliding window extracted, three independent synthetic transformations are applied sequentially:
+
+\begin{enumerate}
+    \item \textbf{Additive Gaussian Noise:} Introducing microscopic noise arrays sampled from a standard normal distribution $\mathcal{N}(0, \sigma^2)$ where $\sigma = 0.01$. This forces the network to ignore minor high-frequency hardware channel static.
+    \item \textbf{Random Linear Scaling:} Multiplying the signal window by a random scaling coefficient $\alpha \sim \mathcal{U}(0.9, 1.1)$, simulating natural amplitude variances caused by changing skin thickness or sensor placement pressure.
+    \item \textbf{Temporal Time-Shifting:} Applying a cyclical shift along the time-axis by a factor of $k \in [-5, 5]$ steps via array rolling. This breaks localized position dependencies, teaching the network to recognize the blood pulse peak morphologically regardless of its exact alignment inside the window.
+\end{enumerate}
+
+By injecting these three transformations alongside the original data arrays, the available structural dataset size was expanded by a factor of four ($4\times$), providing a highly resilient dataset foundation for stable weight convergence.
+
+\subsection{Cross-Domain Transfer Learning Optimization}
+The final advancement introduced in our AI modeling phase is a specialized \textbf{Cross-Domain Transfer Learning Strategy}. Blood glucose fluctuations influence cardiovascular properties similarly to blood pressure variations; both metrics are deeply interconnected within the peripheral micro-vascular system through changes in arterial stiffness and blood volume pulse morphology.
+
+To capitalize on this biological overlap, a separate, auxiliary model was developed using the PyTorch framework to predict Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP) from raw synchronized rPPG windows. This source-domain architecture, structured as a Deep 1D Sequential Convolutional Neural Network (1D-CNN), systematically extracts deep physiological representations across a multi-scale receptive field ($11 \to 9 \to 7$ kernel sizes) backed by Batch Normalization layers to ensure stable latent feature distribution.
+
+The complete architectural details of this auxiliary regression backbone are detailed in Listing~\ref{lst:pytorch_bp_backbone}, representing the exact source model implemented to learn the foundational cardiovascular parameters:
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{PyTorch Structural Implementation of the Auxiliary Blood Pressure Source Model}
+        \label{lst:pytorch_bp_backbone}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{python}
+import torch
+import torch.nn as nn
+
+class CNN_BP(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Feature Extraction Backbone (Learns Arterial Elasticity Dynamics)
+        self.net = nn.Sequential(
+            nn.Conv1d(1, 32, kernel_size=11, padding=5),
+            nn.ReLU(),
+            nn.BatchNorm1d(32),
+
+            nn.Conv1d(32, 64, kernel_size=9, padding=4),
+            nn.ReLU(),
+            nn.BatchNorm1d(64),
+
+            nn.Conv1d(64, 128, kernel_size=7, padding=3),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+
+            nn.AdaptiveAvgPool1d(1)
+        )
+        # Original Dual-Output Regression Head for SBP and DBP
+        self.fc = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 2)
+        )
+
+    def forward(self, x):
+        x = self.net(x)
+        x = x.squeeze(-1)
+        return self.fc(x)
+\end{minted}
+\vspace{1.5em}
+
+Under this Transfer Learning setup, the feature-extraction spatial layers from the pre-trained \texttt{CNN\_BP} model (representing the trained 128-dimensional latent vector) were frozen to lock in the cross-domain physiological signatures. The original dual-output fully-connected regression head ($2$ outputs: SBP/DBP) was completely stripped away. This frozen temporal backbone was then adapted to our primary target domain by attaching a customized continuous blood glucose estimation layer stack implemented via TensorFlow/Keras ($64 \to \text{Dropout} \to \text{Dense}(1)$). 
+
+This hybrid architecture was subsequently fine-tuned using a highly conservative learning rate ($\eta = 10^{-4}$) on our stratified fingertip rPPG dataset. This methodology successfully guides the target network to utilize its prior understanding of pulse wave morphology, eliminating training convergence barriers and optimizing non-invasive glucose prediction metrics despite constrained domain sample counts. The target adaptation setup is graphically mapped in Figure~\ref{fig:transfer_learning_paradigm}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/chapter3/TransferLearning.png}
+    \captionsetup{font=small, labelfont=bf}
+    \caption{Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}
+    \label{fig:transfer_learning_paradigm}
+\end{figure}
