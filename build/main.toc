@@ -46,12 +46,20 @@
 \contentsline {subsection}{\numberline {3.5.3}Robust Time-Series Data Augmentation Pipeline}{35}{subsection.3.5.3}%
 \contentsline {subsection}{\numberline {3.5.4}Cross-Domain Transfer Learning Optimization}{36}{subsection.3.5.4}%
 \contentsline {chapter}{\numberline {4}Results}{39}{chapter.4}%
-\contentsline {chapter}{\numberline {5}Conclusion}{40}{chapter.5}%
-\contentsline {chapter}{References}{41}{section*.30}%
-\contentsline {chapter}{Appendix A: }{42}{appendix*.32}%
-\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{42}{subsection.Alph0.0.1}%
-\contentsline {subsection}{\numberline {.0.2}Right}{43}{subsection.Alph0.0.2}%
-\contentsline {subsection}{\numberline {.0.3}Left}{43}{subsection.Alph0.0.3}%
-\contentsline {subsection}{\numberline {.0.4}center}{43}{subsection.Alph0.0.4}%
-\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{44}{subsection.Alph0.0.5}%
-\contentsline {subsection}{\numberline {.0.6}Alarm}{44}{subsection.Alph0.0.6}%
+\contentsline {section}{\numberline {4.1}Evaluation Metrics}{39}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Mean Absolute Error (MAE)}{39}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Mean Squared Error (MSE)}{40}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Root Mean Squared Error (RMSE)}{40}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Max Absolute Error}{40}{subsection.4.1.4}%
+\contentsline {subsection}{\numberline {4.1.5}Coefficient of Determination ($R^2$ Score)}{40}{subsection.4.1.5}%
+\contentsline {section}{\numberline {4.2}Computational Complexity}{41}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Experimental Results}{42}{section.4.3}%
+\contentsline {chapter}{\numberline {5}Conclusion}{43}{chapter.5}%
+\contentsline {chapter}{References}{44}{section*.30}%
+\contentsline {chapter}{Appendix A: }{45}{appendix*.32}%
+\contentsline {subsection}{\numberline {.0.1}Forward \& Stop}{45}{subsection.Alph0.0.1}%
+\contentsline {subsection}{\numberline {.0.2}Right}{46}{subsection.Alph0.0.2}%
+\contentsline {subsection}{\numberline {.0.3}Left}{46}{subsection.Alph0.0.3}%
+\contentsline {subsection}{\numberline {.0.4}center}{46}{subsection.Alph0.0.4}%
+\contentsline {subsection}{\numberline {.0.5}Toggle System (ON / OFF)}{47}{subsection.Alph0.0.5}%
+\contentsline {subsection}{\numberline {.0.6}Alarm}{47}{subsection.Alph0.0.6}%

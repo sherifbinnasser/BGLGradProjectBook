@@ -1,4 +1,57 @@
-\clearpage
-
 \chapter{Results}
 \label{ch:results}
+
+This chapter presents the empirical findings and quantitative evaluation of the developed non-invasive blood glucose estimation framework. To provide a rigorous validation, the performance of our customized 1D-ResNet architecture and the transfer learning paradigm is analyzed across two distinct computational dimensions: predictive accuracy and structural complexity. 
+
+Before presenting the comparative benchmark data, this section establishes the mathematical and conceptual definition of the evaluation metrics utilized to gauge the models' performance.
+
+\section{Evaluation Metrics}
+To evaluate the clinical and statistical reliability of the continuous glucose regression models, three standard statistical error metrics alongside the coefficient of determination are implemented. Let $y_i$ denote the actual reference blood glucose value measured via the Accu-Chek glucometer, $\hat{y}_i$ represent the corresponding value predicted by the AI model, and $\bar{y}$ be the mean of the actual ground-truth values across a dataset of $N$ temporal windows.
+
+\subsection{Mean Absolute Error (MAE)}
+The Mean Absolute Error computes the average magnitude of the absolute residuals between the predicted values and actual observations. It provides a linear score where all individual differences are weighted equally, serving as an intuitive indicator of baseline predictive accuracy:
+\begin{equation}
+\text{MAE} = \frac{1}{N} \sum_{i=1}^{N} |y_i - \hat{y}_i|
+\end{equation}
+
+\subsection{Mean Squared Error (MSE)}
+The Mean Squared Error measures the average of the squares of the errors. By squaring the residuals, this metric heavily penalizes larger errors and outliers, making it an essential cost function indicator during network backpropagation:
+\begin{equation}
+\text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
+\end{equation}
+
+\subsection{Root Mean Squared Error (RMSE)}
+The Root Mean Squared Error is the square root of the MSE, which realigns the error penalization metric back into the original unit of measurement ($\text{mg/dL}$ for blood glucose). It indicates how closely the model's predictions conform to the ground-truth regression line:
+\begin{equation}
+\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2}
+\end{equation}
+
+\subsection{Max Absolute Error}
+While MAE captures the average error profile, the Max Absolute Error isolates the worst-case scenario within the entire evaluation partition. It is defined as the maximum single absolute deviation recorded:
+\begin{equation}
+\text{Max Error} = \max(|y_1 - \hat{y}_1|, |y_2 - \hat{y}_2|, \dots, |y_N - \hat{y}_N|)
+\end{equation}
+In biomedical engineering, minimizing the Max Error is critical to ensure that no individual patient receives an extreme miscalculated prediction that could lead to clinical danger.
+
+\subsection{Coefficient of Determination (\texorpdfstring{$R^2$}{R2} Score)}
+The $R^2$ score represents the proportion of variance in the dependent variable (glucose level) that is predictable from the independent input signals (rPPG waveforms). It scales from $-\infty$ to $1$, where a value of $1.0$ indicates perfect correlation:
+\begin{equation}
+R^2 = 1 - \frac{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
+\end{equation}
+
+---
+
+\section{Computational Complexity}
+Deploying deep learning algorithms for continuous tracking on wearable systems requires a careful balance between biological accuracy and hardware resource bounds. Thus, the models are benchmarked using three hardware-agnostic computational metrics:
+
+\begin{enumerate}
+    \item \textbf{Model Depth (\# of Layers):} Total sequential stack depth of parameterized layers, signifying the structural capacity of the network to form hierarchical abstract representations.
+    \item \textbf{Trainable Parameters (\# of Params):} The aggregate sum of weights and biases inside the network. This directly influences the final storage allocation weight size (\texttt{.pt} or \texttt{.h5} file size on storage disk).
+    \item \textbf{Floating Point Operations (FLOPs):} The theoretical metric quantifying the total number of manual mathematical operations (multiplications and additions) required during a single forward-pass execution on a 60-point sliding window. High FLOP values imply increased runtime latency and elevated battery consumption on microprocessor nodes.
+\end{enumerate}
+
+---
+
+\newpage
+\section{Experimental Results}
+% TODO: سنضع الجداول هنا فور وصول الأرقام من زملائك
