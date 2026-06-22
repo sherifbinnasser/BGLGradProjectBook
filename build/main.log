@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/VoidLinux) (preloaded format=pdflatex 2026.6.12)  22 JUN 2026 16:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/VoidLinux) (preloaded format=pdflatex 2026.6.12)  22 JUN 2026 18:19
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1200,7 +1200,8 @@ File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 (build/main.aux (build/TitlePage.aux) (build/Acknowledgment.aux)
 (build/Abstract.aux) (build/chapters/chapter1.aux) (build/chapters/chapter2.aux
 ) (build/chapters/chapter3.aux) (build/chapters/chapter4.aux)
-(build/chapters/chapter5.aux) (build/Appendices.aux))
+(build/chapters/chapter5.aux) (build/chapters/chapter6.aux)
+(build/Appendices.aux))
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
@@ -1224,18 +1225,18 @@ LaTeX Font Info:    ... okay on input line 17.
 LaTeX Font Info:    Checking defaults for LGR/cmr/m/n on input line 17.
 LaTeX Font Info:    Trying to load font information for LGR+cmr on input line 1
 7.
-
-(/usr/share/texmf-dist/tex/latex/cbfonts-fd/lgrcmr.fd
+ (/usr/share/texmf-dist/tex/latex/cbfonts-fd/lgrcmr.fd
 File: lgrcmr.fd 2017/07/29 v1.2 Greek European Computer Regular
 )
 LaTeX Font Info:    ... okay on input line 17.
 Package hyperref Info: Link coloring ON on input line 17.
- (build/main.out)
-(build/main.out)
+
+(build/main.out) (build/main.out)
 \@outlinefile=\write8
 \openout8 = `main.out'.
 
- (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+
+(/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count393
 \scratchdimen=\dimen267
@@ -1305,13 +1306,13 @@ Package caption Info: End \AtBeginDocument code.
 \openout2 = `TitlePage.aux'.
 
 (./TitlePage.tex
-<figures/Aswan University Logo.png, id=209, 419.5675pt x 599.23875pt>
+<figures/Aswan University Logo.png, id=237, 419.5675pt x 599.23875pt>
 File: figures/Aswan University Logo.png Graphic file (type png)
 <use figures/Aswan University Logo.png>
 Package pdftex.def Info: figures/Aswan University Logo.png  used on input line 
 6.
 (pdftex.def)             Requested size: 113.80971pt x 122.34183pt.
-<figures/Aswan Faculty of Engineering Logo.png, id=211, 975.645pt x 977.6525pt>
+<figures/Aswan Faculty of Engineering Logo.png, id=239, 975.645pt x 977.6525pt>
 
 File: figures/Aswan Faculty of Engineering Logo.png Graphic file (type png)
 <use figures/Aswan Faculty of Engineering Logo.png>
@@ -1412,32 +1413,54 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--16
 
 ]
 
-[4])
+[4]
+
+[5])
 \tf@toc=\write10
 \openout10 = `main.toc'.
 
 
 
-[5]
+[6]
 \openout2 = `chapters/chapter1.aux'.
 
  (./chapters/chapter1.tex
 Chapter 1.
-)
+<figures/chapter1/blood_test.jpeg, id=370, 215.8464pt x 289.08pt>
+File: figures/chapter1/blood_test.jpeg Graphic file (type jpg)
+<use figures/chapter1/blood_test.jpeg>
+Package pdftex.def Info: figures/chapter1/blood_test.jpeg  used on input line 1
+1.
+(pdftex.def)             Requested size: 204.85846pt x 274.36418pt.
 
-[6
 
+[7
 
 
 
 ]
+<figures/chapter1/Smartwatch_PPG_sensor.jpeg, id=379, 1027.84pt x 1027.84pt>
+File: figures/chapter1/Smartwatch_PPG_sensor.jpeg Graphic file (type jpg)
+<use figures/chapter1/Smartwatch_PPG_sensor.jpeg>
+Package pdftex.def Info: figures/chapter1/Smartwatch_PPG_sensor.jpeg  used on i
+nput line 23.
+(pdftex.def)             Requested size: 295.90588pt x 295.90163pt.
+
+
+[8 <./figures/chapter1/blood_test.jpeg>]
+
+[9 <./figures/chapter1/Smartwatch_PPG_sensor.jpeg>]
+
+[10{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}])
+
+[11]
 \openout2 = `chapters/chapter2.aux'.
 
  (./chapters/chapter2.tex
 Chapter 2.
 )
 
-[7
+[12
 
 
 
@@ -1448,20 +1471,20 @@ Chapter 2.
 
  (./chapters/chapter3.tex
 Chapter 3.
-(./chapters/chapter3-phases/phase1.tex
-
-[8
 
 
+[13
 
 
 
-]
 
-[9{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
 
-[10]
-<figures/chapter3/new_record_form.png, id=356, 722.7pt x 1565.85pt>
+] (./chapters/chapter3-phases/phase1.tex
+
+[14]
+
+[15]
+<figures/chapter3/new_record_form.png, id=426, 722.7pt x 1565.85pt>
 File: figures/chapter3/new_record_form.png Graphic file (type png)
 <use figures/chapter3/new_record_form.png>
 Package pdftex.def Info: figures/chapter3/new_record_form.png  used on input li
@@ -1469,16 +1492,16 @@ ne 49.
 (pdftex.def)             Requested size: 204.85846pt x 443.8587pt.
 
 
-[11]
+[16]
 
-[12 <./figures/chapter3/new_record_form.png>]
-<figures/chapter3/camera_preview.png, id=370, 722.7pt x 1565.85pt>
+[17 <./figures/chapter3/new_record_form.png>]
+<figures/chapter3/camera_preview.png, id=440, 722.7pt x 1565.85pt>
 File: figures/chapter3/camera_preview.png Graphic file (type png)
 <use figures/chapter3/camera_preview.png>
 Package pdftex.def Info: figures/chapter3/camera_preview.png  used on input lin
 e 71.
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
-<figures/chapter3/recording_in_progress.png, id=371, 722.7pt x 1565.85pt>
+<figures/chapter3/recording_in_progress.png, id=441, 722.7pt x 1565.85pt>
 File: figures/chapter3/recording_in_progress.png Graphic file (type png)
 <use figures/chapter3/recording_in_progress.png>
 Package pdftex.def Info: figures/chapter3/recording_in_progress.png  used on in
@@ -1486,17 +1509,17 @@ put line 78.
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
 
 
-[13]
+[18]
 
-[14 <./figures/chapter3/camera_preview.png> <./figures/chapter3/recording_in_pr
+[19 <./figures/chapter3/camera_preview.png> <./figures/chapter3/recording_in_pr
 ogress.png>]
-<figures/chapter3/all_data_list.png, id=386, 706.64pt x 1477.52pt>
+<figures/chapter3/all_data_list.png, id=457, 706.64pt x 1477.52pt>
 File: figures/chapter3/all_data_list.png Graphic file (type png)
 <use figures/chapter3/all_data_list.png>
 Package pdftex.def Info: figures/chapter3/all_data_list.png  used on input line
  111.
 (pdftex.def)             Requested size: 184.37135pt x 385.49884pt.
-<figures/chapter3/exporting.png, id=387, 722.7pt x 1565.85pt>
+<figures/chapter3/exporting.png, id=458, 722.7pt x 1565.85pt>
 File: figures/chapter3/exporting.png Graphic file (type png)
 <use figures/chapter3/exporting.png>
 Package pdftex.def Info: figures/chapter3/exporting.png  used on input line 118
@@ -1504,16 +1527,16 @@ Package pdftex.def Info: figures/chapter3/exporting.png  used on input line 118
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
 
 
-[15 <./figures/chapter3/all_data_list.png> <./figures/chapter3/exporting.png>])
+[20 <./figures/chapter3/all_data_list.png> <./figures/chapter3/exporting.png>])
 (./chapters/chapter3-phases/phase2.tex
 
-[16]
+[21]
 
-[17]
+[22]
 
-[18]
+[23]
 
-[19]
+[24]
 \openout3 = `main.pyg'.
 
  (./build/_minted-main/default.pygstyle)
@@ -1530,48 +1553,48 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 ) (./chapters/chapter3-phases/phase3.tex
 
-[20]
+[25]
 
-[21]
+[26]
 
-[22]
-<figures/chapter3/20-rgb.png, id=446, 867.24pt x 433.62pt>
+[27]
+<figures/chapter3/20-rgb.png, id=518, 867.24pt x 433.62pt>
 File: figures/chapter3/20-rgb.png Graphic file (type png)
 <use figures/chapter3/20-rgb.png>
 Package pdftex.def Info: figures/chapter3/20-rgb.png  used on input line 35.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/25-rgb.png, id=447, 867.24pt x 433.62pt>
+<figures/chapter3/25-rgb.png, id=519, 867.24pt x 433.62pt>
 File: figures/chapter3/25-rgb.png Graphic file (type png)
 <use figures/chapter3/25-rgb.png>
 Package pdftex.def Info: figures/chapter3/25-rgb.png  used on input line 42.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/30-rgb.png, id=448, 867.24pt x 433.62pt>
+<figures/chapter3/30-rgb.png, id=520, 867.24pt x 433.62pt>
 File: figures/chapter3/30-rgb.png Graphic file (type png)
 <use figures/chapter3/30-rgb.png>
 Package pdftex.def Info: figures/chapter3/30-rgb.png  used on input line 49.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
 
 
-[23]
+[28]
 Overfull \vbox (17.75745pt too high) has occurred while \output is active []
 
 
 
-[24 <./figures/chapter3/20-rgb.png> <./figures/chapter3/25-rgb.png> <./figures/
+[29 <./figures/chapter3/20-rgb.png> <./figures/chapter3/25-rgb.png> <./figures/
 chapter3/30-rgb.png>]
-<figures/chapter3/20-rgb-filter.png, id=465, 867.24pt x 433.62pt>
+<figures/chapter3/20-rgb-filter.png, id=535, 867.24pt x 433.62pt>
 File: figures/chapter3/20-rgb-filter.png Graphic file (type png)
 <use figures/chapter3/20-rgb-filter.png>
 Package pdftex.def Info: figures/chapter3/20-rgb-filter.png  used on input line
  76.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/25-rgb-filter.png, id=466, 867.24pt x 433.62pt>
+<figures/chapter3/25-rgb-filter.png, id=536, 867.24pt x 433.62pt>
 File: figures/chapter3/25-rgb-filter.png Graphic file (type png)
 <use figures/chapter3/25-rgb-filter.png>
 Package pdftex.def Info: figures/chapter3/25-rgb-filter.png  used on input line
  83.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/30-rgb-filter.png, id=467, 867.24pt x 433.62pt>
+<figures/chapter3/30-rgb-filter.png, id=537, 867.24pt x 433.62pt>
 File: figures/chapter3/30-rgb-filter.png Graphic file (type png)
 <use figures/chapter3/30-rgb-filter.png>
 Package pdftex.def Info: figures/chapter3/30-rgb-filter.png  used on input line
@@ -1579,15 +1602,15 @@ Package pdftex.def Info: figures/chapter3/30-rgb-filter.png  used on input line
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
 
 
-[25]
+[30]
 Overfull \vbox (17.75745pt too high) has occurred while \output is active []
 
 
 
-[26 <./figures/chapter3/20-rgb-filter.png> <./figures/chapter3/25-rgb-filter.pn
+[31 <./figures/chapter3/20-rgb-filter.png> <./figures/chapter3/25-rgb-filter.pn
 g> <./figures/chapter3/30-rgb-filter.png>]
 
-[27]
+[32]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 131.
@@ -1597,7 +1620,7 @@ See the caption package documentation for explanation.
 (./build/_minted-main/1857674E38D64E98F1AD46F60DD43D227CA51C26B7866DB88E5EA08B1
 6B8251D.pygtex)
 
-[28]
+[33]
 Underfull \vbox (badness 10000) detected at line 145
  []
 
@@ -1607,7 +1630,7 @@ Underfull \vbox (badness 10000) detected at line 145
 
 
 
-[29]
+[34]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 154.
@@ -1619,8 +1642,8 @@ See the caption package documentation for explanation.
 (./build/_minted-main/A86860FBCCF5910614EF083B51DEBB2FB8F4FA9E4BDBFED98083604C2
 2B711AE.pygtex)
 
-[30]
-<figures/chapter3/ppg_signal_output.png, id=505, 867.24pt x 361.35pt>
+[35]
+<figures/chapter3/ppg_signal_output.png, id=575, 867.24pt x 361.35pt>
 File: figures/chapter3/ppg_signal_output.png Graphic file (type png)
 <use figures/chapter3/ppg_signal_output.png>
 Package pdftex.def Info: figures/chapter3/ppg_signal_output.png  used on input 
@@ -1628,20 +1651,20 @@ line 199.
 (pdftex.def)             Requested size: 432.48051pt x 180.20036pt.
 ) (./chapters/chapter3-phases/phase4.tex
 
-[31 <./figures/chapter3/ppg_signal_output.png>]
-<figures/chapter3/ResNet.png, id=512, 890.32625pt x 1780.6525pt>
+[36 <./figures/chapter3/ppg_signal_output.png>]
+<figures/chapter3/ResNet.png, id=583, 890.32625pt x 1780.6525pt>
 File: figures/chapter3/ResNet.png Graphic file (type png)
 <use figures/chapter3/ResNet.png>
 Package pdftex.def Info: figures/chapter3/ResNet.png  used on input line 23.
 (pdftex.def)             Requested size: 318.66948pt x 637.33923pt.
 
 
-[32]
+[37]
 Overfull \vbox (1.40454pt too high) has occurred while \output is active []
 
 
 
-[33 <./figures/chapter3/ResNet.png (PNG copy)>]
+[38 <./figures/chapter3/ResNet.png (PNG copy)>]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 35.
@@ -1653,9 +1676,9 @@ See the caption package documentation for explanation.
 (./build/_minted-main/E3835CE36D3B1A617A25F5118B9D9E41B8F4FA9E4BDBFED98083604C2
 2B711AE.pygtex)
 
-[34]
+[39]
 
-[35]
+[40]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 121.
@@ -1667,8 +1690,8 @@ See the caption package documentation for explanation.
 (./build/_minted-main/6880F0814B15748EF4B770DE276C8C2DB8F4FA9E4BDBFED98083604C2
 2B711AE.pygtex)
 
-[36]
-<figures/chapter3/TransferLearning.png, id=545, 1090.0725pt x 1453.43pt>
+[41]
+<figures/chapter3/TransferLearning.png, id=616, 1090.0725pt x 1453.43pt>
 File: figures/chapter3/TransferLearning.png Graphic file (type png)
 <use figures/chapter3/TransferLearning.png>
 Package pdftex.def Info: figures/chapter3/TransferLearning.png  used on input l
@@ -1676,9 +1699,9 @@ ine 178.
 (pdftex.def)             Requested size: 386.96027pt x 515.93799pt.
 ))
 
-[37]
+[42]
 
-[38 <./figures/chapter3/TransferLearning.png (PNG copy)>]
+[43 <./figures/chapter3/TransferLearning.png (PNG copy)>]
 \openout2 = `chapters/chapter4.aux'.
 
 
@@ -1686,37 +1709,46 @@ ine 178.
 Chapter 4.
 
 
-[39
+[44
 
 
 
 
 ]
 
-[40]
+[45]
 
-[41])
+[46])
 
-[42]
+[47]
 \openout2 = `chapters/chapter5.aux'.
 
  (./chapters/chapter5.tex
 Chapter 5.
 )
 
-[43
+[48
 
 
 
 
 
-] (build/main.bbl
+]
+\openout2 = `chapters/chapter6.aux'.
 
-LaTeX Warning: Empty `thebibliography' environment on input line 24.
-
+ (./chapters/chapter6.tex
+Chapter 6.
 )
 
-[44
+[49
+
+
+
+
+
+] (build/main.bbl)
+
+[50
 
 
 
@@ -1738,7 +1770,7 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2.
 
 
-[45
+[51
 
 
 ])
@@ -1763,14 +1795,14 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
 (./build/_minted-main/44A4B600AFE0868024592AECE35CFA7C4751E519CAC7DFFAB1FFF16DB
 2DA9FA8.pygtex
 
-[46])
+[52])
 \openout3 = `main.pyg'.
 
 
 (./build/_minted-main/E56856A4E1E04B785DD0600832ABDE484751E519CAC7DFFAB1FFF16DB
 2DA9FA8.pygtex))
 
-[47]
+[53]
 
 Package glossaries Warning: No \printglossary or \printglossaries found. 
 (Remove \makeglossaries if you don't want any glossaries.) 
@@ -1779,21 +1811,22 @@ This document will not have a glossary.
 (build/main.aux (build/TitlePage.aux) (build/Acknowledgment.aux)
 (build/Abstract.aux) (build/chapters/chapter1.aux) (build/chapters/chapter2.aux
 ) (build/chapters/chapter3.aux) (build/chapters/chapter4.aux)
-(build/chapters/chapter5.aux) (build/Appendices.aux))
+(build/chapters/chapter5.aux) (build/chapters/chapter6.aux)
+(build/Appendices.aux))
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 7F827C91C60E3D497463E9DCEC49D597;9978.
+(rerunfilecheck)             Checksum: EDFD1D5F8B0431E6389BF799ADCBEAED;11292.
 runsystem(rm build//main.pyg)...executed.
 
  ) 
 Here is how much of TeX's memory you used:
- 25853 strings out of 473190
- 467372 string characters out of 5722569
- 965197 words of memory out of 5000000
- 48432 multiletter control sequences out of 15000+600000
+ 25923 strings out of 473190
+ 469174 string characters out of 5722569
+ 966372 words of memory out of 5000000
+ 48476 multiletter control sequences out of 15000+600000
  577565 words of font info for 76 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,12n,96p,2276b,879s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1818,10 +1851,10 @@ type1/public/cm-super/sfrm0800.pfb></usr/share/texmf-dist/fonts/type1/public/cm
 e/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb></usr/share/texmf-dist/fo
 nts/type1/public/cm-super/sftt1095.pfb></usr/share/texmf-dist/fonts/type1/publi
 c/cm-super/sftt1200.pfb>
-Output written on build/main.pdf (48 pages, 6394289 bytes).
+Output written on build/main.pdf (54 pages, 7300188 bytes).
 PDF statistics:
- 753 PDF objects out of 1000 (max. 8388607)
- 613 compressed objects within 7 object streams
- 151 named destinations out of 1000 (max. 500000)
- 489 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 835 PDF objects out of 1000 (max. 8388607)
+ 687 compressed objects within 7 object streams
+ 170 named destinations out of 1000 (max. 500000)
+ 555 words of extra memory for PDF output out of 10000 (max. 10000000)
 

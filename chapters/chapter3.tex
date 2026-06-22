@@ -5,12 +5,14 @@
 
 \section{Introduction}
 \label{sec:methodology_intro}
-This chapter presents the complete, end-to-end technical methodology designed and implemented in this graduation project to achieve non-invasive blood glucose level estimation. Developing a reliable health-tech system requires a strict sequence of engineering steps, moving from physical data acquisition to software optimization, signal handling, and future predictive modeling.
+This chapter presents the complete, end-to-end technical methodology designed and implemented in this graduation project to achieve non-invasive blood glucose level estimation. Developing a reliable health-tech system requires a strict sequence of engineering steps, moving from physical data acquisition to software optimization, signal handling, and prospective deep learning deployment.
 
-To maintain a rigorous scientific flow, our operational pipeline is structured into successive development phases. This chapter comprehensively details the work executed during the first major milestones of our project:
+To maintain a rigorous scientific flow and architectural clarity, our operational engineering pipeline is structured into four successive, interconnected development phases. This chapter comprehensively details the technical execution, mathematical frameworks, and programmatic implementations executed across each milestone:
 \begin{enumerate}
-    \item \textbf{Phase 1: Data Acquisition} – Building the mobile sensing client, conducting the clinical campaign, and logging ground truth values.
-    \item \textbf{Phase 2: Data Preprocessing and Structuring} – Lossless video orientation normalization, automated directory schema execution, and quality control filtering.
+    \item \textbf{Phase 1: Data Acquisition} – Building the mobile sensing client, conducting the clinical data campaign, and logging ground-truth reference values.
+    \item \textbf{Phase 2: Data Preprocessing and Structuring} – Executing lossless video orientation normalization, automated directory schema builds, and quality control filtering.
+    \item \textbf{Phase 3: rPPG Extraction and Conditioning} – Extracting temporal RGB traces, implementing sampling rate normalization benchmarks, digital bandpass filtering, and stratified dataset partitioning.
+    \item \textbf{Phase 4: AI Modeling and Optimization} – Standardizing temporal sliding windows, constructing the deep 1D-ResNet architecture, integrating time-series data augmentation, and executing cross-domain Transfer Learning paradigms.
 \end{enumerate}
 
 \input{chapters/chapter3-phases/phase1}
