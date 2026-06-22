@@ -33,4 +33,36 @@
   Available: \url{https://diabetesatlas.org}
 \BIBentrySTDinterwordspacing
 
+\bibitem{ta2026hybrid}
+\BIBentryALTinterwordspacing
+A.~Yahia, A.~E. Refai, A.~Mubarak, and O.~A. Omer, ``Hybrid deep learning-based
+  blood glucose level monitoring using ppg signals,'' \emph{Signal, Image and
+  Video Processing}, vol.~20, no.~6, 2026. [Online]. Available:
+  \url{https://link.springer.com/article/10.1007/s11760-026-05368-5}
+\BIBentrySTDinterwordspacing
+
+\bibitem{chu2021feature}
+\BIBentryALTinterwordspacing
+Y.~Chu and et~al., ``Feature extraction and selection of photoplethysmography
+  for blood glucose estimation,'' \emph{IEEE Sensors Journal}, vol.~21, no.~15,
+  pp. 16\,780--16\,788, 2021. [Online]. Available:
+  \url{https://ieeexplore.ieee.org/document/9431671}
+\BIBentrySTDinterwordspacing
+
+\bibitem{zhang2020noninvasive}
+\BIBentryALTinterwordspacing
+Y.~Zhang and et~al., ``Noninvasive blood glucose estimation using
+  multi-wavelength photoplethysmography and deep learning,'' \emph{Biomedical
+  Signal Processing and Control}, vol.~55, p. 101648, 2020. [Online].
+  Available: \url{https://doi.org/10.1016/j.bspc.2019.101648}
+\BIBentrySTDinterwordspacing
+
+\bibitem{jian2024cross}
+\BIBentryALTinterwordspacing
+W.~Jian and et~al., ``Cross-domain transfer learning for continuous blood
+  parameter monitoring based on wearable optical sensors,'' \emph{Artificial
+  Intelligence in Medicine}, vol. 142, p. 102590, 2024. [Online]. Available:
+  \url{https://doi.org/10.1016/j.artmed.2023.102590}
+\BIBentrySTDinterwordspacing
+
 \end{thebibliography}

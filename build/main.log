@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/VoidLinux) (preloaded format=pdflatex 2026.6.12)  22 JUN 2026 18:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/VoidLinux) (preloaded format=pdflatex 2026.6.12)  22 JUN 2026 18:37
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1306,13 +1306,13 @@ Package caption Info: End \AtBeginDocument code.
 \openout2 = `TitlePage.aux'.
 
 (./TitlePage.tex
-<figures/Aswan University Logo.png, id=237, 419.5675pt x 599.23875pt>
+<figures/Aswan University Logo.png, id=257, 419.5675pt x 599.23875pt>
 File: figures/Aswan University Logo.png Graphic file (type png)
 <use figures/Aswan University Logo.png>
 Package pdftex.def Info: figures/Aswan University Logo.png  used on input line 
 6.
 (pdftex.def)             Requested size: 113.80971pt x 122.34183pt.
-<figures/Aswan Faculty of Engineering Logo.png, id=239, 975.645pt x 977.6525pt>
+<figures/Aswan Faculty of Engineering Logo.png, id=259, 975.645pt x 977.6525pt>
 
 File: figures/Aswan Faculty of Engineering Logo.png Graphic file (type png)
 <use figures/Aswan Faculty of Engineering Logo.png>
@@ -1426,7 +1426,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--16
 
  (./chapters/chapter1.tex
 Chapter 1.
-<figures/chapter1/blood_test.jpeg, id=370, 215.8464pt x 289.08pt>
+<figures/chapter1/blood_test.jpeg, id=395, 215.8464pt x 289.08pt>
 File: figures/chapter1/blood_test.jpeg Graphic file (type jpg)
 <use figures/chapter1/blood_test.jpeg>
 Package pdftex.def Info: figures/chapter1/blood_test.jpeg  used on input line 1
@@ -1439,7 +1439,7 @@ Package pdftex.def Info: figures/chapter1/blood_test.jpeg  used on input line 1
 
 
 ]
-<figures/chapter1/Smartwatch_PPG_sensor.jpeg, id=379, 1027.84pt x 1027.84pt>
+<figures/chapter1/Smartwatch_PPG_sensor.jpeg, id=404, 1027.84pt x 1027.84pt>
 File: figures/chapter1/Smartwatch_PPG_sensor.jpeg Graphic file (type jpg)
 <use figures/chapter1/Smartwatch_PPG_sensor.jpeg>
 Package pdftex.def Info: figures/chapter1/Smartwatch_PPG_sensor.jpeg  used on i
@@ -1458,22 +1458,36 @@ nput line 23.
 
  (./chapters/chapter2.tex
 Chapter 2.
-)
+
+Overfull \hbox (4.05415pt too wide) in paragraph at lines 7--7
+[]\T1/cmr/bx/n/17.28 State-of-the-Art Hy-brid Deep Learn-ing Frame-works 
+ []
+
+
 
 [12
 
 
 
 
-
 ]
+Overfull \hbox (7.22708pt too wide) in paragraph at lines 15--16
+[]\T1/cmr/m/n/12 Chu et al. [[]] de-vel-oped a con-tin-u-ous glu-cose track-ing
+ frame-work us-ing multi-wavelength
+ []
+
+
+
+[13])
+
+[14]
 \openout2 = `chapters/chapter3.aux'.
 
  (./chapters/chapter3.tex
 Chapter 3.
 
 
-[13
+[15
 
 
 
@@ -1481,10 +1495,10 @@ Chapter 3.
 
 ] (./chapters/chapter3-phases/phase1.tex
 
-[14]
+[16]
 
-[15]
-<figures/chapter3/new_record_form.png, id=426, 722.7pt x 1565.85pt>
+[17]
+<figures/chapter3/new_record_form.png, id=477, 722.7pt x 1565.85pt>
 File: figures/chapter3/new_record_form.png Graphic file (type png)
 <use figures/chapter3/new_record_form.png>
 Package pdftex.def Info: figures/chapter3/new_record_form.png  used on input li
@@ -1492,16 +1506,16 @@ ne 49.
 (pdftex.def)             Requested size: 204.85846pt x 443.8587pt.
 
 
-[16]
+[18]
 
-[17 <./figures/chapter3/new_record_form.png>]
-<figures/chapter3/camera_preview.png, id=440, 722.7pt x 1565.85pt>
+[19 <./figures/chapter3/new_record_form.png>]
+<figures/chapter3/camera_preview.png, id=492, 722.7pt x 1565.85pt>
 File: figures/chapter3/camera_preview.png Graphic file (type png)
 <use figures/chapter3/camera_preview.png>
 Package pdftex.def Info: figures/chapter3/camera_preview.png  used on input lin
 e 71.
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
-<figures/chapter3/recording_in_progress.png, id=441, 722.7pt x 1565.85pt>
+<figures/chapter3/recording_in_progress.png, id=493, 722.7pt x 1565.85pt>
 File: figures/chapter3/recording_in_progress.png Graphic file (type png)
 <use figures/chapter3/recording_in_progress.png>
 Package pdftex.def Info: figures/chapter3/recording_in_progress.png  used on in
@@ -1509,17 +1523,17 @@ put line 78.
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
 
 
-[18]
+[20]
 
-[19 <./figures/chapter3/camera_preview.png> <./figures/chapter3/recording_in_pr
+[21 <./figures/chapter3/camera_preview.png> <./figures/chapter3/recording_in_pr
 ogress.png>]
-<figures/chapter3/all_data_list.png, id=457, 706.64pt x 1477.52pt>
+<figures/chapter3/all_data_list.png, id=508, 706.64pt x 1477.52pt>
 File: figures/chapter3/all_data_list.png Graphic file (type png)
 <use figures/chapter3/all_data_list.png>
 Package pdftex.def Info: figures/chapter3/all_data_list.png  used on input line
  111.
 (pdftex.def)             Requested size: 184.37135pt x 385.49884pt.
-<figures/chapter3/exporting.png, id=458, 722.7pt x 1565.85pt>
+<figures/chapter3/exporting.png, id=509, 722.7pt x 1565.85pt>
 File: figures/chapter3/exporting.png Graphic file (type png)
 <use figures/chapter3/exporting.png>
 Package pdftex.def Info: figures/chapter3/exporting.png  used on input line 118
@@ -1527,16 +1541,16 @@ Package pdftex.def Info: figures/chapter3/exporting.png  used on input line 118
 (pdftex.def)             Requested size: 184.37135pt x 399.46567pt.
 
 
-[20 <./figures/chapter3/all_data_list.png> <./figures/chapter3/exporting.png>])
+[22 <./figures/chapter3/all_data_list.png> <./figures/chapter3/exporting.png>])
 (./chapters/chapter3-phases/phase2.tex
-
-[21]
-
-[22]
 
 [23]
 
 [24]
+
+[25]
+
+[26]
 \openout3 = `main.pyg'.
 
  (./build/_minted-main/default.pygstyle)
@@ -1553,52 +1567,25 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 ) (./chapters/chapter3-phases/phase3.tex
 
-[25]
-
-[26]
-
 [27]
-<figures/chapter3/20-rgb.png, id=518, 867.24pt x 433.62pt>
+
+[28]
+
+[29]
+<figures/chapter3/20-rgb.png, id=568, 867.24pt x 433.62pt>
 File: figures/chapter3/20-rgb.png Graphic file (type png)
 <use figures/chapter3/20-rgb.png>
 Package pdftex.def Info: figures/chapter3/20-rgb.png  used on input line 35.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/25-rgb.png, id=519, 867.24pt x 433.62pt>
+<figures/chapter3/25-rgb.png, id=569, 867.24pt x 433.62pt>
 File: figures/chapter3/25-rgb.png Graphic file (type png)
 <use figures/chapter3/25-rgb.png>
 Package pdftex.def Info: figures/chapter3/25-rgb.png  used on input line 42.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/30-rgb.png, id=520, 867.24pt x 433.62pt>
+<figures/chapter3/30-rgb.png, id=570, 867.24pt x 433.62pt>
 File: figures/chapter3/30-rgb.png Graphic file (type png)
 <use figures/chapter3/30-rgb.png>
 Package pdftex.def Info: figures/chapter3/30-rgb.png  used on input line 49.
-(pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-
-
-[28]
-Overfull \vbox (17.75745pt too high) has occurred while \output is active []
-
-
-
-[29 <./figures/chapter3/20-rgb.png> <./figures/chapter3/25-rgb.png> <./figures/
-chapter3/30-rgb.png>]
-<figures/chapter3/20-rgb-filter.png, id=535, 867.24pt x 433.62pt>
-File: figures/chapter3/20-rgb-filter.png Graphic file (type png)
-<use figures/chapter3/20-rgb-filter.png>
-Package pdftex.def Info: figures/chapter3/20-rgb-filter.png  used on input line
- 76.
-(pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/25-rgb-filter.png, id=536, 867.24pt x 433.62pt>
-File: figures/chapter3/25-rgb-filter.png Graphic file (type png)
-<use figures/chapter3/25-rgb-filter.png>
-Package pdftex.def Info: figures/chapter3/25-rgb-filter.png  used on input line
- 83.
-(pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
-<figures/chapter3/30-rgb-filter.png, id=537, 867.24pt x 433.62pt>
-File: figures/chapter3/30-rgb-filter.png Graphic file (type png)
-<use figures/chapter3/30-rgb-filter.png>
-Package pdftex.def Info: figures/chapter3/30-rgb-filter.png  used on input line
- 90.
 (pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
 
 
@@ -1607,10 +1594,37 @@ Overfull \vbox (17.75745pt too high) has occurred while \output is active []
 
 
 
-[31 <./figures/chapter3/20-rgb-filter.png> <./figures/chapter3/25-rgb-filter.pn
-g> <./figures/chapter3/30-rgb-filter.png>]
+[31 <./figures/chapter3/20-rgb.png> <./figures/chapter3/25-rgb.png> <./figures/
+chapter3/30-rgb.png>]
+<figures/chapter3/20-rgb-filter.png, id=586, 867.24pt x 433.62pt>
+File: figures/chapter3/20-rgb-filter.png Graphic file (type png)
+<use figures/chapter3/20-rgb-filter.png>
+Package pdftex.def Info: figures/chapter3/20-rgb-filter.png  used on input line
+ 76.
+(pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
+<figures/chapter3/25-rgb-filter.png, id=587, 867.24pt x 433.62pt>
+File: figures/chapter3/25-rgb-filter.png Graphic file (type png)
+<use figures/chapter3/25-rgb-filter.png>
+Package pdftex.def Info: figures/chapter3/25-rgb-filter.png  used on input line
+ 83.
+(pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
+<figures/chapter3/30-rgb-filter.png, id=588, 867.24pt x 433.62pt>
+File: figures/chapter3/30-rgb-filter.png Graphic file (type png)
+<use figures/chapter3/30-rgb-filter.png>
+Package pdftex.def Info: figures/chapter3/30-rgb-filter.png  used on input line
+ 90.
+(pdftex.def)             Requested size: 364.19667pt x 182.0993pt.
+
 
 [32]
+Overfull \vbox (17.75745pt too high) has occurred while \output is active []
+
+
+
+[33 <./figures/chapter3/20-rgb-filter.png> <./figures/chapter3/25-rgb-filter.pn
+g> <./figures/chapter3/30-rgb-filter.png>]
+
+[34]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 131.
@@ -1620,7 +1634,7 @@ See the caption package documentation for explanation.
 (./build/_minted-main/1857674E38D64E98F1AD46F60DD43D227CA51C26B7866DB88E5EA08B1
 6B8251D.pygtex)
 
-[33]
+[35]
 Underfull \vbox (badness 10000) detected at line 145
  []
 
@@ -1630,7 +1644,7 @@ Underfull \vbox (badness 10000) detected at line 145
 
 
 
-[34]
+[36]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 154.
@@ -1642,8 +1656,8 @@ See the caption package documentation for explanation.
 (./build/_minted-main/A86860FBCCF5910614EF083B51DEBB2FB8F4FA9E4BDBFED98083604C2
 2B711AE.pygtex)
 
-[35]
-<figures/chapter3/ppg_signal_output.png, id=575, 867.24pt x 361.35pt>
+[37]
+<figures/chapter3/ppg_signal_output.png, id=627, 867.24pt x 361.35pt>
 File: figures/chapter3/ppg_signal_output.png Graphic file (type png)
 <use figures/chapter3/ppg_signal_output.png>
 Package pdftex.def Info: figures/chapter3/ppg_signal_output.png  used on input 
@@ -1651,20 +1665,20 @@ line 199.
 (pdftex.def)             Requested size: 432.48051pt x 180.20036pt.
 ) (./chapters/chapter3-phases/phase4.tex
 
-[36 <./figures/chapter3/ppg_signal_output.png>]
-<figures/chapter3/ResNet.png, id=583, 890.32625pt x 1780.6525pt>
+[38 <./figures/chapter3/ppg_signal_output.png>]
+<figures/chapter3/ResNet.png, id=634, 890.32625pt x 1780.6525pt>
 File: figures/chapter3/ResNet.png Graphic file (type png)
 <use figures/chapter3/ResNet.png>
 Package pdftex.def Info: figures/chapter3/ResNet.png  used on input line 23.
 (pdftex.def)             Requested size: 318.66948pt x 637.33923pt.
 
 
-[37]
+[39]
 Overfull \vbox (1.40454pt too high) has occurred while \output is active []
 
 
 
-[38 <./figures/chapter3/ResNet.png (PNG copy)>]
+[40 <./figures/chapter3/ResNet.png (PNG copy)>]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 35.
@@ -1676,9 +1690,9 @@ See the caption package documentation for explanation.
 (./build/_minted-main/E3835CE36D3B1A617A25F5118B9D9E41B8F4FA9E4BDBFED98083604C2
 2B711AE.pygtex)
 
-[39]
+[41]
 
-[40]
+[42]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 121.
@@ -1690,8 +1704,8 @@ See the caption package documentation for explanation.
 (./build/_minted-main/6880F0814B15748EF4B770DE276C8C2DB8F4FA9E4BDBFED98083604C2
 2B711AE.pygtex)
 
-[41]
-<figures/chapter3/TransferLearning.png, id=616, 1090.0725pt x 1453.43pt>
+[43]
+<figures/chapter3/TransferLearning.png, id=667, 1090.0725pt x 1453.43pt>
 File: figures/chapter3/TransferLearning.png Graphic file (type png)
 <use figures/chapter3/TransferLearning.png>
 Package pdftex.def Info: figures/chapter3/TransferLearning.png  used on input l
@@ -1699,9 +1713,9 @@ ine 178.
 (pdftex.def)             Requested size: 386.96027pt x 515.93799pt.
 ))
 
-[42]
+[44]
 
-[43 <./figures/chapter3/TransferLearning.png (PNG copy)>]
+[45 <./figures/chapter3/TransferLearning.png (PNG copy)>]
 \openout2 = `chapters/chapter4.aux'.
 
 
@@ -1709,25 +1723,25 @@ ine 178.
 Chapter 4.
 
 
-[44
+[46
 
 
 
 
 ]
 
-[45]
-
-[46])
-
 [47]
+
+[48])
+
+[49]
 \openout2 = `chapters/chapter5.aux'.
 
  (./chapters/chapter5.tex
 Chapter 5.
 )
 
-[48
+[50
 
 
 
@@ -1740,7 +1754,7 @@ Chapter 5.
 Chapter 6.
 )
 
-[49
+[51
 
 
 
@@ -1748,7 +1762,7 @@ Chapter 6.
 
 ] (build/main.bbl)
 
-[50
+[52
 
 
 
@@ -1770,7 +1784,7 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2.
 
 
-[51
+[53
 
 
 ])
@@ -1795,14 +1809,14 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
 (./build/_minted-main/44A4B600AFE0868024592AECE35CFA7C4751E519CAC7DFFAB1FFF16DB
 2DA9FA8.pygtex
 
-[52])
+[54])
 \openout3 = `main.pyg'.
 
 
 (./build/_minted-main/E56856A4E1E04B785DD0600832ABDE484751E519CAC7DFFAB1FFF16DB
 2DA9FA8.pygtex))
 
-[53]
+[55]
 
 Package glossaries Warning: No \printglossary or \printglossaries found. 
 (Remove \makeglossaries if you don't want any glossaries.) 
@@ -1818,15 +1832,15 @@ LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: EDFD1D5F8B0431E6389BF799ADCBEAED;11292.
+(rerunfilecheck)             Checksum: 0EF78BBB3F25D54327D3D7C5C1321448;12518.
 runsystem(rm build//main.pyg)...executed.
 
  ) 
 Here is how much of TeX's memory you used:
- 25923 strings out of 473190
- 469174 string characters out of 5722569
- 966372 words of memory out of 5000000
- 48476 multiletter control sequences out of 15000+600000
+ 25945 strings out of 473190
+ 469494 string characters out of 5722569
+ 966624 words of memory out of 5000000
+ 48486 multiletter control sequences out of 15000+600000
  577565 words of font info for 76 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,12n,96p,2276b,879s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1851,10 +1865,10 @@ type1/public/cm-super/sfrm0800.pfb></usr/share/texmf-dist/fonts/type1/public/cm
 e/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb></usr/share/texmf-dist/fo
 nts/type1/public/cm-super/sftt1095.pfb></usr/share/texmf-dist/fonts/type1/publi
 c/cm-super/sftt1200.pfb>
-Output written on build/main.pdf (54 pages, 7300188 bytes).
+Output written on build/main.pdf (56 pages, 7316096 bytes).
 PDF statistics:
- 835 PDF objects out of 1000 (max. 8388607)
- 687 compressed objects within 7 object streams
- 170 named destinations out of 1000 (max. 500000)
- 555 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 897 PDF objects out of 1000 (max. 8388607)
+ 746 compressed objects within 8 object streams
+ 182 named destinations out of 1000 (max. 500000)
+ 595 words of extra memory for PDF output out of 10000 (max. 10000000)
 
