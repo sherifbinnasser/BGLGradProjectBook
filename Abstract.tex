@@ -2,16 +2,8 @@
 {\textbf{\Huge Abstract}}
 \vspace{1cm}
 
-This project aims to design and develop a smart wheelchair with advanced control mechanisms to enhance mobility and independence for individuals with physical disabilities. 
-\newline
+This graduation project presents the design, development, and deployment of a non-invasive, AI-driven blood glucose level estimation system utilizing smartphone Photoplethysmography (PPG) signals. Traditional methods for metabolic tracking rely heavily on invasive, painful, and costly finger-prick glucometers, which often lead to low patient compliance and fragmented longitudinal tracking. By transforming consumer-grade smartphones into decentralized medical diagnostic tools, this work eliminates the physical and financial barriers associated with continuous glycemic monitoring.
 
-The smart wheelchair integrates multiple advanced control mechanisms, including joystick operation, face recognition, and eye tracking technology, to accommodate users with varying levels of mobility and dexterity.
-\newline
+The proposed framework introduces an optimized, lightweight 1D-ResNet architecture engineered specifically for real-time inference on resource-constrained mobile devices. To overcome the persistent challenge of clinical data scarcity inherent in biomedical signal processing, cross-domain Transfer Learning was successfully leveraged. This paradigm enables the deep learning model to accurately encapsulate the complex, non-linear dynamics of capillary micro-circulation and optical arterial pulses directly from raw, full-frame remote PPG (rPPG) streams without human intervention or manual feature engineering.
 
-The joystick control provides a familiar and intuitive interface for users who retain upper body mobility. For users with limited hand functionality, the face recognition control mode allows for navigation through facial movements and expressions. Furthermore, the eye tracking system offers an innovative solution for users with severe physical limitations, enabling wheelchair control through eye movements. By leveraging state-of-the-art technologies in computer vision and human-computer interaction, the smart wheelchair ensures a versatile and user-friendly interface.
-\newline
-
-Additionally, the wheelchair is integrated with a Healthcare System that monitors and records sensor measurements related to the user's health. This data can be used for ongoing health assessments and to provide real-time feedback to healthcare providers.
-\newline
-
-The goal of this project is to create an adaptable, reliable, and safe mobility solution that significantly improves the quality of life for individuals with mobility challenges.
+The entire methodology is integrated into a production-ready mobile application featuring a localized real-time PPG signal acquisition pipeline, adaptive signal quality estimators to filter somatic noise, and a minimalist biomedical UI/UX configuration. The successful end-to-end execution validates that the system achieves high predictive accuracy with a significantly reduced computational footprint (low FLOPs and parameter density). This research establishes a scalable, painless, and highly accessible consumer health paradigm for modern proactive diabetes management and decentralized clinical analytics.

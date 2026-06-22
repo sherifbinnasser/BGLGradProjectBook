@@ -4,24 +4,24 @@
 \section{Introduction}
 The quest for reliable, non-invasive blood glucose estimation has attracted significant research interest spanning biomedical engineering and machine learning paradigms. This chapter reviews the historical and contemporary state-of-the-art methodologies that utilize Photoplethysmography (PPG) signals for metabolic tracking. The existing literature can be broadly categorized into state-of-the-art local hybrid architectures, classical machine learning frameworks relying on manual feature extraction, and modern deep neural networks leveraging transfer learning.
 
-\section{State-of-the-Art Hybrid Deep Learning Frameworks}
+\section{Hybrid Architectures}
 The local research milestone establishing the foundation for modern non-invasive tracking inside our academic context was formulated by Yahia et al. \cite{ta2026hybrid}. Their work introduced a highly sophisticated hybrid deep learning-based paradigm for blood glucose monitoring using raw PPG streams. By blending multi-scale abstract feature extraction mechanisms with sequential prediction modules, their proposed framework achieved prominent advancements in signal alignment and non-invasive tracking accuracy.
 
 While Yahia et al. \cite{ta2026hybrid} successfully verified the viability of mapping optical cardiac pulses to physiological glucose concentrations, their execution focused heavily on server-side high-performance validation environments. Translating such intricate hybrid mathematical schemes onto resource-constrained mobile systems remains an open engineering challenge. Our project directly builds upon this baseline by introducing a lightweight 1D-ResNet topology tailored specifically to optimize these computational layers for end-user client execution without compromising clinical prediction metrics.
 
-\section{Classical Machine Learning and Handcrafted Features}
+\section{Classical Approaches}
 Historically, early attempts at utilizing PPG signals for glucose monitoring focused on shallow machine learning models. These frameworks required extensive manual domain expertise to isolate specific handcrafted features from the PPG wave anatomy, such as the systolic amplitude, pulse width, and secondary derivative landmarks.
 
 Chu et al. \cite{chu2021feature} developed a continuous glucose tracking framework using multi-wavelength signals. They extracted morphological features and trained classical regression models to predict glucose fluctuations. While their approach demonstrated a baseline correlation under strict laboratory conditions, it suffered from severe degradation when tested on real-world somatic movements and varying skin tones. Furthermore, manual feature extraction is highly sensitive to ambient lighting noise and fails to encapsulate the highly complex, non-linear dynamics inherent in continuous capillary micro-circulation.
 
-\section{Deep Convolutional Networks and Data Scarcity}
+\section{Deep Learning}
 With the advent of deep learning, recent researchers have bypassed the limitations of manual feature engineering by utilizing deep convolutional arrays that automatically learn spatial and temporal abstract representations directly from raw unfiltered signals.
 
 Zhang et al. \cite{zhang2020noninvasive} proposed an end-to-end blood glucose estimation network using multi-scale deep neural architectures. By training their network on extensive multi-wavelength photoplethysmography recordings, they successfully captured continuous glycemic trends without human intervention. However, their model was structurally massive, containing extensive layer stacks. This computational density poses a major barrier to implementation, rendering the framework incompatible with limited memory bounds and battery capacities found on wearable smart devices.
 
 To combat the severe shortage of labeled clinical datasets pairing raw PPG data with accurate blood glucose reference points, recent researchers have explored parameter initialization methodologies. Jian et al. \cite{jian2024cross} introduced a cross-domain Transfer Learning framework where a source model was initially trained on extensive physiological datasets to map baseline arterial elasticity before being fine-tuned on target blood parameters. Although this transfer scheme significantly accelerated network weight convergence and solved data constraints, their model optimization entirely focused on theoretical desktop validation, completely disregarding real-world mobile deployment logistics or user-facing applications.
 
-\section{Summary and Research Gap}
+\section{Research Gap}
 To synthesize the reviewed literature and establish the technical positioning of this graduation project, Table \ref{tab:lit_review_summary} categorizes the critical metrics, limitations, and operational paradigms of existing state-of-the-art systems against our proposed solution.
 
 \begin{table}[H]

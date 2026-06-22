@@ -16,13 +16,12 @@
 
 \begin{document}
 
-% إدراج صفحة العنوان (بدون ترقيم أو إدراج في الشريط الجانبي عادةً)
+% --- English Title Page ---
 \phantomsection
-\addcontentsline{toc}{chapter}{Cover Page} % إدراج الغلاف في القائمة الجانبية
+\addcontentsline{toc}{chapter}{Cover Page} % إدراج الغلاف الإنجليزي في القائمة الجانبية
 \include{TitlePage}
 
-% --- العناصر التمهيدية (Front Matter) ---
-
+% --- Front Matter ---
 \phantomsection
 \addcontentsline{toc}{chapter}{Acknowledgment}
 \include{Acknowledgment}
@@ -53,8 +52,7 @@
 
 \clearpage
 
-% --- الفصول الرئيسية للمشروع (Main Chapters) ---
-
+% --- Main Chapters ---
 \include{chapters/chapter1}
 \include{chapters/chapter2}
 \include{chapters/chapter3}
@@ -62,8 +60,7 @@
 \include{chapters/chapter5}
 \include{chapters/chapter6}
 
-% --- المراجع والملحقات ---
-
+% --- References and Appendices ---
 \clearpage
 \phantomsection
 \addcontentsline{toc}{chapter}{References}
@@ -71,6 +68,13 @@
 \bibliographystyle{IEEEtran}
 \bibliography{References.bib}
 
-\include{Appendices}
+% \include{Appendices}
+
+% --- Arabic Title Page (End of Book) ---
+% \clearpage
+% \thispagestyle{empty}
+% \phantomsection
+% \addcontentsline{toc}{chapter}{Arabic Cover Page}
+% \includepdf[pages={1}]{arabic_cover.pdf} % استدعاء الملف الجاهز مباشرة
 
 \end{document}

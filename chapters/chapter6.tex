@@ -1,4 +1,21 @@
 \clearpage
 
-\chapter{Conclusion}
-\label{ch:conclusion}
+\chapter{Conclusion and Future Work}
+\label{ch:conclusion_future_work}
+
+\section{Project Conclusion}
+This graduation project has successfully bridged the critical gap between theoretical deep learning research and practical, edge-based medical utility. By addressing the clinical need for painless, non-invasive blood glucose tracking, we designed and implemented a production-ready mobile application that eliminates the physical and psychological barriers associated with traditional finger-prick glucometers.
+
+Building upon the state-of-the-art hybrid insights established inside our local academic institution by Yahia et al. \cite{ta2026hybrid}, this work introduced an optimized, lightweight 1D-ResNet architecture tailored for resource-constrained environments. To defeat the persistent challenge of medical data scarcity, cross-domain Transfer Learning was successfully leveraged, allowing the network to capture complex, non-linear arterial micro-circulation dynamics with high predictive accuracy and minimal computational overhead (low FLOPs and parameter density).
+
+The entire system was seamlessly deployed into a functional smartphone application incorporating a real-time Photoplethysmography (PPG) signal processing pipeline, dynamic visual feedback loops, on-device AI inference, and a minimalist biomedical UI/UX. The successful validation of the end-to-end architecture demonstrates that consumer-grade mobile hardware can be effectively transformed into continuous, non-invasive diagnostic tools, offering a solid baseline for modern decentralized healthcare.
+
+\section{Future Work}
+While the current deployment achieves the fundamental engineering and clinical objectives of the project, several avenues remain open for subsequent research and technical optimization:
+
+\begin{itemize}
+    \item \textbf{Clinical Trial Expansion:} Future iterations will focus on conducting large-scale clinical trials across diverse patient demographics, incorporating varying skin tones, age groups, and diabetic profiles (Type 1, Type 2, and Gestational diabetes) to further refine the model's generalized estimation boundaries.
+    \item \textbf{Multi-Sensor Fusion:} Integrating supplementary physiological data streams from wearable hardware—such as skin temperature, galvanic skin response (GSR), and interstitial fluid trends—could enhance the regression matrix and provide multi-modal resilience against motion artifacts.
+    \item \textbf{Advanced Model Compression:} Exploring hyper-parameter optimization techniques, including structural neural network pruning and deep 8-bit quantization, will be investigated to further minimize memory footprints and maximize battery efficiency on ultra-low-power edge devices and smartwatches.
+    \item \textbf{Cloud-Based Longitudinal Analytics:} Developing a secure, HIPAA-compliant cloud backend would allow the system to store long-term historical glycemic trends, enabling predictive analytics for patient hypo/hyperglycemic event forecasting and seamless data sharing with medical professionals.
+\end{itemize}
