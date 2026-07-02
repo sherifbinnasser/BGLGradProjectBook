@@ -1,0 +1,210 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{package}\PYG{+w}{ }\PYG{n+nn}{com.glucoai.presentation.measurement}
+
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{android.util.Size}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.compose.runtime.getValue}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.compose.runtime.mutableFloatStateOf}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.compose.runtime.mutableStateListOf}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.compose.runtime.mutableStateOf}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.compose.runtime.setValue}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.lifecycle.ViewModel}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.lifecycle.viewModelScope}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{com.glucoai.data.repository.GlucoseRepositoryImpl}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{kotlinx.coroutines.Dispatchers}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{kotlinx.coroutines.delay}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{kotlinx.coroutines.launch}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{kotlinx.coroutines.withContext}
+
+\PYG{k+kd}{class}\PYG{+w}{ }\PYG{n+nc}{MeasurementViewModel}\PYG{p}{(}
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{glucoseRepository}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{GlucoseRepositoryImpl}
+\PYG{p}{)}\PYG{+w}{ }\PYG{p}{:}\PYG{+w}{ }\PYG{n}{ViewModel}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{isFingerDetected}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{p}{(}\PYG{k+kc}{true}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{estimatedGlucose}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Float?}\PYG{o}{\PYGZgt{}}\PYG{p}{(}\PYG{k+kc}{null}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{glucoseClass}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{String?}\PYG{o}{\PYGZgt{}}\PYG{p}{(}\PYG{k+kc}{null}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{bloodPressure}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{o}{\PYGZlt{}}\PYG{n}{com}\PYG{p}{.}\PYG{n+na}{glucoai}\PYG{p}{.}\PYG{n+na}{data}\PYG{p}{.}\PYG{n+na}{repository}\PYG{p}{.}\PYG{n+na}{BloodPressure}\PYG{o}{?\PYGZgt{}}\PYG{p}{(}\PYG{k+kc}{null}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{isInferenceRunning}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{p}{(}\PYG{k+kc}{false}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{isProcessingComplete}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{p}{(}\PYG{k+kc}{false}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{isExtremeReading}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Boolean}
+\PYG{+w}{        }\PYG{k}{get}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{glucose}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{estimatedGlucose}\PYG{+w}{ }\PYG{o}{?:}\PYG{+w}{ }\PYG{k}{return}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{isLow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{glucose}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{l+m}{70f}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{glucoseClass}\PYG{o}{?.}\PYG{n+na}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Low\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ignoreCase}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{k+kc}{true}\PYG{p}{)}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{isHigh}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{glucose}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m}{140f}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{glucoseClass}\PYG{o}{?.}\PYG{n+na}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}High\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ignoreCase}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{k+kc}{true}\PYG{p}{)}
+\PYG{+w}{            }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{isLow}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n}{isHigh}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{inferenceBuffer}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mutableListOf}\PYG{o}{\PYGZlt{}}\PYG{n}{Triple}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{o}{\PYGZgt{}\PYGZgt{}}\PYG{p}{()}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{isRecording}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Boolean}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{p}{(}\PYG{k+kc}{false}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{recordingProgress}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableFloatStateOf}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{cameraResolution}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{String}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Detecting...\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{isSignalStable}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{p}{(}\PYG{k+kc}{false}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{availableFps}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mutableStateListOf}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Int}\PYG{o}{\PYGZgt{}}\PYG{p}{()}
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{selectedFps}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Int?}\PYG{o}{\PYGZgt{}}\PYG{p}{(}\PYG{k+kc}{null}\PYG{p}{)}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{availableResolutions}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mutableStateListOf}\PYG{o}{\PYGZlt{}}\PYG{n}{Size}\PYG{o}{\PYGZgt{}}\PYG{p}{()}
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{selectedResolution}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableStateOf}\PYG{o}{\PYGZlt{}}\PYG{n}{Size?\PYGZgt{}}\PYG{p}{(}\PYG{k+kc}{null}\PYG{p}{)}
+
+\PYG{+w}{    }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{updateSelectedFps}\PYG{p}{(}\PYG{n}{fps}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int?}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{selectedFps}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{fps}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{updateSelectedResolution}\PYG{p}{(}\PYG{n}{size}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{Size?)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{selectedResolution}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{size}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{getFriendlyResolution}\PYG{p}{(}\PYG{n}{width}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{):}\PYG{+w}{ }\PYG{k+kt}{String}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{minDim}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{minOf}\PYG{p}{(}\PYG{n}{width}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{)}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{maxDim}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{maxOf}\PYG{p}{(}\PYG{n}{width}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{)}
+
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{k}{when}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{minDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{2160}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n}{maxDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{3840}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}4K\PYGZdq{}}
+\PYG{+w}{            }\PYG{n}{minDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{1440}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n}{maxDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{2560}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}2K\PYGZdq{}}
+\PYG{+w}{            }\PYG{n}{minDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{1080}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n}{maxDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{1920}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}1080p\PYGZdq{}}
+\PYG{+w}{            }\PYG{n}{minDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{720}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n}{maxDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{1280}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}720p\PYGZdq{}}
+\PYG{+w}{            }\PYG{n}{minDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{480}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n}{maxDim}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{l+m}{640}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}480p\PYGZdq{}}
+\PYG{+w}{            }\PYG{k}{else}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n}{width}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s}{x}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n}{height}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s}{\PYGZdq{}}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{liveR}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableFloatStateOf}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{liveG}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableFloatStateOf}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+\PYG{+w}{    }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{liveB}\PYG{+w}{ }\PYG{k}{by}\PYG{+w}{ }\PYG{n}{mutableFloatStateOf}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{private}\PYG{+w}{ }\PYG{k}{set}
+
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{liveRHistory}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mutableStateListOf}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Float}\PYG{o}{\PYGZgt{}}\PYG{p}{()}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{liveGHistory}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mutableStateListOf}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Float}\PYG{o}{\PYGZgt{}}\PYG{p}{()}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{liveBHistory}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mutableStateListOf}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Float}\PYG{o}{\PYGZgt{}}\PYG{p}{()}
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{maxWaveformPoints}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{100}
+
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{updateWaveformHistory}\PYG{p}{(}\PYG{n}{r}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{b}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{liveRHistory}\PYG{p}{.}\PYG{n+na}{add}\PYG{p}{(}\PYG{n}{r}\PYG{p}{)}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{liveRHistory}\PYG{p}{.}\PYG{n+na}{size}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{maxWaveformPoints}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{liveRHistory}\PYG{p}{.}\PYG{n+na}{removeAt}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{liveGHistory}\PYG{p}{.}\PYG{n+na}{add}\PYG{p}{(}\PYG{n}{g}\PYG{p}{)}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{liveGHistory}\PYG{p}{.}\PYG{n+na}{size}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{maxWaveformPoints}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{liveGHistory}\PYG{p}{.}\PYG{n+na}{removeAt}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{liveBHistory}\PYG{p}{.}\PYG{n+na}{add}\PYG{p}{(}\PYG{n}{b}\PYG{p}{)}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{liveBHistory}\PYG{p}{.}\PYG{n+na}{size}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{maxWaveformPoints}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{liveBHistory}\PYG{p}{.}\PYG{n+na}{removeAt}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{)}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{onSignalUpdate}\PYG{p}{(}\PYG{n}{y}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{width}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{cameraResolution}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{getFriendlyResolution}\PYG{p}{(}\PYG{n}{width}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{)}
+
+\PYG{+w}{        }\PYG{n}{liveR}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m}{1.402f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{v}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)).}\PYG{n+na}{coerceIn}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{255f}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{liveG}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0.344136f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{u}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0.714136f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{v}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)).}\PYG{n+na}{coerceIn}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{255f}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{liveB}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m}{1.772f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{u}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)).}\PYG{n+na}{coerceIn}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{255f}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{updateWaveformHistory}\PYG{p}{(}\PYG{n}{liveR}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{liveG}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{liveB}\PYG{p}{)}
+
+\PYG{+w}{        }\PYG{n}{isSignalStable}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}
+
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{isRecording}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{inferenceBuffer}\PYG{p}{.}\PYG{n+na}{add}\PYG{p}{(}\PYG{n}{Triple}\PYG{p}{(}\PYG{n}{y}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{))}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{startRecording}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{isRecording}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}
+\PYG{+w}{        }\PYG{n}{isRecording}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}
+\PYG{+w}{        }\PYG{n}{recordingProgress}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0f}
+\PYG{+w}{        }\PYG{n}{inferenceBuffer}\PYG{p}{.}\PYG{n+na}{clear}\PYG{p}{()}
+\PYG{+w}{        }\PYG{n}{estimatedGlucose}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}
+\PYG{+w}{        }\PYG{n}{isProcessingComplete}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{        }\PYG{n}{isInferenceRunning}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+
+\PYG{+w}{        }\PYG{n}{viewModelScope}\PYG{p}{.}\PYG{n+na}{launch}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{totalDurationMs}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{25000L}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{stepMs}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{100L}
+\PYG{+w}{            }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{elapsedMs}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0L}
+
+\PYG{+w}{            }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{elapsedMs}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{totalDurationMs}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{isRecording}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{n}{delay}\PYG{p}{(}\PYG{n}{stepMs}\PYG{p}{)}
+\PYG{+w}{                }\PYG{n}{elapsedMs}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{stepMs}
+\PYG{+w}{                }\PYG{n}{recordingProgress}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{elapsedMs}\PYG{p}{.}\PYG{n+na}{toFloat}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n}{totalDurationMs}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{            }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{isRecording}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{n}{stopRecording}\PYG{p}{()}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{stopRecording}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{!}\PYG{n}{isRecording}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}
+\PYG{+w}{        }\PYG{n}{isRecording}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{!}\PYG{n}{isInferenceRunning}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{o}{!}\PYG{n}{isProcessingComplete}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{inferenceBuffer}\PYG{p}{.}\PYG{n+na}{isNotEmpty}\PYG{p}{())}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{runInference}\PYG{p}{()}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{runInference}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{isInferenceRunning}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n}{isProcessingComplete}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{inferenceBuffer}\PYG{p}{.}\PYG{n+na}{isEmpty}\PYG{p}{())}\PYG{+w}{ }\PYG{k}{return}
+
+\PYG{+w}{        }\PYG{n}{isInferenceRunning}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}
+\PYG{+w}{        }\PYG{n}{isProcessingComplete}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{        }\PYG{n}{isRecording}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{currentFps}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{selectedFps}\PYG{+w}{ }\PYG{o}{?:}\PYG{+w}{ }\PYG{l+m}{30}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{rawSamples}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{inferenceBuffer}\PYG{p}{.}\PYG{n+na}{toList}\PYG{p}{()}
+\PYG{+w}{        }\PYG{n}{inferenceBuffer}\PYG{p}{.}\PYG{n+na}{clear}\PYG{p}{()}
+
+\PYG{+w}{        }\PYG{n}{viewModelScope}\PYG{p}{.}\PYG{n+na}{launch}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{rgbSamples}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{withContext}\PYG{p}{(}\PYG{n}{Dispatchers}\PYG{p}{.}\PYG{n+na}{Default}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{samplesToDrop}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{currentFps}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{l+m}{5}
+\PYG{+w}{                }\PYG{n}{rawSamples}\PYG{p}{.}\PYG{n+na}{drop}\PYG{p}{(}\PYG{n}{samplesToDrop}\PYG{p}{).}\PYG{n+na}{map}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}
+\PYG{+w}{                    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{r}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m}{1.402f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{v}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)).}\PYG{n+na}{coerceIn}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{255f}\PYG{p}{)}
+\PYG{+w}{                    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{g}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0.344136f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{u}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0.714136f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{v}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)).}\PYG{n+na}{coerceIn}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{255f}\PYG{p}{)}
+\PYG{+w}{                    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{b}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m}{1.772f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{u}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{128f}\PYG{p}{)).}\PYG{n+na}{coerceIn}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{255f}\PYG{p}{)}
+\PYG{+w}{                    }\PYG{n}{Triple}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{b}\PYG{p}{)}
+\PYG{+w}{                }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{            }\PYG{n}{delay}\PYG{p}{(}\PYG{l+m}{1000}\PYG{p}{)}
+
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{response}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{withContext}\PYG{p}{(}\PYG{n}{Dispatchers}\PYG{p}{.}\PYG{n+na}{Default}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{n}{glucoseRepository}\PYG{p}{.}\PYG{n+na}{estimateGlucoseFromApi}\PYG{p}{(}\PYG{n}{rgbSamples}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{currentFps}\PYG{p}{)}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{            }\PYG{n}{estimatedGlucose}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{response}\PYG{p}{.}\PYG{n+na}{glucoseValue}
+\PYG{+w}{            }\PYG{n}{glucoseClass}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{response}\PYG{p}{.}\PYG{n+na}{glucoseClass}
+\PYG{+w}{            }\PYG{n}{bloodPressure}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{response}\PYG{p}{.}\PYG{n+na}{bloodPressure}
+\PYG{+w}{            }\PYG{n}{isInferenceRunning}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{            }\PYG{n}{isProcessingComplete}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{resetMeasurement}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{estimatedGlucose}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}
+\PYG{+w}{        }\PYG{n}{glucoseClass}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}
+\PYG{+w}{        }\PYG{n}{bloodPressure}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}
+\PYG{+w}{        }\PYG{n}{isInferenceRunning}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{        }\PYG{n}{isProcessingComplete}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{        }\PYG{n}{isRecording}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}
+\PYG{+w}{        }\PYG{n}{recordingProgress}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0f}
+\PYG{+w}{        }\PYG{n}{inferenceBuffer}\PYG{p}{.}\PYG{n+na}{clear}\PYG{p}{()}
+\PYG{+w}{        }\PYG{n}{liveRHistory}\PYG{p}{.}\PYG{n+na}{clear}\PYG{p}{()}
+\PYG{+w}{        }\PYG{n}{liveGHistory}\PYG{p}{.}\PYG{n+na}{clear}\PYG{p}{()}
+\PYG{+w}{        }\PYG{n}{liveBHistory}\PYG{p}{.}\PYG{n+na}{clear}\PYG{p}{()}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

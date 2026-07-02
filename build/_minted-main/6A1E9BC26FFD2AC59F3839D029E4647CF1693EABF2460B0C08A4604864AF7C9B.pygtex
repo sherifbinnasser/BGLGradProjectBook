@@ -1,0 +1,52 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{package}\PYG{+w}{ }\PYG{n+nn}{com.glucoai.presentation.measurement.analyzer}
+
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.camera.core.ImageAnalysis}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{androidx.camera.core.ImageProxy}
+
+\PYG{c+cm}{/**}
+\PYG{c+cm}{ * Analyzes camera frames to extract the average RGB intensity for PPG.}
+\PYG{c+cm}{ * Processes every pixel of the frame (no subsampling) for maximum signal integration.}
+\PYG{c+cm}{ */}
+\PYG{k+kd}{class}\PYG{+w}{ }\PYG{n+nc}{FingertipAnalyzer}\PYG{p}{(}
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{onSignalExtracted}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{width}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{+w}{ }\PYG{k+kt}{Unit}
+\PYG{p}{)}\PYG{+w}{ }\PYG{p}{:}\PYG{+w}{ }\PYG{n}{ImageAnalysis}\PYG{p}{.}\PYG{n+na}{Analyzer}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{    }\PYG{k+kd}{override}\PYG{+w}{ }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{analyze}\PYG{p}{(}\PYG{n}{image}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{ImageProxy}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{width}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{image}\PYG{p}{.}\PYG{n+na}{width}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{height}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{image}\PYG{p}{.}\PYG{n+na}{height}
+
+\PYG{+w}{        }\PYG{c+c1}{// Extract averages with proper pixel\PYGZhy{}stride handling across the full frame}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{yMean}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{calculateAverage}\PYG{p}{(}\PYG{n}{image}\PYG{p}{.}\PYG{n+na}{planes}\PYG{o}{[}\PYG{l+m}{0}\PYG{o}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{width}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{)}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{uMean}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{calculateAverage}\PYG{p}{(}\PYG{n}{image}\PYG{p}{.}\PYG{n+na}{planes}\PYG{o}{[}\PYG{l+m}{1}\PYG{o}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{width}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{l+m}{2}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{l+m}{2}\PYG{p}{)}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{vMean}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{calculateAverage}\PYG{p}{(}\PYG{n}{image}\PYG{p}{.}\PYG{n+na}{planes}\PYG{o}{[}\PYG{l+m}{2}\PYG{o}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{width}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{l+m}{2}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{l+m}{2}\PYG{p}{)}
+
+\PYG{+w}{        }\PYG{n}{onSignalExtracted}\PYG{p}{(}\PYG{n}{yMean}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{uMean}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{vMean}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{width}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{)}
+
+\PYG{+w}{        }\PYG{n}{image}\PYG{p}{.}\PYG{n+na}{close}\PYG{p}{()}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{calculateAverage}\PYG{p}{(}\PYG{n}{plane}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{ImageProxy}\PYG{p}{.}\PYG{n+na}{PlaneProxy}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{width}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{p}{):}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{buffer}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{plane}\PYG{p}{.}\PYG{n+na}{buffer}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{rowStride}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{plane}\PYG{p}{.}\PYG{n+na}{rowStride}
+\PYG{+w}{        }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{pixelStride}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{plane}\PYG{p}{.}\PYG{n+na}{pixelStride}
+
+\PYG{+w}{        }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{sum}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0L}
+\PYG{+w}{        }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nv}{count}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0}
+
+\PYG{+w}{        }\PYG{n}{buffer}\PYG{p}{.}\PYG{n+na}{rewind}\PYG{p}{()}
+\PYG{+w}{        }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{y}\PYG{+w}{ }\PYG{k}{in}\PYG{+w}{ }\PYG{l+m}{0}\PYG{+w}{ }\PYG{n}{until}\PYG{+w}{ }\PYG{n}{height}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{rowOffset}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{y}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{rowStride}
+\PYG{+w}{            }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{x}\PYG{+w}{ }\PYG{k}{in}\PYG{+w}{ }\PYG{l+m}{0}\PYG{+w}{ }\PYG{n}{until}\PYG{+w}{ }\PYG{n}{width}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{index}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{rowOffset}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{x}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{pixelStride}
+\PYG{+w}{                }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{index}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{buffer}\PYG{p}{.}\PYG{n+na}{capacity}\PYG{p}{())}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                    }\PYG{n}{sum}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{buffer}\PYG{p}{.}\PYG{n+na}{get}\PYG{p}{(}\PYG{n}{index}\PYG{p}{).}\PYG{n+na}{toInt}\PYG{p}{()}\PYG{+w}{ }\PYG{n}{and}\PYG{+w}{ }\PYG{l+m}{0}\PYG{n}{xFF}
+\PYG{+w}{                    }\PYG{n}{count}\PYG{o}{++}
+\PYG{+w}{                }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{count}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{sum}\PYG{p}{.}\PYG{n+na}{toFloat}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n}{count}\PYG{+w}{ }\PYG{k}{else}\PYG{+w}{ }\PYG{l+m}{0f}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

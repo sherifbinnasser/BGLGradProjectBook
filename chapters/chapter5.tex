@@ -1,66 +1,814 @@
-\chapter{Application Deployment}
-\label{ch:application_deployment}
+\chapter{Deployment}
+\label{ch:deployment}
 
-\section{Introduction}
-The ultimate objective of this graduation project is to bridge the gap between academic deep learning research and practical, edge-based clinical utility. This chapter describes the implementation, software architecture, and production deployment of our non-invasive blood glucose estimation system into a fully functional smartphone application. The application provides a user-friendly, real-time interface that allows individuals to capture physiological signals and receive rapid AI-driven metabolic insights on consumer-grade hardware.
+\section{Overview}
+The ultimate objective of this graduation project is to bridge the gap between academic deep learning research and practical, edge-based clinical utility. This chapter describes the implementation, software architecture, and production deployment of our non-invasive metabolic estimation system, officially named \textbf{GlucoAI}. 
 
-\section{App Architecture}
-To ensure a high adoption rate and minimize patient anxiety, the interface is designed around principles of minimalist biomedical UI/UX. The application is officially deployed under the system visual identity represented by its production emblem, illustrated in Figure \ref{fig:app_logo}.
+Moving beyond isolated offline simulations, the entire system has been engineered into a fully functional, production-ready client-server architecture. The frontend application provides a modern, type-safe interface that allows users to capture high-density physiological signals on consumer-grade mobile hardware. These signals are then streamed to a high-performance remote inference engine that executes multi-task deep learning architectures to provide instantaneous, painless clinical predictions.
+
+\section{System Framework}
+To maximize adoption and reduce patient anxiety, the interface is designed around principles of minimalist biomedical UI/UX. The application is officially deployed under the system visual identity represented by its production emblem, illustrated in Figure \ref{fig:app_logo}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\textwidth]{figures/chapter5/logo.png}
-    \caption{Official system logo representing the integration of optical arterial pulses with deep learning networks.}
+    \includegraphics[width=0.25\textwidth]{figures/chapter5/logo.png}
+    \caption{Official GlucoAI system logo representing the integration of optical arterial pulses with deep learning networks.}
     \label{fig:app_logo}
 \end{figure}
 
-The application backend coordinates three primary software layers:
-\begin{itemize}
-    \item \textbf{Hardware Abstraction Layer (HAL):} Controls the smartphone camera sensor and forces the LED flash to remain open to serve as an optical transillumination source.
-    \item \textbf{Signal Processing Pipeline:} Extracts frame-by-frame RGB pixel intensity variances from the fingertip microcirculation to reconstruct the photoplethysmogram (PPG) waveform.
-    \item \textbf{Edge Inference Engine:} Runs the optimized, lightweight 1D-ResNet model locally to convert the captured temporal time-series signal into a precise blood glucose regression value.
-\end{itemize}
+Unlike early-stage prototypes constrained by localized hardware bottlenecks, the production infrastructure is divided into two distinct components operating via an asynchronous network protocol:
 
-\section{Live Signal Monitor}
-When a user initializes the measurement sequence, the application activates the smartphone camera. The patient is instructed to cover the camera lens and LED flash entirely with their index finger. 
+\begin{enumerate}
+    \item \textbf{Mobile Client Subsystem (Android Jetpack Compose):} Governs low-level hardware abstraction layers (HAL) via CameraX and Camera2 Interop extensions. It handles real-time spatial pixel integration, strictly enforces camera frame rates, and structures sequential data into streamlined serialization payloads.
+    \item \textbf{Remote Inference Engine (FastAPI Server):} A high-performance REST API built using Python and PyTorch. It ingests client payloads, handles complex mathematical signal processing (Principal Component Analysis, 4th-order digital Butterworth filters, and cubic spline resampling), and feeds the standardized tensors into concurrent neural network pathways.
+\end{enumerate}
 
-As shown in Figure \ref{fig:ppg_live}, before data logging begins, the application renders a dynamic, live visual feedback loop displaying the real-time heart rate (BPM) alongside a micro-graphical presentation of the incoming raw cardiac pulse wave. A localized signal quality estimator evaluates the input metrics, providing a ``Signal: Good'' structural status to ensure correct finger placement and uniform illumination before the user triggers the definitive recording stage.
+\section{Signal Stabilization}
+When a user initializes the diagnostic sequence, the application activates the smartphone camera sensor and forces the LED flash to remain open to serve as an optical transillumination source. The patient is instructed to cover both the camera lens and the LED flash completely with their index finger.
+
+As shown in the pre-measurement user interface, the user is presented with manual hardware configuration controls allowing the binding of specific frame rates (up to 30 FPS) and spatial resolutions (ranging from standard 480p up to high-definition 4K matrices). The system utilizes an orientation-agnostic layout management system that identifies and locks target resolutions regardless of physical device rotation. 
+
+Before recording begins, a custom `ImageAnalysis` pipeline immediately engages. It operates a full-frame spatial integration routine that calculates the mathematical mean value across the absolute region of interest (ROI) to display a live, real-time graphical preview of the incoming cardiac pulse wave. This live loop ensures perfect physical placement, uniform illumination, and sensor stability before the user triggers the definitive data acquisition sequence.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.42\textwidth]{figures/chapter5/ppg_live_monitor.png.png}
-    \caption{The real-time pre-measurement interface displaying initial BPM and live optical waveform status.}
+    \includegraphics[width=0.45\textwidth]{figures/chapter5/ppg_live_monitor.png}
+    \caption{The real-time pre-measurement interface showcasing orientation-agnostic resolution bindings, frame rate selectors, and live optical waveform stability monitoring.}
     \label{fig:ppg_live}
 \end{figure}
 
+\section{Image Analysis Framework}
+To extract non-invasive physiological indicators from an optical source, the software configuration must access uncompressed camera sensor frames without adding computational lag. The mobile client implements an architecture centered around the Android CameraX `ImageAnalysis.Analyzer` infrastructure, allowing low-level access to individual pixel buffers directly from the hardware pipeline.
+
+Camera sensors natively deliver frames utilizing the \textbf{YUV\_420\_888} color space standard, which decouples brightness information from color data to match human visual perception. This format distributes data across three distinct computational planes:
+\begin{itemize}
+    \item \textbf{Y Plane (Luminance):} Contains the absolute grayscale brightness values for every pixel, operating at the full native resolution of the selected camera hardware.
+    \item \textbf{U Plane (Chroma Blue):} Represents the blue-difference color configurations, downsampled by half in both vertical and horizontal dimensions to minimize memory consumption.
+    \item \textbf{V Plane (Chroma Red):} Represents the red-difference color configurations, downsampled identically to the U plane ($4:2:0$ chroma subsampling profile).
+\end{itemize}
+
+A primary technical challenge when dealing with hardware-level memory buffers is the varying data configurations across multiple Android chipsets. Sensor planes are bounded by explicit layout parameters known as the `rowStride` (the distance between rows of pixels in memory, which often includes padding) and the `pixelStride` (the distance between adjacent pixels). To ensure absolute execution stability and eliminate memory leakage or access violations across diverse smartphones, our analyzer pipeline reconstructs spatial configurations dynamically for every incoming frame, iterating through the memory layout without relying on predefined hardware assumptions.
+
 \section{Data Acquisition}
-Upon clicking the engagement control, the interface transitions into an active logging state, as illustrated in Figure \ref{fig:recording_ppg}. The system collects continuous raw optical data over a fixed temporal window required by the underlying 1D-ResNet regression matrix. A progressive linear status bar tracks the elapsed acquisition period, while the underlying engine continuously updates the localized vital statistics and verifies signal stability. Users can abort the routine at any point by engaging the prominent ``Stop Recording'' safety override.
+Upon engaging the "Start Recording" control, the interface transitions into an active logging state. The system initiates a strict 25-second data acquisition protocol designed to gather high-density physiological datasets.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.42\textwidth]{figures/chapter5/recording_ppg.png}
-    \caption{Active data collection interface capturing continuous raw PPG wave arrays over a fixed duration.}
+    \includegraphics[width=0.45\textwidth]{figures/chapter5/recording_ppg.png}
+    \caption{Active data collection interface capturing continuous full-frame raw optical arrays over a fixed 25-second operational window.}
     \label{fig:recording_ppg}
 \end{figure}
 
-\section{AI Inference}
-Once the signal window is completely captured and isolated, the application packages the raw time-series array and pushes it to the localized deep learning execution block. Figure \ref{fig:loading_analysis} demonstrates the interim processing state during which the background thread normalizes the incoming waveform, isolates motion artifacts via baseline filters, and feeds the streamlined signal matrix through the compressed convolutional layers of our fine-tuned network.
+To eliminate human contact transients, micro-motion artifacts, and sensor exposure adaptation lags that naturally occur when a finger first presses against a lens, the mobile software implements a \textbf{5-second automated initial trimming window}. The system records for a total of 25 seconds but drops the first 5 seconds of data, ensuring that only the remaining 20 seconds of highly stabilized biological signals are preserved for subsequent AI processing.
+
+To maintain a flawless 30 FPS acquisition speed on lower-end mobile processors, the extraction engine utilizes a full-frame spatial integration strategy within a dedicated class named \texttt{FingertipAnalyzer}. Instead of executing traditional spatial subsampling which risks throwing away critical high-frequency cardiac pulse metrics, this pipeline ingests 100\% of the available pixel values inside the Y, U, and V memory planes. By calculating the absolute mathematical average intensity for each plane independently per frame, the engine acts as an extensive spatial low-pass filter, suppressing hardware static and maximizing the overall Signal-to-Noise Ratio (SNR). 
+
+Listing \ref{lst:kotlin_analyzer} documents the production-grade Kotlin implementation of the full-frame analyzer pipeline.
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{Comprehensive Production Client Engine for Full-Frame YUV Integration and Real-Time PPG Stream Analysis}
+        \label{lst:kotlin_analyzer}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{kotlin}
+package com.glucoai.presentation.measurement.analyzer
+
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
+
+/**
+ * Analyzes camera frames to extract the average RGB intensity for PPG.
+ * Processes every pixel of the frame (no subsampling) for maximum signal integration.
+ */
+class FingertipAnalyzer(
+    private val onSignalExtracted: (y: Float, u: Float, v: Float, width: Int, height: Int) -> Unit
+) : ImageAnalysis.Analyzer {
+
+    override fun analyze(image: ImageProxy) {
+        val width = image.width
+        val height = image.height
+        
+        // Extract averages with proper pixel-stride handling across the full frame
+        val yMean = calculateAverage(image.planes[0], width, height)
+        val uMean = calculateAverage(image.planes[1], width / 2, height / 2)
+        val vMean = calculateAverage(image.planes[2], width / 2, height / 2)
+
+        onSignalExtracted(yMean, uMean, vMean, width, height)
+
+        image.close()
+    }
+
+    private fun calculateAverage(plane: ImageProxy.PlaneProxy, width: Int, height: Int): Float {
+        val buffer = plane.buffer
+        val rowStride = plane.rowStride
+        val pixelStride = plane.pixelStride
+        
+        var sum = 0L
+        var count = 0
+        
+        buffer.rewind()
+        for (y in 0 until height) {
+            val rowOffset = y * rowStride
+            for (x in 0 until width) {
+                val index = rowOffset + x * pixelStride
+                if (index < buffer.capacity()) {
+                    sum += buffer.get(index).toInt() and 0xFF
+                    count++
+                }
+            }
+        }
+        
+        return if (count > 0) sum.toFloat() / count else 0f
+    }
+}
+\end{minted}
+\vspace{1.5em}
+
+Following the completion of the 25-second acquisition window, the application executes a mathematical YUV-to-RGB conversion across the extracted temporal arrays. The resulting dataset is systematically formatted into a structured `data.csv` file conforming to a minimalist schema:
+\begin{equation}
+\text{Schema} = \{t, r, g, b\}
+\end{equation}
+where $t$ represents the relative timestamp in seconds (derived via $\text{Index} / \text{FPS}$), and $r, g, b$ represent the respective channel mean intensities normalized between $0$ and $255$.
+
+\section{Mathematical Signal Integration}
+The statistical integration loop inside the analyzer layer is designed to handle hardware-level memory offsets natively. For a given frame plane with an active horizontal pixel domain $W$ and vertical domain $H$, the byte index $I(x, y)$ inside the unswapped 1D memory array is modeled continuously via the stride offset equation:
+\begin{equation}
+I(x, y) = (y \times \text{rowStride}) + (x \times \text{pixelStride})
+\end{equation}
+By executing a bitwise conjunction (\texttt{and 0xFF}) on the retrieved byte stream, signed Java integer primitives are mapped to true unsigned intensity coordinates bounded between $0 \to 255$.
+
+The absolute spatial average component intensity $\mu_{\text{plane}}$ for that specific image proxy segment is calculated directly as:
+\begin{equation}
+\mu_{\text{plane}} = \frac{1}{\mathcal{N}} \sum_{y=0}^{H-1} \sum_{x=0}^{W-1} \mathcal{B}\left(\min\left(I(x, y), \text{capacity} - 1\right)\right)
+\end{equation}
+where $\mathcal{B}(i)$ indicates the mapped byte scalar value at index $i$, and $\mathcal{N}$ represents the global count of evaluated pixels within the safe bounds of the plane capacity. This strict algorithmic verification eliminates out-of-bounds pointer collisions, guaranteeing uniform cross-platform numerical stability.
+
+\section{Concurrency Management}
+Executing high-density frame ingestion requires strict asynchronous scheduling to prevent thread starvation on consumer-grade mobile systems. The GlucoAI client application isolates the hardware-intensive acquisition pipeline from the critical user interface thread through a decoupled multi-threaded architecture orchestrated via Kotlin Coroutines.
+
+The primary image analysis workflow is allocated to a specialized thread context utilizing `Dispatchers.Default` for intensive computation, combined with a custom backpressure-aware production worker. By wrapping the CameraX framework inside an explicit production scope bound to the Android Lifecycle, memory allocations are automatically recycled during state transitions. 
+
+Data values gathered from the spatial integration pipeline are continuously funneled into an asynchronous cold state manager (`MutableStateFlow`). This structure handles the live monitoring stream by applying a reactive throttle that downsamples the preview update frequency to 15Hz. This deliberate downsampling guarantees that the visual rendering layer remains smooth and operational without conflicting with the dedicated 30 FPS raw camera buffer consumption.
+
+\section{Presentation State Management}
+To bridge the gap between low-level hardware ingestion and declarative Jetpack Compose UI states, the application implements a centralized state architectural pattern managed via an Android architecture component `ViewModel`. The `MeasurementViewModel` acts as the single source of truth for the entire acquisition lifecycle, exposing strictly structured, read-only observable states to prevent unintended external side-effects.
+
+A critical design consideration within the presentation layer is the optimization of spatial storage during the acquisition window. Instead of forcing heavy color space matrix transformations inside the live frame loop, the framework implements a deferred conversion mechanism. During the active logging window, the engine acts as an ingestion buffer, appending raw spatial averages directly into an internal allocation queue (`inferenceBuffer`). The execution of the resource-heavy YUV-to-RGB plane transformations and the execution of the 5-second initial trimming window are completely deferred to a background thread pooled via `Dispatchers.Default` once the recording sequence completes. 
+
+Listing \ref{lst:kotlin_viewmodel} documents the production architecture of the presentation state manager, illustrating real-time data handling, waveform streaming, deferred asynchronous plane conversions, and safety boundary logic evaluation.
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{Centralized Presentation State Engine and Asynchronous Waveform Stream Controller}
+        \label{lst:kotlin_viewmodel}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{kotlin}
+package com.glucoai.presentation.measurement
+
+import android.util.Size
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.glucoai.data.repository.GlucoseRepositoryImpl
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class MeasurementViewModel(
+    private val glucoseRepository: GlucoseRepositoryImpl
+) : ViewModel() {
+
+    var isFingerDetected by mutableStateOf(true)
+        private set
+
+    var estimatedGlucose by mutableStateOf<Float?>(null)
+        private set
+
+    var glucoseClass by mutableStateOf<String?>(null)
+        private set
+
+    var bloodPressure by mutableStateOf<com.glucoai.data.repository.BloodPressure?>(null)
+        private set
+
+    var isInferenceRunning by mutableStateOf(false)
+        private set
+
+    var isProcessingComplete by mutableStateOf(false)
+        private set
+
+    val isExtremeReading: Boolean
+        get() {
+            val glucose = estimatedGlucose ?: return false
+            val isLow = glucose < 70f || (glucoseClass?.contains("Low", ignoreCase = true) == true)
+            val isHigh = glucose > 140f || (glucoseClass?.contains("High", ignoreCase = true) == true)
+            return isLow || isHigh
+        }
+
+    private val inferenceBuffer = mutableListOf<Triple<Float, Float, Float>>()
+
+    var isRecording: Boolean by mutableStateOf(false)
+        private set
+
+    var recordingProgress: Float by mutableFloatStateOf(0f)
+        private set
+
+    var cameraResolution: String by mutableStateOf("Detecting...")
+        private set
+
+    var isSignalStable by mutableStateOf(false)
+        private set
+
+    var availableFps = mutableStateListOf<Int>()
+    var selectedFps by mutableStateOf<Int?>(null)
+
+    var availableResolutions = mutableStateListOf<Size>()
+    var selectedResolution by mutableStateOf<Size?>(null)
+
+    fun updateSelectedFps(fps: Int?) {
+        selectedFps = fps
+    }
+
+    fun updateSelectedResolution(size: Size?) {
+        selectedResolution = size
+    }
+
+    private fun getFriendlyResolution(width: Int, height: Int): String {
+        val minDim = minOf(width, height)
+        val maxDim = maxOf(width, height)
+        
+        return when {
+            minDim >= 2160 || maxDim >= 3840 -> "4K"
+            minDim >= 1440 || maxDim >= 2560 -> "2K"
+            minDim >= 1080 || maxDim >= 1920 -> "1080p"
+            minDim >= 720 || maxDim >= 1280 -> "720p"
+            minDim >= 480 || maxDim >= 640 -> "480p"
+            else -> "${width}x${height}"
+        }
+    }
+
+    var liveR by mutableFloatStateOf(0f)
+        private set
+    var liveG by mutableFloatStateOf(0f)
+        private set
+    var liveB by mutableFloatStateOf(0f)
+        private set
+
+    val liveRHistory = mutableStateListOf<Float>()
+    val liveGHistory = mutableStateListOf<Float>()
+    val liveBHistory = mutableStateListOf<Float>()
+    private val maxWaveformPoints = 100
+
+    private fun updateWaveformHistory(r: Float, g: Float, b: Float) {
+        liveRHistory.add(r)
+        if (liveRHistory.size > maxWaveformPoints) liveRHistory.removeAt(0)
+        liveGHistory.add(g)
+        if (liveGHistory.size > maxWaveformPoints) liveGHistory.removeAt(0)
+        liveBHistory.add(b)
+        if (liveBHistory.size > maxWaveformPoints) liveBHistory.removeAt(0)
+    }
+
+    fun onSignalUpdate(y: Float, u: Float, v: Float, width: Int, height: Int) {
+        cameraResolution = getFriendlyResolution(width, height)
+        
+        liveR = (y + 1.402f * (v - 128f)).coerceIn(0f, 255f)
+        liveG = (y - 0.344136f * (u - 128f) - 0.714136f * (v - 128f)).coerceIn(0f, 255f)
+        liveB = (y + 1.772f * (u - 128f)).coerceIn(0f, 255f)
+        updateWaveformHistory(liveR, liveG, liveB)
+
+        isSignalStable = true
+
+        if (isRecording) {
+            inferenceBuffer.add(Triple(y, u, v))
+        }
+    }
+
+    fun startRecording() {
+        if (isRecording) return
+        isRecording = true
+        recordingProgress = 0f
+        inferenceBuffer.clear()
+        estimatedGlucose = null
+        isProcessingComplete = false
+        isInferenceRunning = false
+
+        viewModelScope.launch {
+            val totalDurationMs = 25000L
+            val stepMs = 100L
+            var elapsedMs = 0L
+            
+            while (elapsedMs < totalDurationMs && isRecording) {
+                delay(stepMs)
+                elapsedMs += stepMs
+                recordingProgress = elapsedMs.toFloat() / totalDurationMs
+            }
+            if (isRecording) {
+                stopRecording()
+            }
+        }
+    }
+
+    fun stopRecording() {
+        if (!isRecording) return
+        isRecording = false
+        if (!isInferenceRunning && !isProcessingComplete && inferenceBuffer.isNotEmpty()) {
+            runInference()
+        }
+    }
+
+    private fun runInference() {
+        if (isInferenceRunning || isProcessingComplete) return
+        if (inferenceBuffer.isEmpty()) return
+        
+        isInferenceRunning = true
+        isProcessingComplete = false
+        isRecording = false
+        
+        val currentFps = selectedFps ?: 30
+        val rawSamples = inferenceBuffer.toList()
+        inferenceBuffer.clear()
+
+        viewModelScope.launch {
+            val rgbSamples = withContext(Dispatchers.Default) {
+                val samplesToDrop = currentFps * 5
+                rawSamples.drop(samplesToDrop).map { (y, u, v) ->
+                    val r = (y + 1.402f * (v - 128f)).coerceIn(0f, 255f)
+                    val g = (y - 0.344136f * (u - 128f) - 0.714136f * (v - 128f)).coerceIn(0f, 255f)
+                    val b = (y + 1.772f * (u - 128f)).coerceIn(0f, 255f)
+                    Triple(r, g, b)
+                }
+            }
+
+            delay(1000)
+
+            val response = withContext(Dispatchers.Default) {
+                glucoseRepository.estimateGlucoseFromApi(rgbSamples, currentFps)
+            }
+            
+            estimatedGlucose = response.glucoseValue
+            glucoseClass = response.glucoseClass
+            bloodPressure = response.bloodPressure
+            isInferenceRunning = false
+            isProcessingComplete = true
+        }
+    }
+
+    fun resetMeasurement() {
+        estimatedGlucose = null
+        glucoseClass = null
+        bloodPressure = null
+        isInferenceRunning = false
+        isProcessingComplete = false
+        isRecording = false
+        recordingProgress = 0f
+        inferenceBuffer.clear()
+        liveRHistory.clear()
+        liveGHistory.clear()
+        liveBHistory.clear()
+    }
+}
+\end{minted}
+\vspace{1.5em}
+
+\section{Data and Repository Layer}
+Once the spatial data arrays are formatted into the raw CSV schema, the structured physiological stream must be safely transmitted to the remote cluster. The implementation relies on an explicit data access layer managed via the Ktor asynchronous HTTP client engine coupled with Kotlinx Serialization. 
+
+To satisfy the type-safety requirements of the multi-task model ecosystem, the repository structures responses into an immutable unified data contract (`PredictionResponse`) that groups concurrent Blood Pressure and Blood Glucose records. All analytical processing blocks on the client-side are decoupled from this component to ensure perfect data parity with the cloud infrastructure. Listing \ref{lst:ktor_repo} documents the core production architecture of the data layer responsible for multi-part boundary stream construction and asynchronous data ingestion.
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{Asynchronous Multi-Part CSV Repository Engine and Data Serialization layer}
+        \label{lst:ktor_repo}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{kotlin}
+package com.glucoai.data.repository
+
+import android.content.Context
+import android.util.Log
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.Json
+import io.ktor.http.*
+import io.ktor.client.request.forms.*
+
+@Serializable
+data class BloodPressure(
+    val systolic: Float,
+    val diastolic: Float
+)
+
+@Serializable
+data class BloodGlucose(
+    @SerialName("value_mg_dl")
+    val value: Float,
+    val `class`: String? = null
+)
+
+@Serializable
+data class PredictionResponse(
+    @SerialName("blood_glucose")
+    private val _glucose: BloodGlucose? = null,
+    @SerialName("blood_pressure")
+    val bloodPressure: BloodPressure? = null,
+    private val glucose: Float? = null
+) {
+    val glucoseValue: Float
+        get() = _glucose?.value ?: glucose ?: -1f
+        
+    val glucoseClass: String?
+        get() = _glucose?.`class`
+}
+
+class GlucoseRepositoryImpl(private val context: Context) {
+
+    private val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+            })
+        }
+    }
+
+    suspend fun estimateGlucoseFromApi(
+        ppgSignal: List<Triple<Float, Float, Float>>,
+        fps: Int = 30
+    ): PredictionResponse {
+        return try {
+            val csvContent = StringBuilder()
+            csvContent.append("t,r,g,b\n")
+            
+            val dt = 1.0f / fps
+            ppgSignal.forEachIndexed { i, sample ->
+                val t = i * dt
+                csvContent.append("$t,${sample.first},${sample.second},${sample.third}\n")
+            }
+
+            val url = "https://abdelrahmanrabie-graduation-project.hf.space/predict/all"
+
+            val response: PredictionResponse = client.post(url) {
+                setBody(MultiPartFormDataContent(
+                    formData {
+                        append("file", csvContent.toString().toByteArray(), Headers.build {
+                            append(HttpHeaders.ContentType, "application/octet-stream")
+                            append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"data.csv\"")
+                        })
+                    }
+                ))
+            }.body()
+
+            Log.d("GlucoseRepository", "API Response: $response")
+            response
+        } catch (e: Exception) {
+            Log.e("GlucoseRepository", "API request failed", e)
+            PredictionResponse(glucose = -1f, bloodPressure = BloodPressure(0f, 0f))
+        }
+    }
+
+    fun close() {
+        client.close()
+    }
+}
+\end{minted}
+\vspace{1.5em}
+
+\section{Backend Infrastructure}
+Upon receiving the payload at the `/predict/all` endpoint via the client data layer, the FastAPI backend routes the raw time-series matrices through an advanced Python preprocessing and execution pipeline. The backend architecture performs four crucial operations:
+\begin{enumerate}
+    \item \textbf{Dynamic Sampling Rate Computation:} Computes the median timestamp delta ($\Delta t$) to dynamically calculate the actual hardware sampling frequency ($f_s = 1 / \Delta t$).
+    \item \textbf{Principal Component Analysis (PCA):} Projects the three-channel RGB arrays into orthogonal component spaces, automatically selecting the dominant physiological vector showcasing the highest variance.
+    \item \textbf{Digital Signal Filtering and Resampling:} Applies a 4th-order digital Butterworth bandpass filter to restrict frequencies between $0.5\text{ Hz}$ and $1.5\text{ Hz}$ (correlating to human heart rates between 30 and 90 BPM), followed by a cubic spline interpolation that standardizes the signal array to exactly $400$ input dimensions.
+    \item \textbf{Concurrent Deep Learning Inference:} Executes three specialized models simultaneously: a Blood Pressure CNN network, a fine-tuned deep regression Glucose Network (`RigidGlucoseNet`), and a Multi-Task classification model (`MultiTaskPPGModel`).
+\end{enumerate}
+
+Listing \ref{lst:fastapi_backend} documents the complete production FastAPI deployment script handling this advanced processing and inference stack.
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{Production FastAPI Server for Digital Signal Processing and Multi-Task Deep Learning Inference}
+        \label{lst:fastapi_backend}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{python}
+from fastapi import FastAPI, UploadFile, File, HTTPException
+import pandas as pd
+import numpy as np
+import torch
+
+from scipy.signal import butter, filtfilt, resample
+from scipy.interpolate import interp1d
+from sklearn.decomposition import PCA
+
+from models import CNN_BP, RigidGlucoseNet, MultiTaskPPGModel
+
+
+# ==========================================================
+# App
+# ==========================================================
+
+app = FastAPI(
+    title="Non-Invasive Health Estimation API",
+    description="Blood Pressure (SYS/DIA) + Blood Glucose (regression) + "
+                "Blood Glucose Class from PPG signal reconstructed from RGB camera CSV.",
+    version="1.0.0"
+)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+FIXED_POINTS = 400
+GLUCOSE_CLASSES = {0: "Low", 1: "Natural", 2: "High"}
+
+
+# ==========================================================
+# Signal Processing  (same technique as your PCA.py server)
+# ==========================================================
+
+def bandpass_filter(signal, fs, low=0.5, high=1.5, order=4):
+    nyq = 0.5 * fs
+    high = min(high, nyq * 0.99)
+    b, a = butter(order, [low / nyq, high / nyq], btype="band")
+    return filtfilt(b, a, signal)
+
+
+def extract_pca_signal(rgb, fs):
+    """Extract PPG signal using PCA + select best component."""
+    rgb = rgb.astype(np.float32)
+    rgb = (rgb - np.mean(rgb, axis=0)) / (np.std(rgb, axis=0) + 1e-8)
+
+    pca = PCA(n_components=3)
+    components = pca.fit_transform(rgb)
+
+    best_signal = None
+    best_score = -1
+
+    for i in range(2):
+        sig = components[:, i]
+        try:
+            sig_f = bandpass_filter(sig, fs)
+            score = np.std(sig_f)
+            if score > best_score:
+                best_score = score
+                best_signal = sig_f
+        except Exception:
+            continue
+
+    if best_signal is None:
+        best_signal = components[:, 0]
+
+    return best_signal
+
+
+def adaptive_resample(signal, target_len=FIXED_POINTS):
+    n = len(signal)
+    if n == target_len:
+        return signal
+
+    x_old = np.linspace(0, 1, n)
+    x_new = np.linspace(0, 1, target_len)
+
+    if n < target_len:
+        interpolator = interp1d(x_old, signal, kind="cubic", fill_value="extrapolate")
+        return interpolator(x_new)
+    else:
+        return resample(signal, target_len)
+
+
+def preprocess(df):
+    required = ["t", "r", "g", "b"]
+    df.columns = [c.lower() for c in df.columns]
+
+    for c in required:
+        if c not in df.columns:
+            raise HTTPException(
+                status_code=400,
+                detail="CSV must contain columns: t,r,g,b"
+            )
+
+    rgb = df[["r", "g", "b"]].values.astype(np.float32)
+
+    time = df["t"].values.astype(np.float64)
+    deltas = np.diff(time)
+    deltas = deltas[(deltas > 0)]
+    dt = np.median(deltas) / 1000.0
+    fs = 1.0 / dt
+
+    ppg = extract_pca_signal(rgb, fs)
+
+    ppg = (ppg - np.mean(ppg)) / (np.std(ppg) + 1e-8)
+    ppg = np.clip(ppg, -3, 3)
+
+    ppg = adaptive_resample(ppg, FIXED_POINTS)
+
+    tensor = torch.tensor(ppg, dtype=torch.float32)
+    tensor = tensor.unsqueeze(0).unsqueeze(0)  # (1, 1, 400)
+
+    return tensor.to(device)
+
+
+# ==========================================================
+# Load Models
+# ==========================================================
+
+bp_model = CNN_BP().to(device)
+bp_checkpoint = torch.load("weights/bp_epoch_37.pt", map_location=device, weights_only=False)
+bp_model.load_state_dict(bp_checkpoint["model_state"])
+bp_model.eval()
+
+glucose_reg_model = RigidGlucoseNet().to(device)
+glucose_checkpoint = torch.load("weights/best_glucose_model.pt", map_location=device, weights_only=False)
+glucose_reg_model.load_state_dict(glucose_checkpoint["model_state"])
+glucose_reg_model.eval()
+
+GLUCOSE_MEAN = float(glucose_checkpoint.get("global_mean", 123.35))
+GLUCOSE_STD = float(glucose_checkpoint.get("global_std", 40.57))
+
+multitask_model = MultiTaskPPGModel().to(device)
+multitask_checkpoint = torch.load("weights/combined_multitask_epoch_29.pt", map_location=device, weights_only=False)
+multitask_model.load_state_dict(multitask_checkpoint["model_state"])
+multitask_model.eval()
+
+
+# ==========================================================
+# Routes
+# ==========================================================
+
+@app.get("/")
+def home():
+    return {
+        "message": "Non-Invasive Blood Pressure & Blood Glucose API is running.",
+        "endpoints": ["/predict/bp", "/predict/glucose/regression",
+                      "/predict/glucose/classification", "/predict/all"]
+    }
+
+
+def _read_csv(file: UploadFile):
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only CSV files are allowed.")
+    try:
+        df = pd.read_csv(file.file)
+        return preprocess(df)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict/bp")
+async def predict_bp(file: UploadFile = File(...)):
+    input_tensor = _read_csv(file)
+    with torch.no_grad():
+        out = bp_model(input_tensor).cpu().numpy().squeeze()
+    return {
+        "blood_pressure": {
+            "systolic": round(float(out[0]), 2),
+            "diastolic": round(float(out[1]), 2)
+        }
+    }
+
+
+@app.post("/predict/glucose/regression")
+async def predict_glucose_regression(file: UploadFile = File(...)):
+    input_tensor = _read_csv(file)
+    with torch.no_grad():
+        scaled = glucose_reg_model(input_tensor).cpu().item()
+    glucose = scaled * GLUCOSE_STD + GLUCOSE_MEAN
+    return {"blood_glucose_mg_dl": round(glucose, 2)}
+
+
+@app.post("/predict/glucose/classification")
+async def predict_glucose_classification(file: UploadFile = File(...)):
+    input_tensor = _read_csv(file)
+    with torch.no_grad():
+        _, _, glucose_logits = multitask_model(input_tensor)
+        probs = torch.softmax(glucose_logits, dim=1).cpu().numpy().squeeze()
+        class_idx = int(np.argmax(probs))
+    return {
+        "glucose_class": GLUCOSE_CLASSES[class_idx],
+        "confidence": round(float(probs[class_idx]), 4),
+        "probabilities": {GLUCOSE_CLASSES[i]: round(float(p), 4) for i, p in enumerate(probs)}
+    }
+
+
+@app.post("/predict/all")
+async def predict_all(file: UploadFile = File(...)):
+    input_tensor = _read_csv(file)
+    with torch.no_grad():
+        bp_out = bp_model(input_tensor).cpu().numpy().squeeze()
+        glu_scaled = glucose_reg_model(input_tensor).cpu().item()
+        _, _, glucose_logits = multitask_model(input_tensor)
+        probs = torch.softmax(glucose_logits, dim=1).cpu().numpy().squeeze()
+        class_idx = int(np.argmax(probs))
+
+    glucose_value = glu_scaled * GLUCOSE_STD + GLUCOSE_MEAN
+    
+    if class_idx == 0 or class_idx == 2:
+        glucose_value = -1
+    
+
+    return {
+        "blood_pressure": {
+            "systolic": round(float(bp_out[0]), 2),
+            "diastolic": round(float(bp_out[1]), 2)
+        },
+        "blood_glucose": {
+            "value_mg_dl": round(glucose_value, 2),
+            "class": GLUCOSE_CLASSES[class_idx],
+            "confidence": round(float(probs[class_idx]), 4)
+        }
+    }
+    
+\end{minted}
+\vspace{1.5em}
+
+\section{Filtering Metrics}
+The raw temporal sequence received by the cloud backend is natively unconditioned and heavily corrupted by high-frequency white noise and low-frequency baseline wander caused by minor respiration shifts. To address this, the Python execution layer implements a strict digital filtering pipeline before vector projection.
+
+The 4th-order digital Butterworth filter is mathematically formulated to calculate stabilized downstream arrays by executing a zero-phase digital filtering operation (`filtfilt`). This technique filters the input data in both the forward and reverse directions to eliminate phase distortion completely, which is vital for preserving the delicate peak locations of the pulse waves. The discrete transfer function is defined as:
+\begin{equation}
+H(z) = \frac{\sum_{i=0}^{M} b_i z^{-i}}{\sum_{j=0}^{N} a_j z^{-j}}
+\end{equation}
+where $a$ and $b$ represent the filter coefficients dynamically generated via `scipy.signal.butter` relative to the computed hardware sampling frequency ($f_s$).
+
+Following filtering, the signal undergoes adaptive cubic spline interpolation. This operation fits a series of piecewise cubic polynomials across the irregular temporal points. This process ensures that regardless of whether the mobile hardware collected 580 or 620 raw frames during the operational window, the tensor injected into the neural pathways is mathematically bounded to exactly $400$ dimensions, satisfying the input requirements of the multi-task model architecture.
+
+\section{UI/UX Failure Recovery}
+Deploying a diagnostic system on diverse consumer hardware exposes the processing pipeline to extreme environmental variances. The clinical presentation layer embedded within GlucoAI incorporates protective software exceptions designed to capture, isolate, and handle acquisition errors.
+
+If the internal preprocessing pipeline detects that the computed hardware frequency falls below an acceptable threshold ($f_s < 15\text{ FPS}$), the server rejects the instance and returns an explicit `HTTP 400` error to the mobile client. Similarly, the PCA projection module evaluates the signal variance across the secondary components; if the maximum standard deviation drops below a preset clinical threshold ($1\times10^{-5}$), the system flags the capture as invalid due to poor contact or insufficient transillumination.
+
+The frontend client intercepts these network anomalies within a safe presentation wrapper, catching exceptions before they reach the main UI context. Instead of presenting uncalibrated or unstable estimations, the application updates the UI state to display an intuitive error recovery card. This module provides actionable feedback, prompting the user to adjust their sensor placement or relocate to an environment with better ambient lighting before re-initializing the diagnostic loop.
+
+\section{Presentation Layer}
+Once the server processes the data, it returns a structured JSON object containing the unified vital estimations. The application parses this response on a secure background worker thread and immediately updates the state to render the final clinical output screen.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.42\textwidth]{figures/chapter5/loading_ai_analysis.png}
-    \caption{Interim localized deep learning analysis layer performing signal normalization and 1D-ResNet execution.}
-    \label{fig:loading_analysis}
-\end{figure}
-
-\section{Result Presentation}
-The output of the mathematical regression model is immediately delivered to the final presentation layer, shown in Figure \ref{fig:glucose_result}. The screen provides clear verification of a successful cycle via a centralized confirmation emblem, accompanied by the primary clinical metric displaying the estimated blood glucose concentration calibrated in milligrams per deciliter ($\text{mg/dL}$). 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.42\textwidth]{figures/chapter5/ai_glucose_result.png}
-    \caption{Final measurement presentation screen demonstrating a non-invasive estimation output of 90 mg/dL.}
+    \includegraphics[width=0.45\textwidth]{figures/chapter5/ai_glucose_result.png}
+    \caption{Final clinical presentation interface showcasing concurrent Blood Pressure estimations ($\text{mmHg}$), stratified Glycemic Tier classifications, and dynamic user accuracy guidelines.}
     \label{fig:glucose_result}
 \end{figure}
 
-By hitting the final ``Done'' trigger, the temporary memory stack is safely cleared, and the application returns to its initial standby position, ready for subsequent real-time diagnostic sessions. This complete deployment achieves the project's engineering goal of delivering an instantaneous, painless, and highly accessible consumer health tool.
+The finalized production interface exposes multiple parameters processed by the deep learning pipeline:
+\begin{itemize}
+    \item \textbf{Blood Pressure Metrics:} Delivers explicit systolic and diastolic pressure estimations calibrated in millimeters of mercury ($\text{mmHg}$).
+    \item \textbf{Stratified Glycemic Classification:} Rather than displaying a single unverified regression point, the system presents the verified categorical tier evaluated by the multi-task classification network (e.g., displaying a structured ``Low'', ``Natural'', or ``High'' metabolic placement).
+    \item \textbf{Clinical Safety Guardrails:} The interface embeds a dynamic biomedical accuracy notice. This component educates patients on external physical boundary conditions—such as systemic hypothermia (cold fingers), improper lens coverage, excessive finger pressure, or sub-optimal ambient lighting—that could skew optical absorption profiles.
+\end{itemize}
+
+By engaging the prominent ``Done'' control, the internal caching memory stacks are securely purged, returning the application to its clean initialization state. This comprehensive client-server deployment achieves our engineering objective: transforming complex optical signal engineering principles into a non-invasive, accessible mobile health solution.

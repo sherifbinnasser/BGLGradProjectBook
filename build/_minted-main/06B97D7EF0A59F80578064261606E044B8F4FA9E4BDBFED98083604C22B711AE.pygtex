@@ -1,0 +1,229 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{fastapi}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{FastAPI}\PYG{p}{,} \PYG{n}{UploadFile}\PYG{p}{,} \PYG{n}{File}\PYG{p}{,} \PYG{n}{HTTPException}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{pandas}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{pd}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{np}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{torch}
+
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{scipy.signal}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{butter}\PYG{p}{,} \PYG{n}{filtfilt}\PYG{p}{,} \PYG{n}{resample}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{scipy.interpolate}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{interp1d}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{sklearn.decomposition}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{PCA}
+
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{models}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{CNN\PYGZus{}BP}\PYG{p}{,} \PYG{n}{RigidGlucoseNet}\PYG{p}{,} \PYG{n}{MultiTaskPPGModel}
+
+
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+\PYG{c+c1}{\PYGZsh{} App}
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+
+\PYG{n}{app} \PYG{o}{=} \PYG{n}{FastAPI}\PYG{p}{(}
+    \PYG{n}{title}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}Non\PYGZhy{}Invasive Health Estimation API\PYGZdq{}}\PYG{p}{,}
+    \PYG{n}{description}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}Blood Pressure (SYS/DIA) + Blood Glucose (regression) + \PYGZdq{}}
+                \PYG{l+s+s2}{\PYGZdq{}Blood Glucose Class from PPG signal reconstructed from RGB camera CSV.\PYGZdq{}}\PYG{p}{,}
+    \PYG{n}{version}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}1.0.0\PYGZdq{}}
+\PYG{p}{)}
+
+\PYG{n}{device} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{device}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}cuda\PYGZdq{}} \PYG{k}{if} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{cuda}\PYG{o}{.}\PYG{n}{is\PYGZus{}available}\PYG{p}{()} \PYG{k}{else} \PYG{l+s+s2}{\PYGZdq{}cpu\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{FIXED\PYGZus{}POINTS} \PYG{o}{=} \PYG{l+m+mi}{400}
+\PYG{n}{GLUCOSE\PYGZus{}CLASSES} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+m+mi}{0}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}Low\PYGZdq{}}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}Natural\PYGZdq{}}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}High\PYGZdq{}}\PYG{p}{\PYGZcb{}}
+
+
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+\PYG{c+c1}{\PYGZsh{} Signal Processing  (same technique as your PCA.py server)}
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{bandpass\PYGZus{}filter}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{,} \PYG{n}{low}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{n}{high}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{order}\PYG{o}{=}\PYG{l+m+mi}{4}\PYG{p}{):}
+    \PYG{n}{nyq} \PYG{o}{=} \PYG{l+m+mf}{0.5} \PYG{o}{*} \PYG{n}{fs}
+    \PYG{n}{high} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{high}\PYG{p}{,} \PYG{n}{nyq} \PYG{o}{*} \PYG{l+m+mf}{0.99}\PYG{p}{)}
+    \PYG{n}{b}\PYG{p}{,} \PYG{n}{a} \PYG{o}{=} \PYG{n}{butter}\PYG{p}{(}\PYG{n}{order}\PYG{p}{,} \PYG{p}{[}\PYG{n}{low} \PYG{o}{/} \PYG{n}{nyq}\PYG{p}{,} \PYG{n}{high} \PYG{o}{/} \PYG{n}{nyq}\PYG{p}{],} \PYG{n}{btype}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}band\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{filtfilt}\PYG{p}{(}\PYG{n}{b}\PYG{p}{,} \PYG{n}{a}\PYG{p}{,} \PYG{n}{signal}\PYG{p}{)}
+
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{extract\PYGZus{}pca\PYGZus{}signal}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Extract PPG signal using PCA + select best component.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{rgb} \PYG{o}{=} \PYG{n}{rgb}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{)}
+    \PYG{n}{rgb} \PYG{o}{=} \PYG{p}{(}\PYG{n}{rgb} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{))} \PYG{o}{/} \PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mf}{1e\PYGZhy{}8}\PYG{p}{)}
+
+    \PYG{n}{pca} \PYG{o}{=} \PYG{n}{PCA}\PYG{p}{(}\PYG{n}{n\PYGZus{}components}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{)}
+    \PYG{n}{components} \PYG{o}{=} \PYG{n}{pca}\PYG{o}{.}\PYG{n}{fit\PYGZus{}transform}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{)}
+
+    \PYG{n}{best\PYGZus{}signal} \PYG{o}{=} \PYG{k+kc}{None}
+    \PYG{n}{best\PYGZus{}score} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}
+
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{):}
+        \PYG{n}{sig} \PYG{o}{=} \PYG{n}{components}\PYG{p}{[:,} \PYG{n}{i}\PYG{p}{]}
+        \PYG{k}{try}\PYG{p}{:}
+            \PYG{n}{sig\PYGZus{}f} \PYG{o}{=} \PYG{n}{bandpass\PYGZus{}filter}\PYG{p}{(}\PYG{n}{sig}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{)}
+            \PYG{n}{score} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{sig\PYGZus{}f}\PYG{p}{)}
+            \PYG{k}{if} \PYG{n}{score} \PYG{o}{\PYGZgt{}} \PYG{n}{best\PYGZus{}score}\PYG{p}{:}
+                \PYG{n}{best\PYGZus{}score} \PYG{o}{=} \PYG{n}{score}
+                \PYG{n}{best\PYGZus{}signal} \PYG{o}{=} \PYG{n}{sig\PYGZus{}f}
+        \PYG{k}{except} \PYG{n+ne}{Exception}\PYG{p}{:}
+            \PYG{k}{continue}
+
+    \PYG{k}{if} \PYG{n}{best\PYGZus{}signal} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{best\PYGZus{}signal} \PYG{o}{=} \PYG{n}{components}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{]}
+
+    \PYG{k}{return} \PYG{n}{best\PYGZus{}signal}
+
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{adaptive\PYGZus{}resample}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{target\PYGZus{}len}\PYG{o}{=}\PYG{n}{FIXED\PYGZus{}POINTS}\PYG{p}{):}
+    \PYG{n}{n} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{n} \PYG{o}{==} \PYG{n}{target\PYGZus{}len}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n}{signal}
+
+    \PYG{n}{x\PYGZus{}old} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{n}\PYG{p}{)}
+    \PYG{n}{x\PYGZus{}new} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{target\PYGZus{}len}\PYG{p}{)}
+
+    \PYG{k}{if} \PYG{n}{n} \PYG{o}{\PYGZlt{}} \PYG{n}{target\PYGZus{}len}\PYG{p}{:}
+        \PYG{n}{interpolator} \PYG{o}{=} \PYG{n}{interp1d}\PYG{p}{(}\PYG{n}{x\PYGZus{}old}\PYG{p}{,} \PYG{n}{signal}\PYG{p}{,} \PYG{n}{kind}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}cubic\PYGZdq{}}\PYG{p}{,} \PYG{n}{fill\PYGZus{}value}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}extrapolate\PYGZdq{}}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{interpolator}\PYG{p}{(}\PYG{n}{x\PYGZus{}new}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n}{resample}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{target\PYGZus{}len}\PYG{p}{)}
+
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{preprocess}\PYG{p}{(}\PYG{n}{df}\PYG{p}{):}
+    \PYG{n}{required} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}t\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}r\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}g\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}b\PYGZdq{}}\PYG{p}{]}
+    \PYG{n}{df}\PYG{o}{.}\PYG{n}{columns} \PYG{o}{=} \PYG{p}{[}\PYG{n}{c}\PYG{o}{.}\PYG{n}{lower}\PYG{p}{()} \PYG{k}{for} \PYG{n}{c} \PYG{o+ow}{in} \PYG{n}{df}\PYG{o}{.}\PYG{n}{columns}\PYG{p}{]}
+
+    \PYG{k}{for} \PYG{n}{c} \PYG{o+ow}{in} \PYG{n}{required}\PYG{p}{:}
+        \PYG{k}{if} \PYG{n}{c} \PYG{o+ow}{not} \PYG{o+ow}{in} \PYG{n}{df}\PYG{o}{.}\PYG{n}{columns}\PYG{p}{:}
+            \PYG{k}{raise} \PYG{n}{HTTPException}\PYG{p}{(}
+                \PYG{n}{status\PYGZus{}code}\PYG{o}{=}\PYG{l+m+mi}{400}\PYG{p}{,}
+                \PYG{n}{detail}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}CSV must contain columns: t,r,g,b\PYGZdq{}}
+            \PYG{p}{)}
+
+    \PYG{n}{rgb} \PYG{o}{=} \PYG{n}{df}\PYG{p}{[[}\PYG{l+s+s2}{\PYGZdq{}r\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}g\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}b\PYGZdq{}}\PYG{p}{]]}\PYG{o}{.}\PYG{n}{values}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{)}
+
+    \PYG{n}{time} \PYG{o}{=} \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}t\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{float64}\PYG{p}{)}
+    \PYG{n}{deltas} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{diff}\PYG{p}{(}\PYG{n}{time}\PYG{p}{)}
+    \PYG{n}{deltas} \PYG{o}{=} \PYG{n}{deltas}\PYG{p}{[(}\PYG{n}{deltas} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{)]}
+    \PYG{n}{dt} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{median}\PYG{p}{(}\PYG{n}{deltas}\PYG{p}{)} \PYG{o}{/} \PYG{l+m+mf}{1000.0}
+    \PYG{n}{fs} \PYG{o}{=} \PYG{l+m+mf}{1.0} \PYG{o}{/} \PYG{n}{dt}
+
+    \PYG{n}{ppg} \PYG{o}{=} \PYG{n}{extract\PYGZus{}pca\PYGZus{}signal}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{)}
+
+    \PYG{n}{ppg} \PYG{o}{=} \PYG{p}{(}\PYG{n}{ppg} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{))} \PYG{o}{/} \PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mf}{1e\PYGZhy{}8}\PYG{p}{)}
+    \PYG{n}{ppg} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{clip}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{)}
+
+    \PYG{n}{ppg} \PYG{o}{=} \PYG{n}{adaptive\PYGZus{}resample}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{,} \PYG{n}{FIXED\PYGZus{}POINTS}\PYG{p}{)}
+
+    \PYG{n}{tensor} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{tensor}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{,} \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{)}
+    \PYG{n}{tensor} \PYG{o}{=} \PYG{n}{tensor}\PYG{o}{.}\PYG{n}{unsqueeze}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{unsqueeze}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} (1, 1, 400)}
+
+    \PYG{k}{return} \PYG{n}{tensor}\PYG{o}{.}\PYG{n}{to}\PYG{p}{(}\PYG{n}{device}\PYG{p}{)}
+
+
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+\PYG{c+c1}{\PYGZsh{} Load Models}
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+
+\PYG{n}{bp\PYGZus{}model} \PYG{o}{=} \PYG{n}{CNN\PYGZus{}BP}\PYG{p}{()}\PYG{o}{.}\PYG{n}{to}\PYG{p}{(}\PYG{n}{device}\PYG{p}{)}
+\PYG{n}{bp\PYGZus{}checkpoint} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}weights/bp\PYGZus{}epoch\PYGZus{}37.pt\PYGZdq{}}\PYG{p}{,} \PYG{n}{map\PYGZus{}location}\PYG{o}{=}\PYG{n}{device}\PYG{p}{,} \PYG{n}{weights\PYGZus{}only}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+\PYG{n}{bp\PYGZus{}model}\PYG{o}{.}\PYG{n}{load\PYGZus{}state\PYGZus{}dict}\PYG{p}{(}\PYG{n}{bp\PYGZus{}checkpoint}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}model\PYGZus{}state\PYGZdq{}}\PYG{p}{])}
+\PYG{n}{bp\PYGZus{}model}\PYG{o}{.}\PYG{n}{eval}\PYG{p}{()}
+
+\PYG{n}{glucose\PYGZus{}reg\PYGZus{}model} \PYG{o}{=} \PYG{n}{RigidGlucoseNet}\PYG{p}{()}\PYG{o}{.}\PYG{n}{to}\PYG{p}{(}\PYG{n}{device}\PYG{p}{)}
+\PYG{n}{glucose\PYGZus{}checkpoint} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}weights/best\PYGZus{}glucose\PYGZus{}model.pt\PYGZdq{}}\PYG{p}{,} \PYG{n}{map\PYGZus{}location}\PYG{o}{=}\PYG{n}{device}\PYG{p}{,} \PYG{n}{weights\PYGZus{}only}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+\PYG{n}{glucose\PYGZus{}reg\PYGZus{}model}\PYG{o}{.}\PYG{n}{load\PYGZus{}state\PYGZus{}dict}\PYG{p}{(}\PYG{n}{glucose\PYGZus{}checkpoint}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}model\PYGZus{}state\PYGZdq{}}\PYG{p}{])}
+\PYG{n}{glucose\PYGZus{}reg\PYGZus{}model}\PYG{o}{.}\PYG{n}{eval}\PYG{p}{()}
+
+\PYG{n}{GLUCOSE\PYGZus{}MEAN} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{glucose\PYGZus{}checkpoint}\PYG{o}{.}\PYG{n}{get}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}global\PYGZus{}mean\PYGZdq{}}\PYG{p}{,} \PYG{l+m+mf}{123.35}\PYG{p}{))}
+\PYG{n}{GLUCOSE\PYGZus{}STD} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{glucose\PYGZus{}checkpoint}\PYG{o}{.}\PYG{n}{get}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}global\PYGZus{}std\PYGZdq{}}\PYG{p}{,} \PYG{l+m+mf}{40.57}\PYG{p}{))}
+
+\PYG{n}{multitask\PYGZus{}model} \PYG{o}{=} \PYG{n}{MultiTaskPPGModel}\PYG{p}{()}\PYG{o}{.}\PYG{n}{to}\PYG{p}{(}\PYG{n}{device}\PYG{p}{)}
+\PYG{n}{multitask\PYGZus{}checkpoint} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}weights/combined\PYGZus{}multitask\PYGZus{}epoch\PYGZus{}29.pt\PYGZdq{}}\PYG{p}{,} \PYG{n}{map\PYGZus{}location}\PYG{o}{=}\PYG{n}{device}\PYG{p}{,} \PYG{n}{weights\PYGZus{}only}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+\PYG{n}{multitask\PYGZus{}model}\PYG{o}{.}\PYG{n}{load\PYGZus{}state\PYGZus{}dict}\PYG{p}{(}\PYG{n}{multitask\PYGZus{}checkpoint}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}model\PYGZus{}state\PYGZdq{}}\PYG{p}{])}
+\PYG{n}{multitask\PYGZus{}model}\PYG{o}{.}\PYG{n}{eval}\PYG{p}{()}
+
+
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+\PYG{c+c1}{\PYGZsh{} Routes}
+\PYG{c+c1}{\PYGZsh{} ==========================================================}
+
+\PYG{n+nd}{@app}\PYG{o}{.}\PYG{n}{get}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}/\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{home}\PYG{p}{():}
+    \PYG{k}{return} \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s2}{\PYGZdq{}message\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}Non\PYGZhy{}Invasive Blood Pressure \PYGZam{} Blood Glucose API is running.\PYGZdq{}}\PYG{p}{,}
+        \PYG{l+s+s2}{\PYGZdq{}endpoints\PYGZdq{}}\PYG{p}{:} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}/predict/bp\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}/predict/glucose/regression\PYGZdq{}}\PYG{p}{,}
+                      \PYG{l+s+s2}{\PYGZdq{}/predict/glucose/classification\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}/predict/all\PYGZdq{}}\PYG{p}{]}
+    \PYG{p}{\PYGZcb{}}
+
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{\PYGZus{}read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{file}\PYG{p}{:} \PYG{n}{UploadFile}\PYG{p}{):}
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{file}\PYG{o}{.}\PYG{n}{filename}\PYG{o}{.}\PYG{n}{endswith}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}.csv\PYGZdq{}}\PYG{p}{):}
+        \PYG{k}{raise} \PYG{n}{HTTPException}\PYG{p}{(}\PYG{n}{status\PYGZus{}code}\PYG{o}{=}\PYG{l+m+mi}{400}\PYG{p}{,} \PYG{n}{detail}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}Only CSV files are allowed.\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{try}\PYG{p}{:}
+        \PYG{n}{df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{file}\PYG{o}{.}\PYG{n}{file}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{preprocess}\PYG{p}{(}\PYG{n}{df}\PYG{p}{)}
+    \PYG{k}{except} \PYG{n}{HTTPException}\PYG{p}{:}
+        \PYG{k}{raise}
+    \PYG{k}{except} \PYG{n+ne}{Exception} \PYG{k}{as} \PYG{n}{e}\PYG{p}{:}
+        \PYG{k}{raise} \PYG{n}{HTTPException}\PYG{p}{(}\PYG{n}{status\PYGZus{}code}\PYG{o}{=}\PYG{l+m+mi}{500}\PYG{p}{,} \PYG{n}{detail}\PYG{o}{=}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{e}\PYG{p}{))}
+
+
+\PYG{n+nd}{@app}\PYG{o}{.}\PYG{n}{post}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}/predict/bp\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{async} \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{predict\PYGZus{}bp}\PYG{p}{(}\PYG{n}{file}\PYG{p}{:} \PYG{n}{UploadFile} \PYG{o}{=} \PYG{n}{File}\PYG{p}{(}\PYG{o}{...}\PYG{p}{)):}
+    \PYG{n}{input\PYGZus{}tensor} \PYG{o}{=} \PYG{n}{\PYGZus{}read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{file}\PYG{p}{)}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+        \PYG{n}{out} \PYG{o}{=} \PYG{n}{bp\PYGZus{}model}\PYG{p}{(}\PYG{n}{input\PYGZus{}tensor}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{()}
+    \PYG{k}{return} \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s2}{\PYGZdq{}blood\PYGZus{}pressure\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}systolic\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{out}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]),} \PYG{l+m+mi}{2}\PYG{p}{),}
+            \PYG{l+s+s2}{\PYGZdq{}diastolic\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{out}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]),} \PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{p}{\PYGZcb{}}
+    \PYG{p}{\PYGZcb{}}
+
+
+\PYG{n+nd}{@app}\PYG{o}{.}\PYG{n}{post}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}/predict/glucose/regression\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{async} \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{predict\PYGZus{}glucose\PYGZus{}regression}\PYG{p}{(}\PYG{n}{file}\PYG{p}{:} \PYG{n}{UploadFile} \PYG{o}{=} \PYG{n}{File}\PYG{p}{(}\PYG{o}{...}\PYG{p}{)):}
+    \PYG{n}{input\PYGZus{}tensor} \PYG{o}{=} \PYG{n}{\PYGZus{}read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{file}\PYG{p}{)}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+        \PYG{n}{scaled} \PYG{o}{=} \PYG{n}{glucose\PYGZus{}reg\PYGZus{}model}\PYG{p}{(}\PYG{n}{input\PYGZus{}tensor}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{item}\PYG{p}{()}
+    \PYG{n}{glucose} \PYG{o}{=} \PYG{n}{scaled} \PYG{o}{*} \PYG{n}{GLUCOSE\PYGZus{}STD} \PYG{o}{+} \PYG{n}{GLUCOSE\PYGZus{}MEAN}
+    \PYG{k}{return} \PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}blood\PYGZus{}glucose\PYGZus{}mg\PYGZus{}dl\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n}{glucose}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)\PYGZcb{}}
+
+
+\PYG{n+nd}{@app}\PYG{o}{.}\PYG{n}{post}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}/predict/glucose/classification\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{async} \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{predict\PYGZus{}glucose\PYGZus{}classification}\PYG{p}{(}\PYG{n}{file}\PYG{p}{:} \PYG{n}{UploadFile} \PYG{o}{=} \PYG{n}{File}\PYG{p}{(}\PYG{o}{...}\PYG{p}{)):}
+    \PYG{n}{input\PYGZus{}tensor} \PYG{o}{=} \PYG{n}{\PYGZus{}read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{file}\PYG{p}{)}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+        \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{glucose\PYGZus{}logits} \PYG{o}{=} \PYG{n}{multitask\PYGZus{}model}\PYG{p}{(}\PYG{n}{input\PYGZus{}tensor}\PYG{p}{)}
+        \PYG{n}{probs} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{softmax}\PYG{p}{(}\PYG{n}{glucose\PYGZus{}logits}\PYG{p}{,} \PYG{n}{dim}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{()}
+        \PYG{n}{class\PYGZus{}idx} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{probs}\PYG{p}{))}
+    \PYG{k}{return} \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s2}{\PYGZdq{}glucose\PYGZus{}class\PYGZdq{}}\PYG{p}{:} \PYG{n}{GLUCOSE\PYGZus{}CLASSES}\PYG{p}{[}\PYG{n}{class\PYGZus{}idx}\PYG{p}{],}
+        \PYG{l+s+s2}{\PYGZdq{}confidence\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{probs}\PYG{p}{[}\PYG{n}{class\PYGZus{}idx}\PYG{p}{]),} \PYG{l+m+mi}{4}\PYG{p}{),}
+        \PYG{l+s+s2}{\PYGZdq{}probabilities\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}\PYG{n}{GLUCOSE\PYGZus{}CLASSES}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{p}\PYG{p}{),} \PYG{l+m+mi}{4}\PYG{p}{)} \PYG{k}{for} \PYG{n}{i}\PYG{p}{,} \PYG{n}{p} \PYG{o+ow}{in} \PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{probs}\PYG{p}{)\PYGZcb{}}
+    \PYG{p}{\PYGZcb{}}
+
+
+\PYG{n+nd}{@app}\PYG{o}{.}\PYG{n}{post}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}/predict/all\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{async} \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{predict\PYGZus{}all}\PYG{p}{(}\PYG{n}{file}\PYG{p}{:} \PYG{n}{UploadFile} \PYG{o}{=} \PYG{n}{File}\PYG{p}{(}\PYG{o}{...}\PYG{p}{)):}
+    \PYG{n}{input\PYGZus{}tensor} \PYG{o}{=} \PYG{n}{\PYGZus{}read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{file}\PYG{p}{)}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+        \PYG{n}{bp\PYGZus{}out} \PYG{o}{=} \PYG{n}{bp\PYGZus{}model}\PYG{p}{(}\PYG{n}{input\PYGZus{}tensor}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{()}
+        \PYG{n}{glu\PYGZus{}scaled} \PYG{o}{=} \PYG{n}{glucose\PYGZus{}reg\PYGZus{}model}\PYG{p}{(}\PYG{n}{input\PYGZus{}tensor}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{item}\PYG{p}{()}
+        \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{glucose\PYGZus{}logits} \PYG{o}{=} \PYG{n}{multitask\PYGZus{}model}\PYG{p}{(}\PYG{n}{input\PYGZus{}tensor}\PYG{p}{)}
+        \PYG{n}{probs} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{softmax}\PYG{p}{(}\PYG{n}{glucose\PYGZus{}logits}\PYG{p}{,} \PYG{n}{dim}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{()}
+        \PYG{n}{class\PYGZus{}idx} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{probs}\PYG{p}{))}
+
+    \PYG{n}{glucose\PYGZus{}value} \PYG{o}{=} \PYG{n}{glu\PYGZus{}scaled} \PYG{o}{*} \PYG{n}{GLUCOSE\PYGZus{}STD} \PYG{o}{+} \PYG{n}{GLUCOSE\PYGZus{}MEAN}
+
+    \PYG{k}{if} \PYG{n}{class\PYGZus{}idx} \PYG{o}{==} \PYG{l+m+mi}{0} \PYG{o+ow}{or} \PYG{n}{class\PYGZus{}idx} \PYG{o}{==} \PYG{l+m+mi}{2}\PYG{p}{:}
+        \PYG{n}{glucose\PYGZus{}value} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}
+
+
+    \PYG{k}{return} \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s2}{\PYGZdq{}blood\PYGZus{}pressure\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}systolic\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{bp\PYGZus{}out}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]),} \PYG{l+m+mi}{2}\PYG{p}{),}
+            \PYG{l+s+s2}{\PYGZdq{}diastolic\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{bp\PYGZus{}out}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]),} \PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}blood\PYGZus{}glucose\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZus{}mg\PYGZus{}dl\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n}{glucose\PYGZus{}value}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{),}
+            \PYG{l+s+s2}{\PYGZdq{}class\PYGZdq{}}\PYG{p}{:} \PYG{n}{GLUCOSE\PYGZus{}CLASSES}\PYG{p}{[}\PYG{n}{class\PYGZus{}idx}\PYG{p}{],}
+            \PYG{l+s+s2}{\PYGZdq{}confidence\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{probs}\PYG{p}{[}\PYG{n}{class\PYGZus{}idx}\PYG{p}{]),} \PYG{l+m+mi}{4}\PYG{p}{)}
+        \PYG{p}{\PYGZcb{}}
+    \PYG{p}{\PYGZcb{}}
+
+\end{Verbatim}

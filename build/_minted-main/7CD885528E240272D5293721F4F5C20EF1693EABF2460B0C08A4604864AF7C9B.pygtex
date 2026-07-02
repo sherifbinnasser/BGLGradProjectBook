@@ -1,0 +1,95 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{package}\PYG{+w}{ }\PYG{n+nn}{com.glucoai.data.repository}
+
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{android.content.Context}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{android.util.Log}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{io.ktor.client.*}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{io.ktor.client.request.*}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{io.ktor.client.call.*}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{io.ktor.client.plugins.contentnegotiation.*}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{io.ktor.serialization.kotlinx.json.*}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{kotlinx.serialization.Serializable}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{kotlinx.serialization.SerialName}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{kotlinx.serialization.json.Json}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{io.ktor.http.*}
+\PYG{k}{import}\PYG{+w}{ }\PYG{n+nn}{io.ktor.client.request.forms.*}
+
+\PYG{n+nd}{@Serializable}
+\PYG{k+kd}{data}\PYG{+w}{ }\PYG{k+kd}{class}\PYG{+w}{ }\PYG{n+nc}{BloodPressure}\PYG{p}{(}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{systolic}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{diastolic}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}
+\PYG{p}{)}
+
+\PYG{n+nd}{@Serializable}
+\PYG{k+kd}{data}\PYG{+w}{ }\PYG{k+kd}{class}\PYG{+w}{ }\PYG{n+nc}{BloodGlucose}\PYG{p}{(}
+\PYG{+w}{    }\PYG{n+nd}{@SerialName}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}value\PYGZus{}mg\PYGZus{}dl\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{value}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{`class`}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{String?}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}
+\PYG{p}{)}
+
+\PYG{n+nd}{@Serializable}
+\PYG{k+kd}{data}\PYG{+w}{ }\PYG{k+kd}{class}\PYG{+w}{ }\PYG{n+nc}{PredictionResponse}\PYG{p}{(}
+\PYG{+w}{    }\PYG{n+nd}{@SerialName}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}blood\PYGZus{}glucose\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{\PYGZus{}glucose}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{BloodGlucose? }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{p}{,}
+\PYG{+w}{    }\PYG{n+nd}{@SerialName}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}blood\PYGZus{}pressure\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{bloodPressure}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{BloodPressure? }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{p}{,}
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{glucose}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float?}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}
+\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{glucoseValue}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Float}
+\PYG{+w}{        }\PYG{k}{get}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{\PYGZus{}glucose}\PYG{o}{?.}\PYG{n+na}{value}\PYG{+w}{ }\PYG{o}{?:}\PYG{+w}{ }\PYG{n}{glucose}\PYG{+w}{ }\PYG{o}{?:}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{l+m}{1f}
+
+\PYG{+w}{    }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{glucoseClass}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{String?}
+\PYG{+w}{        }\PYG{k}{get}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{\PYGZus{}glucose}\PYG{o}{?.}\PYG{n}{`class`}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{k+kd}{class}\PYG{+w}{ }\PYG{n+nc}{GlucoseRepositoryImpl}\PYG{p}{(}\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{context}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{Context}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{    }\PYG{k+kd}{private}\PYG{+w}{ }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{client}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{HttpClient}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{install}\PYG{p}{(}\PYG{n}{ContentNegotiation}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{json}\PYG{p}{(}\PYG{n}{Json}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{n}{ignoreUnknownKeys}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}
+\PYG{+w}{                }\PYG{n}{isLenient}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{})}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{suspend}\PYG{+w}{ }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{estimateGlucoseFromApi}\PYG{p}{(}
+\PYG{+w}{        }\PYG{n}{ppgSignal}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{List}\PYG{o}{\PYGZlt{}}\PYG{n}{Triple}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{Float}\PYG{o}{\PYGZgt{}\PYGZgt{}}\PYG{p}{,}
+\PYG{+w}{        }\PYG{n}{fps}\PYG{p}{:}\PYG{+w}{ }\PYG{k+kt}{Int}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{30}
+\PYG{+w}{    }\PYG{p}{):}\PYG{+w}{ }\PYG{n}{PredictionResponse}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{k}{try}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{csvContent}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{StringBuilder}\PYG{p}{()}
+\PYG{+w}{            }\PYG{n}{csvContent}\PYG{p}{.}\PYG{n+na}{append}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}t,r,g,b\PYGZbs{}n\PYGZdq{}}\PYG{p}{)}
+
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{dt}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{1.0f}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n}{fps}
+\PYG{+w}{            }\PYG{n}{ppgSignal}\PYG{p}{.}\PYG{n+na}{forEachIndexed}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sample}\PYG{+w}{ }\PYG{o}{\PYGZhy{}\PYGZgt{}}
+\PYG{+w}{                }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{t}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{dt}
+\PYG{+w}{                }\PYG{n}{csvContent}\PYG{p}{.}\PYG{n+na}{append}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}}\PYG{n}{t}\PYG{l+s}{,}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n}{sample}\PYG{p}{.}\PYG{n+na}{first}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s}{,}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n}{sample}\PYG{p}{.}\PYG{n+na}{second}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s}{,}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n}{sample}\PYG{p}{.}\PYG{n+na}{third}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s}{\PYGZbs{}n\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{url}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}https://abdelrahmanrabie\PYGZhy{}graduation\PYGZhy{}project.hf.space/predict/all\PYGZdq{}}
+
+\PYG{+w}{            }\PYG{k+kd}{val}\PYG{+w}{ }\PYG{n+nv}{response}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{PredictionResponse}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{client}\PYG{p}{.}\PYG{n+na}{post}\PYG{p}{(}\PYG{n}{url}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{n}{setBody}\PYG{p}{(}\PYG{n}{MultiPartFormDataContent}\PYG{p}{(}
+\PYG{+w}{                    }\PYG{n}{formData}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                        }\PYG{n}{append}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}file\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{csvContent}\PYG{p}{.}\PYG{n+na}{toString}\PYG{p}{().}\PYG{n+na}{toByteArray}\PYG{p}{(),}\PYG{+w}{ }\PYG{n}{Headers}\PYG{p}{.}\PYG{n+na}{build}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                            }\PYG{n}{append}\PYG{p}{(}\PYG{n}{HttpHeaders}\PYG{p}{.}\PYG{n+na}{ContentType}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}application/octet\PYGZhy{}stream\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{                            }\PYG{n}{append}\PYG{p}{(}\PYG{n}{HttpHeaders}\PYG{p}{.}\PYG{n+na}{ContentDisposition}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}form\PYGZhy{}data; name=\PYGZbs{}\PYGZdq{}file\PYGZbs{}\PYGZdq{}; filename=\PYGZbs{}\PYGZdq{}data.csv\PYGZbs{}\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{                        }\PYG{p}{\PYGZcb{})}
+\PYG{+w}{                    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                }\PYG{p}{))}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}.}\PYG{n+na}{body}\PYG{p}{()}
+
+\PYG{+w}{            }\PYG{n}{Log}\PYG{p}{.}\PYG{n+na}{d}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}GlucoseRepository\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}API Response: }\PYG{l+s+si}{\PYGZdl{}}\PYG{n}{response}\PYG{l+s}{\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{            }\PYG{n}{response}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k}{catch}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{e}\PYG{p}{:}\PYG{+w}{ }\PYG{n}{Exception}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{Log}\PYG{p}{.}\PYG{n+na}{e}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}GlucoseRepository\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}API request failed\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{)}
+\PYG{+w}{            }\PYG{n}{PredictionResponse}\PYG{p}{(}\PYG{n}{glucose}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{l+m}{1f}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{bloodPressure}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{BloodPressure}\PYG{p}{(}\PYG{l+m}{0f}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{0f}\PYG{p}{))}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kd}{fun}\PYG{+w}{ }\PYG{n+nf}{close}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{client}\PYG{p}{.}\PYG{n+na}{close}\PYG{p}{()}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}
