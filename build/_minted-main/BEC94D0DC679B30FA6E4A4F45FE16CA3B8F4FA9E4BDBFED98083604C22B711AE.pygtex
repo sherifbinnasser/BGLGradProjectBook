@@ -1,0 +1,65 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{torch}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{torch.nn}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{nn}
+
+\PYG{k}{class}\PYG{+w}{ }\PYG{n+nc}{CNN\PYGZus{}Block}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Module}\PYG{p}{):}
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{net} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{32}\PYG{p}{,} \PYG{l+m+mi}{11}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{5}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{32}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{32}\PYG{p}{,} \PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{9}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{4}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{7}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{AdaptiveAvgPool1d}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{p}{)}
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{forward}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{x}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{net}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+
+\PYG{k}{class}\PYG{+w}{ }\PYG{n+nc}{RigidGlucoseNet}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Module}\PYG{p}{):}
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{pretrained\PYGZus{}cnn\PYGZus{}state}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{micro\PYGZus{}cnn} \PYG{o}{=} \PYG{n}{CNN\PYGZus{}Block}\PYG{p}{()}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{macro\PYGZus{}cnn} \PYG{o}{=} \PYG{n}{CNN\PYGZus{}Block}\PYG{p}{()}
+
+        \PYG{k}{if} \PYG{n}{pretrained\PYGZus{}cnn\PYGZus{}state} \PYG{o+ow}{is} \PYG{o+ow}{not} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{n}{mapped\PYGZus{}state} \PYG{o}{=} \PYG{p}{\PYGZob{}\PYGZcb{}}
+            \PYG{k}{for} \PYG{n}{k}\PYG{p}{,} \PYG{n}{v} \PYG{o+ow}{in} \PYG{n}{pretrained\PYGZus{}cnn\PYGZus{}state}\PYG{o}{.}\PYG{n}{items}\PYG{p}{():}
+                \PYG{k}{if} \PYG{n}{k}\PYG{o}{.}\PYG{n}{startswith}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}net.\PYGZdq{}}\PYG{p}{):}
+                    \PYG{n}{mapped\PYGZus{}state}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]} \PYG{o}{=} \PYG{n}{v}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{micro\PYGZus{}cnn}\PYG{o}{.}\PYG{n}{net}\PYG{o}{.}\PYG{n}{load\PYGZus{}state\PYGZus{}dict}\PYG{p}{(}\PYG{n}{mapped\PYGZus{}state}\PYG{p}{,} \PYG{n}{strict}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{macro\PYGZus{}cnn}\PYG{o}{.}\PYG{n}{net}\PYG{o}{.}\PYG{n}{load\PYGZus{}state\PYGZus{}dict}\PYG{p}{(}\PYG{n}{mapped\PYGZus{}state}\PYG{p}{,} \PYG{n}{strict}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bi\PYGZus{}lstm} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{LSTM}\PYG{p}{(}\PYG{n}{input\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{hidden\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{32}\PYG{p}{,} \PYG{n}{num\PYGZus{}layers}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{bidirectional}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{batch\PYGZus{}first}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{lstm\PYGZus{}pool} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{AdaptiveAvgPool1d}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}
+
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{fc\PYGZus{}micro} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{32}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Dropout}\PYG{p}{(}\PYG{l+m+mf}{0.3}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{fc\PYGZus{}macro} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{32}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Dropout}\PYG{p}{(}\PYG{l+m+mf}{0.3}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{fc\PYGZus{}lstm} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{32}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Dropout}\PYG{p}{(}\PYG{l+m+mf}{0.3}\PYG{p}{))}
+
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{final\PYGZus{}fc} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{32} \PYG{o}{+} \PYG{l+m+mi}{32} \PYG{o}{+} \PYG{l+m+mi}{32}\PYG{p}{,} \PYG{l+m+mi}{32}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Dropout}\PYG{p}{(}\PYG{l+m+mf}{0.3}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{32}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{p}{)}
+
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{forward}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{x}\PYG{p}{):}
+        \PYG{n}{feat\PYGZus{}micro} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{micro\PYGZus{}cnn}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+        \PYG{n}{feat\PYGZus{}macro} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{macro\PYGZus{}cnn}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+
+        \PYG{n}{x\PYGZus{}lstm} \PYG{o}{=} \PYG{n}{x}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{n}{lstm\PYGZus{}out}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bi\PYGZus{}lstm}\PYG{p}{(}\PYG{n}{x\PYGZus{}lstm}\PYG{p}{)}
+        \PYG{n}{feat\PYGZus{}lstm} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{lstm\PYGZus{}pool}\PYG{p}{(}\PYG{n}{lstm\PYGZus{}out}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{))}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+
+        \PYG{n}{out\PYGZus{}micro} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{fc\PYGZus{}micro}\PYG{p}{(}\PYG{n}{feat\PYGZus{}micro}\PYG{p}{)}
+        \PYG{n}{out\PYGZus{}macro} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{fc\PYGZus{}macro}\PYG{p}{(}\PYG{n}{feat\PYGZus{}macro}\PYG{p}{)}
+        \PYG{n}{out\PYGZus{}lstm} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{fc\PYGZus{}lstm}\PYG{p}{(}\PYG{n}{feat\PYGZus{}lstm}\PYG{p}{)}
+
+        \PYG{n}{merged} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{cat}\PYG{p}{((}\PYG{n}{out\PYGZus{}micro}\PYG{p}{,} \PYG{n}{out\PYGZus{}macro}\PYG{p}{,} \PYG{n}{out\PYGZus{}lstm}\PYG{p}{),} \PYG{n}{dim}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{final\PYGZus{}fc}\PYG{p}{(}\PYG{n}{merged}\PYG{p}{)}
+\end{Verbatim}

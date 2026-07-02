@@ -1,0 +1,52 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{torch}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{torch.nn}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{nn}
+
+\PYG{k}{class}\PYG{+w}{ }\PYG{n+nc}{MultiTaskPPGModel}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Module}\PYG{p}{):}
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{checkpoint\PYGZus{}path}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{shared\PYGZus{}backbone} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{32}\PYG{p}{,} \PYG{l+m+mi}{11}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{5}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{32}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{32}\PYG{p}{,} \PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{9}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{4}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{)}
+        \PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bp\PYGZus{}conv} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{7}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{AdaptiveAvgPool1d}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{glucose\PYGZus{}conv} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{7}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Conv1d}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{,} \PYG{n}{padding}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{BatchNorm1d}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{),}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{AdaptiveAvgPool1d}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bp\PYGZus{}head} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{64}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{glucose\PYGZus{}head} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+            \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{128}\PYG{p}{,} \PYG{l+m+mi}{64}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Dropout}\PYG{p}{(}\PYG{l+m+mf}{0.5}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{)}
+        \PYG{p}{)}
+
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{forward}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{x}\PYG{p}{):}
+        \PYG{n}{shared\PYGZus{}features} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{shared\PYGZus{}backbone}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Blood Pressure Branch Execution}
+        \PYG{n}{bp\PYGZus{}features} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bp\PYGZus{}conv}\PYG{p}{(}\PYG{n}{shared\PYGZus{}features}\PYG{p}{)}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{n}{bp\PYGZus{}out} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{bp\PYGZus{}head}\PYG{p}{(}\PYG{n}{bp\PYGZus{}features}\PYG{p}{)}
+        \PYG{n}{sys\PYGZus{}val} \PYG{o}{=} \PYG{n}{bp\PYGZus{}out}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{n}{dia\PYGZus{}val} \PYG{o}{=} \PYG{n}{bp\PYGZus{}out}\PYG{p}{[:,} \PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{l+m+mf}{10.0}
+
+        \PYG{c+c1}{\PYGZsh{} Glycemic Classification Branch Execution}
+        \PYG{n}{glucose\PYGZus{}features} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{glucose\PYGZus{}conv}\PYG{p}{(}\PYG{n}{shared\PYGZus{}features}\PYG{p}{)}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{n}{glucose\PYGZus{}logits} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{glucose\PYGZus{}head}\PYG{p}{(}\PYG{n}{glucose\PYGZus{}features}\PYG{p}{)}
+
+        \PYG{k}{return} \PYG{n}{sys\PYGZus{}val}\PYG{p}{,} \PYG{n}{dia\PYGZus{}val}\PYG{p}{,} \PYG{n}{glucose\PYGZus{}logits}
+\end{Verbatim}

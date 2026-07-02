@@ -1,18 +1,30 @@
 \section{Phase 3: rPPG Extraction}
 \label{sec:phase3_extraction}
-Once the raw video database was securely organized and unified into a standard spatial layout, the core signal processing pipeline was executed. The main objective of this phase is to transform raw spatiotemporal video information into continuous, clean, one-dimensional Photoplethysmography (PPG) waveforms. 
+Once the raw video database was securely organized and unified into a standard spatial layout, the core signal processing pipeline was executed. The main objective of this phase is to transform raw spatiotemporal video information into continuous, clean, one-dimensional remote Photoplethysmography (rPPG) waveforms. 
 
-This technical phase encompasses four critical consecutive steps: raw color channel extraction, frame rate normalization analysis, digital signal filtering, and balanced dataset splitting for future machine learning modeling.
+This technical phase encompasses comprehensive color channel extraction, multi-algorithmic signal decomposition, frame rate normalization analysis, digital signal filtering, and balanced dataset splitting for future machine learning modeling.
 
-\subsection{Raw Temporal RGB Extraction}
-To observe the micro-variations of blood volume pulsing through the capillary tissue, the spatial frame sequences must be reduced to temporal tracking arrays. Instead of isolating a localized geometric Region of Interest (ROI) which may risk dropping crucial cardiac properties due to minor finger movements, a full-frame averaging strategy was implemented.
+\subsection{Raw Temporal RGB Extraction and Algorithmic Frameworks}
+To observe the micro-variations of blood volume pulsing through the capillary tissue, the spatial frame sequences must be reduced to temporal tracking arrays. Instead of isolating a localized geometric Region of Interest (ROI) which may risk dropping crucial cardiac properties due to minor finger or hand movements, a full-frame averaging strategy was implemented.
 
-For each successive video frame, the spatial matrix containing thousands of pixels is compressed into a single, representative absolute mean value for the Red (R), Green (G), and Blue (B) channels. Mathematically, for a frame matrix $F$ of size $M \times N$, the average channel intensity $C_{\text{avg}}$ (where $C \in \{R, G, B\}$) is defined as:
+For each successive video frame, the spatial matrix containing thousands of pixels is compressed into a single, representative absolute mean value for the Red ($R$), Green ($G$), and Blue ($B$) channels. Mathematically, for a frame matrix $F$ of size $M \times N$, the average channel intensity $C_{\text{avg}}$ (where $C \in \{R, G, B\}$) is defined as:
 \begin{equation}
 C_{\text{avg}} = \frac{1}{M \times N} \sum_{i=1}^{M} \sum_{j=1}^{N} F(i, j, C)
 \end{equation}
 
-Given that each patient session consists of a strict 20-second video recorded at a standardized rate of 20 frames per second, this computational reduction yields exactly 400 continuous mathematical points per channel (20 seconds multiplied by 20 FPS equals 400 points), capturing the comprehensive raw rPPG signal.
+Given that each patient session consists of a strict 20-second video recorded at a standardized rate of 20 frames per second, this computational reduction yields exactly 400 continuous mathematical points per channel ($20\text{ seconds} \times 20\text{ FPS} = 400\text{ points}$), capturing the raw rPPG baseline. 
+
+To isolate the blood volume pulse from artifacts such as illumination variations and motion, the pipeline incorporates an analytical review of the eight standard state-of-the-art rPPG extraction frameworks:
+\begin{itemize}
+    \item \textbf{GREEN (Green Channel Method):} Relies exclusively on the green wavelength ($500-570\text{ nm}$) due to its high absorption coefficient by oxygenated hemoglobin, offering the strongest physiological signal-to-noise ratio.
+    \item \textbf{CHROME (Chrominance-based Method):} Utilizes a specular-tuned skin reflection model to eliminate specular motion artifacts by projecting RGB signals into an orthogonal chrominance subspace.
+    \item \textbf{POS (Plane-Orthogonal-to-Skin):} Defines a mathematical projection plane orthogonal to the skin tone vector, combining color channels non-linearly to provide absolute resilience against intensive structural motion.
+    \item \textbf{PBV (Blood Volume Pulse Signature):} Leverages the explicit signature of blood volume changes across the visible spectrum, weighting the RGB channels based on their distinct physiological properties.
+    \item \textbf{PCA (Principal Component Analysis):} Decomposes the multi-channel color arrays into orthogonal principal components, effectively isolating the cardiovascular pulse wave along the axis of maximum variance.
+    \item \textbf{ICA (Independent Component Analysis):} Employs blind source separation via Joint Approximate Diagonalization of Eigenmatrices (JADE) to isolate independent physiological source signals from ambient light clutter.
+    \item \textbf{LGI (Local Group Invariance):} Translates the signal coordinates using local linear transformations to suppress un-modeled illumination shadows without shifting underlying frequencies.
+    \item \textbf{OMIT (Orthogonal Matrix Image Transformation):} Minimizes noise energy distributions by mapping spatial matrices into a normalized orthogonal coordinate field.
+\end{itemize}
 
 \subsection{Frame Rate Normalization Strategies}
 A primary technical challenge in multi-device data campaigns is hardware sampling variance. Within our verified corpus of 248 patient videos, a clear hardware split was present: 93 videos were captured at a sampling frequency of 30 FPS, while 155 videos were recorded at 20 FPS. This discrepancy directly alters the frequency distribution during Fourier Transform calculations and destroys model training generalization. 
@@ -64,7 +76,7 @@ Capillary blood signals extracted from mobile hardware are inherently buried und
     x_{\text{norm}} = \frac{x - \mu}{\sigma}
     \end{equation}
     where $\mu$ is the signal mean and $\sigma$ represents the standard deviation.
-    \item \textbf{Butterworth Bandpass Filtering:} Passing the standardized signal through a 4th-order digital Butterworth bandpass filter (0.5 Hz to 8.0 Hz) to eliminate non-cardiac noise frequencies.
+    \item \textbf{Butterworth Bandpass Filtering:} Passing the standardized signal through a 4th-order digital Butterworth bandpass filter (0.5 Hz to 4.0 Hz) to eliminate non-cardiac noise frequencies while strictly keeping physiological human heart rates intact.
 \end{itemize}
 
 The highly constructive impact of this filtering stack is visually evaluated in Figure~\ref{fig:filtered_rgb_comparison}. Following spatial detrending and bandpass application, the DC component offset is entirely resolved, and the physiological systolic-diastolic oscillations are cleanly exposed across all sampling conditions with maximum amplitude clarity in the Green channel array.
@@ -145,14 +157,15 @@ The complete processing script implemented during this stage is locked in its pr
 ]{python}{codes/process_signals.py}
 \vspace{1.5em}
 
-\subsection{Experimental Results and Visualization}
-To evaluate the absolute output quality of the conditioning stage, the post-filtered signals were parsed and visualized over a continuous time axis using a tailored programmatic plotting pipeline. 
+\subsection{Experimental PCA Signal Extraction Execution and Visualization}
+To implement an advanced, alternative extraction pipeline leveraging Principal Component Analysis (PCA), a functional pipeline was engineered. This pipeline isolates blood volume variations across orthogonal dimensions to maximize output integrity. The clean, fully documented implementation script is defined in Listing~\ref{lst:pca_extraction_code}.
 
+\vspace{1.5em}
 \begin{center}
     \begin{minipage}{\textwidth}
         \centering
-        \captionof{listing}{Python Script for Clean rPPG Waveform Visualization and Analysis}
-        \label{lst:plot_script}
+        \captionof{listing}{Python Engine for Automated Face ROI Identification and PCA rPPG Waveform Extraction}
+        \label{lst:pca_extraction_code}
         \vspace{-0.5em}
     \end{minipage}
 \end{center}
@@ -166,37 +179,162 @@ To evaluate the absolute output quality of the conditioning stage, the post-filt
     linenos,
     breaklines
 ]{python}
-import pandas as pd
+import cv2
+import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import butter, filtfilt, resample
+from scipy.interpolate import interp1d
+from sklearn.decomposition import PCA
 
-# Read CSV for patient sample
-file_path = "filtering/20/patient1.csv"
-df = pd.read_csv(file_path)
+# Global Configuration Parameters
+VIDEO_PATH = "patient1.mp4"          # Target patient video path
+USE_FACE_ROI = True                 # Toggle Face Cascade detection
+FIXED_POINTS = 400                  # Standarized output array resolution
 
-# Extract Green-channel PPG data points
-ppg_signal = df['G_value'].values
+def bandpass_filter(signal, fs, low=0.5, high=4.0, order=4):
+    """Applies a 4th-order forward-backward digital Butterworth filter."""
+    nyq = 0.5 * fs
+    high = min(high, nyq * 0.99)
+    b, a = butter(order, [low / nyq, high / nyq], btype="band")
+    return filtfilt(b, a, signal)
 
-# Establish Time axis based on standard 20 FPS
-fs = 20  
-time = [i/fs for i in range(len(ppg_signal))]
+def extract_pca_signal(rgb, fs):
+    """Performs PCA blind source separation on standardized RGB signals."""
+    rgb = rgb.astype(np.float32)
+    rgb = (rgb - np.mean(rgb, axis=0)) / (np.std(rgb, axis=0) + 1e-8)
 
-# Construct the physiological wave plot
-plt.figure(figsize=(12,5))
-plt.plot(time, ppg_signal, color='#1f77b4', linewidth=1.5)
-plt.xlabel("Time (seconds)")
-plt.ylabel("Amplitude")
-plt.title("PPG Signal (Green Method)")
-plt.grid(True, linestyle='--', alpha=0.7)
-plt.tight_layout()
-plt.show()
+    pca = PCA(n_components=3)
+    components = pca.fit_transform(rgb)
+
+    best_signal = None
+    best_score = -1
+
+    # Evaluate the first two components for optimal physiological signal power
+    for i in range(2):
+        sig = components[:, i]
+        try:
+            sig_f = bandpass_filter(sig, fs)
+            score = np.std(sig_f)
+            if score > best_score:
+                best_score = score
+                best_signal = sig_f
+        except Exception:
+            continue
+
+    if best_signal is None:
+        best_signal = components[:, 0]
+
+    return best_signal
+
+def adaptive_resample(signal, target_len=400):
+    """Resamples the input sequence using cubic spline interpolation or decimation."""
+    n = len(signal)
+    if n == target_len:
+        return signal
+
+    x_old = np.linspace(0, 1, n)
+    x_new = np.linspace(0, 1, target_len)
+
+    if n < target_len:
+        interpolator = interp1d(x_old, signal, kind="cubic", fill_value="extrapolate")
+        return interpolator(x_new)
+    else:
+        return resample(signal, target_len)
+
+def extract_rgb_from_video(video_path, use_face_roi=True):
+    """Extracts raw temporal mean RGB arrays from video frames with adaptive ROI tracking."""
+    cap = cv2.VideoCapture(video_path)
+
+    if not cap.isOpened():
+        raise FileNotFoundError(f"Unable to open target video source: {video_path}")
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    if fps is None or fps <= 0:
+        fps = 30.0  # Fallback default frequency
+
+    face_cascade = None
+    if use_face_roi:
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        )
+
+    rgb_values = []
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        roi = frame
+
+        if face_cascade is not None:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray, 1.1, 5, minSize=(60, 60))
+
+            if len(faces) > 0:
+                # Isolate the largest detected facial surface area
+                x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
+                # Focus strictly on upper facial regions (forehead/cheeks)
+                roi = frame[y:y + int(h * 0.6), x:x + w]
+
+        # Convert OpenCV native BGR matrices to standard RGB space
+        mean_bgr = roi.reshape(-1, 3).mean(axis=0)
+        mean_rgb = mean_bgr[::-1]
+        rgb_values.append(mean_rgb)
+
+    cap.release()
+
+    if len(rgb_values) < 10:
+        raise ValueError("Insufficient extracted frame volume. Verify video stream file.")
+
+    return np.array(rgb_values), fps
+
+def main():
+    print(f"Ingesting raw video array: {VIDEO_PATH}")
+    rgb, fs = extract_rgb_from_video(VIDEO_PATH, USE_FACE_ROI)
+    print(f"Total extracted frames: {len(rgb)} | Target sampling frequency (fs): {fs:.2f} Hz")
+
+    # Extract rPPG pulse via the PCA decomposition pipeline
+    ppg = extract_pca_signal(rgb, fs)
+
+    # Perform global signal standard scaling
+    ppg = (ppg - np.mean(ppg)) / (np.std(ppg) + 1e-8)
+    ppg = np.clip(ppg, -3, 3)
+
+    # Normalize structural length to the standard benchmark size
+    ppg_resampled = adaptive_resample(ppg, FIXED_POINTS)
+
+    # Generate analytical validation visual plots
+    fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+
+    axes[0].plot(ppg, color="crimson")
+    axes[0].set_title("rPPG Signal (Raw Length, After PCA Subspace + Bandpass Filtering)")
+    axes[0].set_xlabel("Frame Index")
+    axes[0].set_ylabel("Amplitude (Normalized)")
+    axes[0].grid(alpha=0.3)
+
+    axes[1].plot(ppg_resampled, color="royalblue")
+    axes[1].set_title(f"rPPG Signal (Resampled Standardized Output to {FIXED_POINTS} Points)")
+    axes[1].set_xlabel("Sample Index")
+    axes[1].set_ylabel("Amplitude (Normalized)")
+    axes[1].grid(alpha=0.3)
+
+    plt.tight_layout()
+    out_path = "ppg_signal_plot.png"
+    plt.savefig(out_path, dpi=150)
+    print(f"Analytical plot saved successfully to: {out_path}")
+    plt.show()
+
+if __name__ == "__main__":
+    main()
 \end{minted}
 \vspace{1.5em}
 
-The execution of this visualization structure on the processed record of Patient 1 provides critical confirmation of data integrity. As visualized in Figure~\ref{fig:ppg_signal_output}, the extracted waveform successfully displays consistent, sharp systolic peaks and diastolic troughs, validating that the underlying biological micro-blushing tracking remains thoroughly intact and clean of arbitrary motion clutter.
+The execution of this comprehensive processing structure provides absolute validation of structural signal transformation. As shown in Figure~\ref{fig:ppg_signal_output}, the final processed waveform yields clear systolic-diastolic patterns, proving that the underlying multi-algorithmic core pipeline remains highly robust and ready for deep learning optimization.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/chapter3/ppg_signal_output.png}
-    \caption{Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}
+    \includegraphics[width=0.95\textwidth]{figures/chapter3/ppg_signal_output.jpeg}
+    \caption{Clean Extracted rPPG Signal Waveform via the Algorithmic Extraction Stack for Patient 1.}
     \label{fig:ppg_signal_output}
 \end{figure}

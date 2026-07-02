@@ -7,16 +7,17 @@
 \contentsline {figure}{\numberline {3.1}{\ignorespaces The New Record Form interface where patient demographics and Accu-Chek readings are entered.}}{19}{figure.caption.16}%
 \contentsline {figure}{\numberline {3.2}{\ignorespaces The user interfaces designed for checking the finger alignment and executing the 20-second signal capture sequence.}}{21}{figure.caption.18}%
 \contentsline {figure}{\numberline {3.3}{\ignorespaces Data management screens showing local storage monitoring and the final data export engine workflow.}}{22}{figure.caption.20}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}}{31}{figure.caption.28}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}}{33}{figure.caption.29}%
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Clean Extracted rPPG Signal Waveform via Full-Frame Green Method for Patient 1.}}{38}{figure.caption.31}%
-\contentsline {figure}{\numberline {3.7}{\ignorespaces 2D Vector Diagram of the Developed Deep 1D-ResNet Layer Stack including sliding window input and functional residual blocks.}}{40}{figure.caption.32}%
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}}{45}{figure.caption.33}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}}{32}{figure.caption.28}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}}{34}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Clean Extracted rPPG Signal Waveform via the Algorithmic Extraction Stack for Patient 1.}}{42}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces 2D Vector Diagram of the Developed Deep 1D-ResNet Layer Stack including sliding window input and functional residual blocks.}}{45}{figure.caption.32}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}}{50}{figure.caption.33}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Architectural pipeline of the Multi-Task Shared-Backbone Network, detailing the shared convolutional baseline, the calibrated Blood Pressure regression branch, and the expanded 3-class glycemic risk classification head.}}{56}{figure.caption.35}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Official system logo representing the integration of optical arterial pulses with deep learning networks.}}{51}{figure.caption.34}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces The real-time pre-measurement interface displaying initial BPM and live optical waveform status.}}{52}{figure.caption.35}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Active data collection interface capturing continuous raw PPG wave arrays over a fixed duration.}}{53}{figure.caption.36}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Interim localized deep learning analysis layer performing signal normalization and 1D-ResNet execution.}}{54}{figure.caption.37}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Final measurement presentation screen demonstrating a non-invasive estimation output of 90 mg/dL.}}{55}{figure.caption.38}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Official system logo representing the integration of optical arterial pulses with deep learning networks.}}{62}{figure.caption.36}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces The real-time pre-measurement interface displaying initial BPM and live optical waveform status.}}{63}{figure.caption.37}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Active data collection interface capturing continuous raw PPG wave arrays over a fixed duration.}}{64}{figure.caption.38}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Interim localized deep learning analysis layer performing signal normalization and 1D-ResNet execution.}}{65}{figure.caption.39}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Final measurement presentation screen demonstrating a non-invasive estimation output of 90 mg/dL.}}{66}{figure.caption.40}%
 \addvspace {10\p@ }

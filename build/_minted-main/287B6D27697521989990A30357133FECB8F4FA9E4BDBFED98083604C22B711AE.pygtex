@@ -1,0 +1,150 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{cv2}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{np}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{matplotlib.pyplot}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{plt}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{scipy.signal}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{butter}\PYG{p}{,} \PYG{n}{filtfilt}\PYG{p}{,} \PYG{n}{resample}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{scipy.interpolate}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{interp1d}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{sklearn.decomposition}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{PCA}
+
+\PYG{c+c1}{\PYGZsh{} Global Configuration Parameters}
+\PYG{n}{VIDEO\PYGZus{}PATH} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}patient1.mp4\PYGZdq{}}          \PYG{c+c1}{\PYGZsh{} Target patient video path}
+\PYG{n}{USE\PYGZus{}FACE\PYGZus{}ROI} \PYG{o}{=} \PYG{k+kc}{True}                 \PYG{c+c1}{\PYGZsh{} Toggle Face Cascade detection}
+\PYG{n}{FIXED\PYGZus{}POINTS} \PYG{o}{=} \PYG{l+m+mi}{400}                  \PYG{c+c1}{\PYGZsh{} Standarized output array resolution}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{bandpass\PYGZus{}filter}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{,} \PYG{n}{low}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{n}{high}\PYG{o}{=}\PYG{l+m+mf}{4.0}\PYG{p}{,} \PYG{n}{order}\PYG{o}{=}\PYG{l+m+mi}{4}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Applies a 4th\PYGZhy{}order forward\PYGZhy{}backward digital Butterworth filter.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{nyq} \PYG{o}{=} \PYG{l+m+mf}{0.5} \PYG{o}{*} \PYG{n}{fs}
+    \PYG{n}{high} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{high}\PYG{p}{,} \PYG{n}{nyq} \PYG{o}{*} \PYG{l+m+mf}{0.99}\PYG{p}{)}
+    \PYG{n}{b}\PYG{p}{,} \PYG{n}{a} \PYG{o}{=} \PYG{n}{butter}\PYG{p}{(}\PYG{n}{order}\PYG{p}{,} \PYG{p}{[}\PYG{n}{low} \PYG{o}{/} \PYG{n}{nyq}\PYG{p}{,} \PYG{n}{high} \PYG{o}{/} \PYG{n}{nyq}\PYG{p}{],} \PYG{n}{btype}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}band\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{filtfilt}\PYG{p}{(}\PYG{n}{b}\PYG{p}{,} \PYG{n}{a}\PYG{p}{,} \PYG{n}{signal}\PYG{p}{)}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{extract\PYGZus{}pca\PYGZus{}signal}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Performs PCA blind source separation on standardized RGB signals.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{rgb} \PYG{o}{=} \PYG{n}{rgb}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{)}
+    \PYG{n}{rgb} \PYG{o}{=} \PYG{p}{(}\PYG{n}{rgb} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{))} \PYG{o}{/} \PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mf}{1e\PYGZhy{}8}\PYG{p}{)}
+
+    \PYG{n}{pca} \PYG{o}{=} \PYG{n}{PCA}\PYG{p}{(}\PYG{n}{n\PYGZus{}components}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{)}
+    \PYG{n}{components} \PYG{o}{=} \PYG{n}{pca}\PYG{o}{.}\PYG{n}{fit\PYGZus{}transform}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{)}
+
+    \PYG{n}{best\PYGZus{}signal} \PYG{o}{=} \PYG{k+kc}{None}
+    \PYG{n}{best\PYGZus{}score} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}
+
+    \PYG{c+c1}{\PYGZsh{} Evaluate the first two components for optimal physiological signal power}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{):}
+        \PYG{n}{sig} \PYG{o}{=} \PYG{n}{components}\PYG{p}{[:,} \PYG{n}{i}\PYG{p}{]}
+        \PYG{k}{try}\PYG{p}{:}
+            \PYG{n}{sig\PYGZus{}f} \PYG{o}{=} \PYG{n}{bandpass\PYGZus{}filter}\PYG{p}{(}\PYG{n}{sig}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{)}
+            \PYG{n}{score} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{sig\PYGZus{}f}\PYG{p}{)}
+            \PYG{k}{if} \PYG{n}{score} \PYG{o}{\PYGZgt{}} \PYG{n}{best\PYGZus{}score}\PYG{p}{:}
+                \PYG{n}{best\PYGZus{}score} \PYG{o}{=} \PYG{n}{score}
+                \PYG{n}{best\PYGZus{}signal} \PYG{o}{=} \PYG{n}{sig\PYGZus{}f}
+        \PYG{k}{except} \PYG{n+ne}{Exception}\PYG{p}{:}
+            \PYG{k}{continue}
+
+    \PYG{k}{if} \PYG{n}{best\PYGZus{}signal} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{best\PYGZus{}signal} \PYG{o}{=} \PYG{n}{components}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{]}
+
+    \PYG{k}{return} \PYG{n}{best\PYGZus{}signal}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{adaptive\PYGZus{}resample}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{target\PYGZus{}len}\PYG{o}{=}\PYG{l+m+mi}{400}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Resamples the input sequence using cubic spline interpolation or decimation.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{n} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{n} \PYG{o}{==} \PYG{n}{target\PYGZus{}len}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n}{signal}
+
+    \PYG{n}{x\PYGZus{}old} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{n}\PYG{p}{)}
+    \PYG{n}{x\PYGZus{}new} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{target\PYGZus{}len}\PYG{p}{)}
+
+    \PYG{k}{if} \PYG{n}{n} \PYG{o}{\PYGZlt{}} \PYG{n}{target\PYGZus{}len}\PYG{p}{:}
+        \PYG{n}{interpolator} \PYG{o}{=} \PYG{n}{interp1d}\PYG{p}{(}\PYG{n}{x\PYGZus{}old}\PYG{p}{,} \PYG{n}{signal}\PYG{p}{,} \PYG{n}{kind}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}cubic\PYGZdq{}}\PYG{p}{,} \PYG{n}{fill\PYGZus{}value}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}extrapolate\PYGZdq{}}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{interpolator}\PYG{p}{(}\PYG{n}{x\PYGZus{}new}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n}{resample}\PYG{p}{(}\PYG{n}{signal}\PYG{p}{,} \PYG{n}{target\PYGZus{}len}\PYG{p}{)}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{extract\PYGZus{}rgb\PYGZus{}from\PYGZus{}video}\PYG{p}{(}\PYG{n}{video\PYGZus{}path}\PYG{p}{,} \PYG{n}{use\PYGZus{}face\PYGZus{}roi}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Extracts raw temporal mean RGB arrays from video frames with adaptive ROI tracking.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{cap} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{VideoCapture}\PYG{p}{(}\PYG{n}{video\PYGZus{}path}\PYG{p}{)}
+
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{cap}\PYG{o}{.}\PYG{n}{isOpened}\PYG{p}{():}
+        \PYG{k}{raise} \PYG{n+ne}{FileNotFoundError}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Unable to open target video source: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{video\PYGZus{}path}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+    \PYG{n}{fps} \PYG{o}{=} \PYG{n}{cap}\PYG{o}{.}\PYG{n}{get}\PYG{p}{(}\PYG{n}{cv2}\PYG{o}{.}\PYG{n}{CAP\PYGZus{}PROP\PYGZus{}FPS}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{fps} \PYG{o+ow}{is} \PYG{k+kc}{None} \PYG{o+ow}{or} \PYG{n}{fps} \PYG{o}{\PYGZlt{}=} \PYG{l+m+mi}{0}\PYG{p}{:}
+        \PYG{n}{fps} \PYG{o}{=} \PYG{l+m+mf}{30.0}  \PYG{c+c1}{\PYGZsh{} Fallback default frequency}
+
+    \PYG{n}{face\PYGZus{}cascade} \PYG{o}{=} \PYG{k+kc}{None}
+    \PYG{k}{if} \PYG{n}{use\PYGZus{}face\PYGZus{}roi}\PYG{p}{:}
+        \PYG{n}{face\PYGZus{}cascade} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{CascadeClassifier}\PYG{p}{(}
+            \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{haarcascades} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}haarcascade\PYGZus{}frontalface\PYGZus{}default.xml\PYGZdq{}}
+        \PYG{p}{)}
+
+    \PYG{n}{rgb\PYGZus{}values} \PYG{o}{=} \PYG{p}{[]}
+
+    \PYG{k}{while} \PYG{k+kc}{True}\PYG{p}{:}
+        \PYG{n}{ret}\PYG{p}{,} \PYG{n}{frame} \PYG{o}{=} \PYG{n}{cap}\PYG{o}{.}\PYG{n}{read}\PYG{p}{()}
+        \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{ret}\PYG{p}{:}
+            \PYG{k}{break}
+
+        \PYG{n}{roi} \PYG{o}{=} \PYG{n}{frame}
+
+        \PYG{k}{if} \PYG{n}{face\PYGZus{}cascade} \PYG{o+ow}{is} \PYG{o+ow}{not} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{n}{gray} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{cvtColor}\PYG{p}{(}\PYG{n}{frame}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{COLOR\PYGZus{}BGR2GRAY}\PYG{p}{)}
+            \PYG{n}{faces} \PYG{o}{=} \PYG{n}{face\PYGZus{}cascade}\PYG{o}{.}\PYG{n}{detectMultiScale}\PYG{p}{(}\PYG{n}{gray}\PYG{p}{,} \PYG{l+m+mf}{1.1}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{,} \PYG{n}{minSize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{60}\PYG{p}{,} \PYG{l+m+mi}{60}\PYG{p}{))}
+
+            \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{faces}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+                \PYG{c+c1}{\PYGZsh{} Isolate the largest detected facial surface area}
+                \PYG{n}{x}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{n}{w}\PYG{p}{,} \PYG{n}{h} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{faces}\PYG{p}{,} \PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{f}\PYG{p}{:} \PYG{n}{f}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{*} \PYG{n}{f}\PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{])}
+                \PYG{c+c1}{\PYGZsh{} Focus strictly on upper facial regions (forehead/cheeks)}
+                \PYG{n}{roi} \PYG{o}{=} \PYG{n}{frame}\PYG{p}{[}\PYG{n}{y}\PYG{p}{:}\PYG{n}{y} \PYG{o}{+} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{h} \PYG{o}{*} \PYG{l+m+mf}{0.6}\PYG{p}{),} \PYG{n}{x}\PYG{p}{:}\PYG{n}{x} \PYG{o}{+} \PYG{n}{w}\PYG{p}{]}
+
+        \PYG{c+c1}{\PYGZsh{} Convert OpenCV native BGR matrices to standard RGB space}
+        \PYG{n}{mean\PYGZus{}bgr} \PYG{o}{=} \PYG{n}{roi}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+        \PYG{n}{mean\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{mean\PYGZus{}bgr}\PYG{p}{[::}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}
+        \PYG{n}{rgb\PYGZus{}values}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{mean\PYGZus{}rgb}\PYG{p}{)}
+
+    \PYG{n}{cap}\PYG{o}{.}\PYG{n}{release}\PYG{p}{()}
+
+    \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}values}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{10}\PYG{p}{:}
+        \PYG{k}{raise} \PYG{n+ne}{ValueError}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Insufficient extracted frame volume. Verify video stream file.\PYGZdq{}}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}values}\PYG{p}{),} \PYG{n}{fps}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{main}\PYG{p}{():}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Ingesting raw video array: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{VIDEO\PYGZus{}PATH}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{rgb}\PYG{p}{,} \PYG{n}{fs} \PYG{o}{=} \PYG{n}{extract\PYGZus{}rgb\PYGZus{}from\PYGZus{}video}\PYG{p}{(}\PYG{n}{VIDEO\PYGZus{}PATH}\PYG{p}{,} \PYG{n}{USE\PYGZus{}FACE\PYGZus{}ROI}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Total extracted frames: }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ | Target sampling frequency (fs): }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{fs}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ Hz\PYGZdq{}}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Extract rPPG pulse via the PCA decomposition pipeline}
+    \PYG{n}{ppg} \PYG{o}{=} \PYG{n}{extract\PYGZus{}pca\PYGZus{}signal}\PYG{p}{(}\PYG{n}{rgb}\PYG{p}{,} \PYG{n}{fs}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Perform global signal standard scaling}
+    \PYG{n}{ppg} \PYG{o}{=} \PYG{p}{(}\PYG{n}{ppg} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{))} \PYG{o}{/} \PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mf}{1e\PYGZhy{}8}\PYG{p}{)}
+    \PYG{n}{ppg} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{clip}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Normalize structural length to the standard benchmark size}
+    \PYG{n}{ppg\PYGZus{}resampled} \PYG{o}{=} \PYG{n}{adaptive\PYGZus{}resample}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{,} \PYG{n}{FIXED\PYGZus{}POINTS}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Generate analytical validation visual plots}
+    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{axes} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{12}\PYG{p}{,} \PYG{l+m+mi}{8}\PYG{p}{))}
+
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ppg}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}crimson\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}rPPG Signal (Raw Length, After PCA Subspace + Bandpass Filtering)\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Frame Index\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Amplitude (Normalized)\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.3}\PYG{p}{)}
+
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ppg\PYGZus{}resampled}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}royalblue\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}rPPG Signal (Resampled Standardized Output to }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{FIXED\PYGZus{}POINTS}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ Points)\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Sample Index\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Amplitude (Normalized)\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.3}\PYG{p}{)}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{tight\PYGZus{}layout}\PYG{p}{()}
+    \PYG{n}{out\PYGZus{}path} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}ppg\PYGZus{}signal\PYGZus{}plot.png\PYGZdq{}}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{n}{out\PYGZus{}path}\PYG{p}{,} \PYG{n}{dpi}\PYG{o}{=}\PYG{l+m+mi}{150}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Analytical plot saved successfully to: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{out\PYGZus{}path}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZdq{}}\PYG{p}{:}
+    \PYG{n}{main}\PYG{p}{()}
+\end{Verbatim}

@@ -36,7 +36,7 @@
 \contentsline {subsubsection}{File Structure on the Phone}{21}{section*.19}%
 \contentsline {subsubsection}{The Metadata CSV File}{23}{section*.21}%
 \contentsline {subsubsection}{Final Dataset Aggregation}{23}{section*.23}%
-\contentsline {section}{\numberline {3.3}Phase 2: Data Preprocessing and Structuring}{24}{section.3.3}%
+\contentsline {section}{\numberline {3.3}Phase 2: Data Preprocessing}{24}{section.3.3}%
 \contentsline {subsection}{\numberline {3.3.1}Video Orientation Normalization}{24}{subsection.3.3.1}%
 \contentsline {subsubsection}{The Challenge with Standard Video Editors}{24}{section*.24}%
 \contentsline {subsubsection}{The Automated FFmpeg Command-Line Solution}{24}{section*.25}%
@@ -45,34 +45,37 @@
 \contentsline {subsection}{\numberline {3.3.3}Quality Control and Data Filtering}{27}{subsection.3.3.3}%
 \contentsline {subsection}{\numberline {3.3.4}Automation Python Script for Restructuring}{27}{subsection.3.3.4}%
 \contentsline {section}{\numberline {3.4}Phase 3: rPPG Extraction}{28}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Raw Temporal RGB Extraction}{29}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Frame Rate Normalization Strategies}{29}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{32}{subsection.3.4.3}%
-\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{34}{subsection.3.4.4}%
-\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{34}{subsection.3.4.5}%
-\contentsline {subsection}{\numberline {3.4.6}Experimental Results and Visualization}{37}{subsection.3.4.6}%
-\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{38}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Temporal Sliding Window and Data Preparation}{39}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3.5.2}The 1D-ResNet Architecture Core}{39}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.5.3}Robust Time-Series Data Augmentation Pipeline}{42}{subsection.3.5.3}%
-\contentsline {subsection}{\numberline {3.5.4}Cross-Domain Transfer Learning Optimization}{43}{subsection.3.5.4}%
-\contentsline {chapter}{\numberline {4}Results}{46}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Evaluation Metrics}{46}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Mean Absolute Error (MAE)}{46}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Mean Squared Error (MSE)}{47}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Root Mean Squared Error (RMSE)}{47}{subsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.1.4}Max Absolute Error}{47}{subsection.4.1.4}%
-\contentsline {subsection}{\numberline {4.1.5}Coefficient of Determination ($R^2$ Score)}{47}{subsection.4.1.5}%
-\contentsline {section}{\numberline {4.2}Computational Complexity}{48}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Experimental Results}{49}{section.4.3}%
-\contentsline {chapter}{\numberline {5}Application Deployment}{50}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Introduction}{50}{section.5.1}%
-\contentsline {section}{\numberline {5.2}App Architecture}{50}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Live Signal Monitor}{51}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Data Acquisition}{52}{section.5.4}%
-\contentsline {section}{\numberline {5.5}AI Inference}{53}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Result Presentation}{54}{section.5.6}%
-\contentsline {chapter}{\numberline {6}Conclusion and Future Work}{56}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Project Conclusion}{56}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Future Work}{57}{section.6.2}%
-\contentsline {chapter}{References}{58}{section*.39}%
+\contentsline {subsection}{\numberline {3.4.1}Raw Temporal RGB Extraction and Algorithmic Frameworks}{29}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Frame Rate Normalization Strategies}{30}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{33}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{35}{subsection.3.4.4}%
+\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{35}{subsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.4.6}Experimental PCA Signal Extraction Execution and Visualization}{38}{subsection.3.4.6}%
+\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{43}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Temporal Sliding Window and Data Preparation}{43}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}The 1D-ResNet Architecture Core (Baseline Model)}{44}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Robust Time-Series Data Augmentation Pipeline}{47}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.5.4}Advanced Parallel Hybrid Bi-LSTM CNN Regression Architecture}{48}{subsection.3.5.4}%
+\contentsline {subsection}{\numberline {3.5.5}Cross-Domain Transfer Learning Optimization}{48}{subsection.3.5.5}%
+\contentsline {subsection}{\numberline {3.5.6}Multi-Task Shared-Backbone Classification Network}{52}{subsection.3.5.6}%
+\contentsline {subsubsection}{Clinical Dataset Distribution and Stratification}{53}{section*.34}%
+\contentsline {chapter}{\numberline {4}Results}{57}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Evaluation Metrics}{57}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Mean Absolute Error (MAE)}{57}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Mean Squared Error (MSE)}{58}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Root Mean Squared Error (RMSE)}{58}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Max Absolute Error}{58}{subsection.4.1.4}%
+\contentsline {subsection}{\numberline {4.1.5}Coefficient of Determination ($R^2$ Score)}{58}{subsection.4.1.5}%
+\contentsline {section}{\numberline {4.2}Computational Complexity}{59}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Experimental Results}{60}{section.4.3}%
+\contentsline {chapter}{\numberline {5}Application Deployment}{61}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Introduction}{61}{section.5.1}%
+\contentsline {section}{\numberline {5.2}App Architecture}{61}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Live Signal Monitor}{62}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Data Acquisition}{63}{section.5.4}%
+\contentsline {section}{\numberline {5.5}AI Inference}{64}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Result Presentation}{65}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Conclusion and Future Work}{67}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Project Conclusion}{67}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{68}{section.6.2}%
+\contentsline {chapter}{References}{69}{section*.41}%

@@ -1,8 +1,9 @@
+\clearpage
 \section{Phase 4: AI Modeling}
 \label{sec:phase4_modeling}
 Following the successful extraction and conditioning of the raw continuous rPPG waveforms, the project transitioned into the core computational stage: Artificial Intelligence modeling for non-invasive glucose estimation. Due to the complex, non-linear relationship between peripheral blood volume pulses and blood glucose concentrations, traditional feature-engineering regressions are insufficient.
 
-To capture the subtle temporal micro-features embedded within the dynamic waveforms, our team developed a deep learning framework based on a one-dimensional Residual Network (1D-ResNet). This phase outlines the structural progression of our optimization pipeline, expanding across three core paradigms: baseline network implementation, dynamic time-series data augmentation, and cross-domain Transfer Learning.
+To capture the subtle temporal micro-features embedded within the dynamic waveforms, our framework expands across three core paradigms: a baseline convolutional framework based on a 1D Residual Network (1D-ResNet), an advanced parallel hybrid Bi-LSTM CNN regression architecture utilizing cross-domain Transfer Learning, and a multi-task shared-backbone classification system engineered to counter clinical class imbalances.
 
 \subsection{Temporal Sliding Window and Data Preparation}
 A key pre-processing strategy required for training deep 1D Convolutional networks on physiological signals is the standardization of input shapes. Rather than processing the entire 20-second rPPG array as a single monolithic input, a fixed \textbf{Sliding Window Technique} was deployed.
@@ -13,10 +14,10 @@ X_{\text{window}}^{(i)} = [x_i, x_{i+1}, \dots, x_{i+W-1}]
 \end{equation}
 where each windowed segment is mapped to the continuous ground-truth clinical Accu-Chek measurement $y$ of that specific patient. This temporal slicing effectively boosts the network's local feature visibility and exponentially increases the operational sample size fed into the layers. Following data shaping, a strict deterministic 70\% Training, 15\% Validation, and 15\% Testing partition rule was maintained.
 
-\subsection{The 1D-ResNet Architecture Core}
-The foundational architecture developed for this regression framework is a customized Deep 1D Residual Network (1D-ResNet). Deep networks traditionally suffer from the vanishing gradient problem during backpropagation. To bypass this, the architecture implements \textbf{Skip Connections (Residual Shortcuts)} that add the original input directly to the processed output of the convolutional blocks, preserving the gradients across deep layers.
+\subsection{The 1D-ResNet Architecture Core (Baseline Model)}
+The foundational baseline architecture developed for this regression framework is a customized Deep 1D Residual Network (1D-ResNet) implemented in TensorFlow/Keras. Deep networks traditionally suffer from the vanishing gradient problem during backpropagation. To bypass this, the architecture implements \textbf{Skip Connections (Residual Shortcuts)} that add the original input directly to the processed output of the convolutional blocks, preserving the gradients across deep layers.
 
-The visual abstraction of the developed network topology and its computational mapping block sequence is illustrated in Figure~\ref{fig:resnet_core_architecture}.
+To establish a solid performance benchmark, this baseline 1D-ResNet was trained directly using a localized cohort consisting of exactly 248 validated clinical rPPG waveform samples. The visual abstraction of the developed baseline network topology and its computational mapping block sequence is illustrated in Figure~\ref{fig:resnet_core_architecture}.
 
 \begin{figure}[H]
     \centering
@@ -26,7 +27,7 @@ The visual abstraction of the developed network topology and its computational m
     \label{fig:resnet_core_architecture}
 \end{figure}
 
-The structural composition and execution logic of the foundational operational layers are locked and detailed in Listing~\ref{lst:resnet_architecture_code}, illustrating the network setup without redundant syntax:
+The structural composition and execution logic of the foundational operational layers are detailed in Listing~\ref{lst:resnet_architecture_code}, illustrating the network setup without redundant syntax:
 
 \vspace{1.5em}
 \begin{center}
@@ -97,7 +98,7 @@ model = Model(inp, out)
 \vspace{1.5em}
 
 \subsection{Robust Time-Series Data Augmentation Pipeline}
-To strengthen the structural generalization of our 1D-ResNet and mitigate over-fitting caused by limited sample profiles, a robust mathematical \textbf{Data Augmentation Pipeline} was integrated during the data preparation loop. For every original 60-point sliding window extracted, three independent synthetic transformations are applied sequentially:
+To strengthen the structural generalization of our deep networks and mitigate over-fitting caused by limited sample profiles, a robust mathematical \textbf{Data Augmentation Pipeline} was integrated during the data preparation loop. For every original 60-point sliding window extracted, three independent synthetic transformations are applied sequentially:
 
 \begin{enumerate}
     \item \textbf{Additive Gaussian Noise:} Introducing microscopic noise arrays sampled from a standard normal distribution $\mathcal{N}(0, \sigma^2)$ where $\sigma = 0.01$. This forces the network to ignore minor high-frequency hardware channel static.
@@ -107,19 +108,41 @@ To strengthen the structural generalization of our 1D-ResNet and mitigate over-f
 
 By injecting these three transformations alongside the original data arrays, the available structural dataset size was expanded by a factor of four ($4\times$), providing a highly resilient dataset foundation for stable weight convergence.
 
+\subsection{Advanced Parallel Hybrid Bi-LSTM CNN Regression Architecture}
+To capture both localized micro-temporal patterns and long-range sequential dependencies within the full-length rPPG waveforms concurrently, an advanced multi-branch deep learning network designated as \textbf{RigidGlucoseNet} was developed using the PyTorch framework. Traditional sequential architectures often attenuate fine-grained morphological details; hence, this custom network topology splits the feature extraction phase into three parallel deep processing tracks:
+
+\begin{itemize}
+    \item \textbf{Micro and Macro CNN Branches:} Two identical structural blocks (\texttt{CNN\_Block}) operate in parallel to extract multi-scale spatial abstractions across variable temporal fields. Each block comprises a cascading sequence of 1D Convolutional layers with progressively expanding channels ($32 \to 64 \to 128$) and contractive kernel sizes ($11 \to 9 \to 7$), backed by Batch Normalization and ReLU activations.
+    \item \textbf{Bidirectional LSTM Branch:} Concurrently, a Bidirectional Long Short-Term Memory (\texttt{Bi-LSTM}) network with a 32-dimensional hidden state processes the input sequence. By scanning the waveform forward and backward simultaneously, the branch effectively models dynamic cardiac pulse velocity behaviors over time.
+\end{itemize}
+
+The spatial and sequential features extracted across these three tracks are globally pooled, flattened, and merged via a dense feature concatenation layer (\texttt{torch.cat}). This integrated latent representation is routed through independent dense projection steps before hitting the final output regressor to predict the continuous blood glucose concentration.
+
 \subsection{Cross-Domain Transfer Learning Optimization}
-The final advancement introduced in our AI modeling phase is a specialized \textbf{Cross-Domain Transfer Learning Strategy}. Blood glucose fluctuations influence cardiovascular properties similarly to blood pressure variations; both metrics are deeply interconnected within the peripheral micro-vascular system through changes in arterial stiffness and blood volume pulse morphology.
+Blood glucose fluctuations influence cardiovascular properties similarly to blood pressure variations; both metrics are deeply interconnected within the peripheral micro-vascular system through changes in arterial stiffness and blood volume pulse morphology. To capitalize on this biological overlap, a specialized \textbf{Cross-Domain Transfer Learning Strategy} was executed.
 
-To capitalize on this biological overlap, a separate, auxiliary model was developed using the PyTorch framework to predict Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP) from raw synchronized rPPG windows. This source-domain architecture, structured as a Deep 1D Sequential Convolutional Neural Network (1D-CNN), systematically extracts deep physiological representations across a multi-scale receptive field ($11 \to 9 \to 7$ kernel sizes) backed by Batch Normalization layers to ensure stable latent feature distribution.
+The optimization was divided into two distinct, structured phases to combat target-domain data scarcity:
+\begin{enumerate}
+    \item \textbf{Large-Scale Source Pre-training:} The auxiliary convolutional backbone was first pre-trained on an extensive, large-scale dataset consisting of approximately 150,000 multi-parameter cardiovascular waveforms extracted from the open-source \textbf{VitalDB} clinical registry. This stage focused entirely on modeling blood pressure profiles (SBP and DBP estimation) to extract generalized cardiovascular representations.
+    \item \textbf{Target Domain Fine-Tuning:} Knowledge transfer was conducted by capturing the spatial weight configurations from this pre-trained blood pressure backbone and mapping them directly into the deep spatial layers of both the \texttt{micro\_cnn} and \texttt{macro\_cnn} branches of the \texttt{RigidGlucoseNet}. The target network was then fine-tuned using a blended domain dataset comprising 7,500 blood glucose records sourced from VitalDB alongside our specialized 248 locally collected clinical patient samples.
+\end{enumerate}
 
-The complete architectural details of this auxiliary regression backbone are detailed in Listing~\ref{lst:pytorch_bp_backbone}, representing the exact source model implemented to learn the foundational cardiovascular parameters:
+This parameter transfer initializes the target regression network with a highly stable mathematical understanding of pulse wave shapes, accelerating optimization and minimizing convergence barriers during target domain fine-tuning. The operational PyTorch schema of this parallel transfer setup is detailed in Listing~\ref{lst:rigid_glucose_net}, and its structural paradigm is illustrated in Figure~\ref{fig:transfer_learning_paradigm}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/chapter3/TransferLearning.png}
+    \captionsetup{font=small, labelfont=bf}
+    \caption{Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}
+    \label{fig:transfer_learning_paradigm}
+\end{figure}
 
 \vspace{1.5em}
 \begin{center}
     \begin{minipage}{\textwidth}
         \centering
-        \captionof{listing}{PyTorch Structural Implementation of the Auxiliary Blood Pressure Source Model}
-        \label{lst:pytorch_bp_backbone}
+        \captionof{listing}{PyTorch Implementation of the Parallel Hybrid Bi-LSTM CNN Regression Network}
+        \label{lst:rigid_glucose_net}
         \vspace{-0.5em}
     \end{minipage}
 \end{center}
@@ -136,47 +159,183 @@ The complete architectural details of this auxiliary regression backbone are det
 import torch
 import torch.nn as nn
 
-class CNN_BP(nn.Module):
+class CNN_Block(nn.Module):
     def __init__(self):
         super().__init__()
-        # Feature Extraction Backbone (Learns Arterial Elasticity Dynamics)
         self.net = nn.Sequential(
-            nn.Conv1d(1, 32, kernel_size=11, padding=5),
+            nn.Conv1d(1, 32, 11, padding=5),
             nn.ReLU(),
             nn.BatchNorm1d(32),
-
-            nn.Conv1d(32, 64, kernel_size=9, padding=4),
+            nn.Conv1d(32, 64, 9, padding=4),
             nn.ReLU(),
             nn.BatchNorm1d(64),
-
-            nn.Conv1d(64, 128, kernel_size=7, padding=3),
+            nn.Conv1d(64, 128, 7, padding=3),
             nn.ReLU(),
             nn.BatchNorm1d(128),
-
             nn.AdaptiveAvgPool1d(1)
         )
-        # Original Dual-Output Regression Head for SBP and DBP
-        self.fc = nn.Sequential(
-            nn.Linear(128, 64),
+    def forward(self, x):
+        return self.net(x).squeeze(-1)
+
+class RigidGlucoseNet(nn.Module):
+    def __init__(self, pretrained_cnn_state=None):
+        super().__init__()
+        self.micro_cnn = CNN_Block()
+        self.macro_cnn = CNN_Block()
+        
+        if pretrained_cnn_state is not None:
+            mapped_state = {}
+            for k, v in pretrained_cnn_state.items():
+                if k.startswith("net."):
+                    mapped_state[k] = v
+            self.micro_cnn.net.load_state_dict(mapped_state, strict=False)
+            self.macro_cnn.net.load_state_dict(mapped_state, strict=False)
+
+        self.bi_lstm = nn.LSTM(input_size=1, hidden_size=32, num_layers=1, bidirectional=True, batch_first=True)
+        self.lstm_pool = nn.AdaptiveAvgPool1d(1)
+
+        self.fc_micro = nn.Sequential(nn.Linear(128, 32), nn.ReLU(), nn.Dropout(0.3))
+        self.fc_macro = nn.Sequential(nn.Linear(128, 32), nn.ReLU(), nn.Dropout(0.3))
+        self.fc_lstm = nn.Sequential(nn.Linear(64, 32), nn.ReLU(), nn.Dropout(0.3))
+
+        self.final_fc = nn.Sequential(
+            nn.Linear(32 + 32 + 32, 32),
             nn.ReLU(),
-            nn.Linear(64, 2)
+            nn.Dropout(0.3),
+            nn.Linear(32, 1) 
         )
 
     def forward(self, x):
-        x = self.net(x)
-        x = x.squeeze(-1)
-        return self.fc(x)
+        feat_micro = self.micro_cnn(x)
+        feat_macro = self.macro_cnn(x)
+        
+        x_lstm = x.transpose(1, 2) 
+        lstm_out, _ = self.bi_lstm(x_lstm)
+        feat_lstm = self.lstm_pool(lstm_out.transpose(1, 2)).squeeze(-1)
+        
+        out_micro = self.fc_micro(feat_micro)
+        out_macro = self.fc_macro(feat_macro)
+        out_lstm = self.fc_lstm(feat_lstm)
+        
+        merged = torch.cat((out_micro, out_macro, out_lstm), dim=1)
+        return self.final_fc(merged)
 \end{minted}
 \vspace{1.5em}
 
-Under this Transfer Learning setup, the feature-extraction spatial layers from the pre-trained \texttt{CNN\_BP} model (representing the trained 128-dimensional latent vector) were frozen to lock in the cross-domain physiological signatures. The original dual-output fully-connected regression head ($2$ outputs: SBP/DBP) was completely stripped away. This frozen temporal backbone was then adapted to our primary target domain by attaching a customized continuous blood glucose estimation layer stack implemented via TensorFlow/Keras ($64 \to \text{Dropout} \to \text{Dense}(1)$). 
+\subsection{Multi-Task Shared-Backbone Classification Network}
+To complement continuous regression estimation, a secondary network topology structured as a \textbf{Multi-Task Shared-Backbone Network} was deployed to classify glycemic states into three clinical risk categories based on standard medical diagnostic boundaries:
+\begin{itemize}
+    \item \textbf{Low (Hypoglycemic):} Blood glucose level $< 70$ mg/dL.
+    \item \textbf{Natural (Normoglycemic):} Blood glucose level within $70 \le y \le 200$ mg/dL.
+    \item \textbf{High (Hyperglycemic):} Blood glucose level $> 200$ mg/dL.
+\end{itemize}
 
-This hybrid architecture was subsequently fine-tuned using a highly conservative learning rate ($\eta = 10^{-4}$) on our stratified fingertip rPPG dataset. This methodology successfully guides the target network to utilize its prior understanding of pulse wave morphology, eliminating training convergence barriers and optimizing non-invasive glucose prediction metrics despite constrained domain sample counts. The target adaptation setup is graphically mapped in Figure~\ref{fig:transfer_learning_paradigm}.
+This topology maximizes feature reusability across related cardiovascular domains by bifurcating a shared feature representation stream into independent physiological estimation heads:
+
+\begin{enumerate}
+    \item \textbf{Shared Feature Backbone:} A 2-layer deep 1D-CNN infrastructure that absorbs raw filtered rPPG signals, constructing shared latent feature maps that reflect universal blood volume pulse profiles.
+    \item \textbf{Blood Pressure Branch:} Composed of an auxiliary 1D-CNN feature extraction block mapped to a dual-output regression head. This branch estimates continuous Systolic and Diastolic Blood Pressure (SBP/DBP), implementing a deterministic linear correction factor ($+10.0$ mmHg) on the diastolic output stream to compensate for systemic physiological variations.
+    \item \textbf{Expanded Glycemic Classification Branch:} Engineered with an augmented feature extraction structure containing two successive 1D-CNN layers ($128$ filters, kernel size $7 \to 5$) to isolate subtle metabolic wave shifts. The extracted vectors are routed into a 3-class classification head mapping to the clinical target states.
+\end{enumerate}
+
+\subsubsection{Clinical Dataset Distribution and Stratification}
+The classification framework was optimized using an aggregated clinical dataset containing a total of exactly 450 complete patient records. This training corpus was constructed via cross-domain data consolidation from two distinct sources:
+\begin{itemize}
+    \item \textbf{VitalDB Cohort Segment:} Contributing 228 patient files, which naturally broke down into 104 Low cases, 20 Natural cases, and 104 High cases.
+    \item \textbf{Primary Local Cohort:} Contributing 222 patient files, which broke down into 2 Low cases, 161 Natural cases, and 59 High cases.
+\end{itemize}
+
+Summing these independent cohorts yields a highly skewed global distribution. Out of the 450 total clinical files, the categorical class counts and their precise proportional representation are structured as follows:
+\begin{itemize}
+    \item \textbf{Low Category Sub-population:} $2 + 104 = 106$ files, representing exactly \textbf{23.5\%} of the dataset.
+    \item \textbf{High Category Sub-population:} $59 + 104 = 163$ files, representing exactly \textbf{36.2\%} of the dataset.
+    \item \textbf{Natural Category Sub-population:} $20 + 161 = 181$ files, representing exactly \textbf{40.2\%} of the dataset.
+\end{itemize}
+
+\textbf{Imbalance Mitigation via Weighted Focal Loss:} Due to these inherent class distribution skews, traditional Cross-Entropy loss functions are highly vulnerable to majority-class bias. To guarantee maximum sensitivity across critical clinical boundaries, a specialized \textbf{Multi-Class Focal Loss function} was incorporated during optimization. This loss automatically computes dynamic class weights based on the inverse frequency of training data points:
+\begin{equation}
+W_{\text{class}} = \frac{N_{\text{total}}}{C \cdot N_{\text{class}}}
+\end{equation}
+By incorporating a scaling focus parameter ($\gamma = 2.5$) combined with a 0.1 Label Smoothing factor, the loss suppresses gradients generated from easily classified normoglycemic cases and heavily penalizes errors on the boundaries, forcing the network to maximize main diagonal accuracy across the global confusion matrix. The comprehensive multi-task architectural code layout is structured in Listing~\ref{lst:multitask_model}.
+
+\vspace{1.5em}
+\begin{center}
+    \begin{minipage}{\textwidth}
+        \centering
+        \captionof{listing}{PyTorch Architecture of the Multi-Task Shared-Backbone Glycemic Classification Model}
+        \label{lst:multitask_model}
+        \vspace{-0.5em}
+    \end{minipage}
+\end{center}
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.1,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos,
+    breaklines
+]{python}
+import torch
+import torch.nn as nn
+
+class MultiTaskPPGModel(nn.Module):
+    def __init__(self, checkpoint_path=None):
+        super().__init__()
+        self.shared_backbone = nn.Sequential(
+            nn.Conv1d(1, 32, 11, padding=5),
+            nn.ReLU(),
+            nn.BatchNorm1d(32),
+            nn.Conv1d(32, 64, 9, padding=4),
+            nn.ReLU(),
+            nn.BatchNorm1d(64)
+        )
+        self.bp_conv = nn.Sequential(
+            nn.Conv1d(64, 128, 7, padding=3),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+            nn.AdaptiveAvgPool1d(1)
+        )
+        self.glucose_conv = nn.Sequential(
+            nn.Conv1d(64, 128, 7, padding=3),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+            nn.Conv1d(128, 128, 5, padding=2),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+            nn.AdaptiveAvgPool1d(1)
+        )
+        self.bp_head = nn.Sequential(
+            nn.Linear(128, 64), nn.ReLU(), nn.Linear(64, 2)
+        )
+        self.glucose_head = nn.Sequential(
+            nn.Linear(128, 64), nn.ReLU(), nn.Dropout(0.5), nn.Linear(64, 3)
+        )
+
+    def forward(self, x):
+        shared_features = self.shared_backbone(x)
+        
+        # Blood Pressure Branch Execution
+        bp_features = self.bp_conv(shared_features).squeeze(-1)
+        bp_out = self.bp_head(bp_features) 
+        sys_val = bp_out[:, 0]
+        dia_val = bp_out[:, 1] + 10.0 
+        
+        # Glycemic Classification Branch Execution
+        glucose_features = self.glucose_conv(shared_features).squeeze(-1)
+        glucose_logits = self.glucose_head(glucose_features)
+        
+        return sys_val, dia_val, glucose_logits
+\end{minted}
+\vspace{1.5em}
+
+The sequential execution flow, demonstrating the extraction of universal blood volume pulse profiles from the shared layers and their subsequent bifurcation into independent physiological estimators, is graphically illustrated in Figure~\ref{fig:multitask_shared_backbone}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/chapter3/TransferLearning.png}
+    \includegraphics[width=0.85\textwidth]{figures/chapter3/multitask_architecture.png}
     \captionsetup{font=small, labelfont=bf}
-    \caption{Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}
-    \label{fig:transfer_learning_paradigm}
+    \caption{Architectural pipeline of the Multi-Task Shared-Backbone Network, detailing the shared convolutional baseline, the calibrated Blood Pressure regression branch, and the expanded 3-class glycemic risk classification head.}
+    \label{fig:multitask_shared_backbone}
 \end{figure}
