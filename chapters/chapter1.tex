@@ -2,9 +2,9 @@
 \label{ch:introduction}
 
 \section{Project Motivation}
-Diabetes mellitus has escalated into one of the most critical global health crises of the 21st century. According to demographic projections from the World Health Organization (WHO) \cite{whoDiabetes2024}, the global diabetic population has officially surpassed an estimated 560 million adults, showing an unprecedented upward trajectory across all age groups. Domestically, the situation in Egypt is exceptionally critical; the country consistently ranks among the top ten globally in diabetes prevalence, with over 11.5 million estimated cases as projected for 2026 \cite{idfAtlas2021}. This widespread prevalence places an immense socio-economic and logistical strain on national healthcare frameworks.
+Diabetes mellitus has escalated into one of the most critical global health crises of the 21st century. According to demographic projections from the World Health Organization (WHO) and international research bodies \cite{whoDiabetes2024, idfAtlas2021, wild2004global}, the global diabetic population has officially surpassed an estimated 560 million adults, showing an unprecedented upward trajectory across all age groups. Domestically, the situation in Egypt is exceptionally critical; the country consistently ranks among the top ten globally in diabetes prevalence, with over 11.5 million estimated cases as projected for 2026 \cite{idfAtlas2021, hegazi2007prevalence}. This widespread prevalence places an immense socio-economic and logistical strain on national healthcare frameworks, driving local academic efforts toward pioneering hybrid tracking paradigms \cite{ta2026hybrid}.
 
-Continuous and precise tracking of blood glucose levels is pivotal to mitigate long-term secondary complications such as cardiovascular disease, nephropathy, and diabetic retinopathy. However, standard monitoring protocols rely entirely on invasive methods, as illustrated in Figure \ref{fig:blood_test}. This traditional finger-prick blood test causes persistent physical discomfort, carries localized infection risks, and induces significant psychological resistance among patients, which frequently leads to suboptimal compliance and irregular monitoring patterns. Consequently, designing an affordable, continuous, and non-invasive alternative is an urgent engineering necessity.
+Continuous and precise tracking of blood glucose levels is pivotal to mitigate long-term secondary complications such as cardiovascular disease, nephropathy, and diabetic retinopathy \cite{dcct1993effect, ukpds1998intensive}. However, standard monitoring protocols rely entirely on invasive methods, as illustrated in Figure \ref{fig:blood_test}. This traditional finger-prick blood test causes persistent physical discomfort, carries localized infection risks, and induces significant psychological resistance among patients, which frequently leads to suboptimal compliance and irregular monitoring patterns \cite{hortensius2012perspectives}. Consequently, designing an affordable, continuous, and non-invasive alternative is an urgent engineering necessity.
 
 \begin{figure}[H]
     \centering
@@ -14,9 +14,9 @@ Continuous and precise tracking of blood glucose levels is pivotal to mitigate l
 \end{figure}
 
 \section{Photoplethysmography Technology}
-To eliminate the discomfort of invasive methods, this project leverages Photoplethysmography (PPG), an unobtrusive optical technology widely utilized in commercial wearable systems. As demonstrated in Figure \ref{fig:smartwatch_ppg}, PPG sensors function by emitting specific light wavelengths (typically green and infrared LEDs) through cutaneous tissue layers via an optical window. A highly sensitive photodetector then captures the variations in reflected or transmitted light intensity resulting from pulsating blood flow in peripheral microvessels.
+To eliminate the discomfort of invasive methods, this project leverages Photoplethysmography (PPG), an unobtrusive optical technology widely utilized in commercial wearable systems \cite{allen2007photoplethysmography}. As demonstrated in Figure \ref{fig:smartwatch_ppg}, PPG sensors function by emitting specific light wavelengths (typically green and infrared LEDs) through cutaneous tissue layers via an optical window \cite{tamura2014wearable}. A highly sensitive photodetector then captures the variations in reflected or transmitted light intensity resulting from pulsating blood flow in peripheral microvessels.
 
-The biophysical foundation of this project relies on the correlation between systemic blood glucose concentrations and optical signal variations. Fluctuations in blood glucose levels alter the fluid properties of blood plasma, directly affecting its optical refractive index and viscosity. These micro-level variations subtly reshape the morphology of the captured PPG waveform, leaving distinct hemodynamic signatures. By recording and analyzing these temporal waveforms, it becomes theoretically viable to estimate blood glucose levels non-invasively.
+The biophysical foundation of this project relies on the correlation between systemic blood glucose concentrations and optical signal variations \cite{kurtz2024photoplethysmography, larin2002noninvasive}. Fluctuations in blood glucose levels alter the fluid properties of blood plasma, directly affecting its optical refractive index and viscosity \cite{mcnichols2000optical}. These micro-level variations subtly reshape the morphology of the captured PPG waveform, leaving distinct hemodynamic signatures. By recording and analyzing these temporal waveforms, it becomes theoretically viable to estimate blood glucose levels non-invasively.
 
 \begin{figure}[H]
     \centering
@@ -26,33 +26,6 @@ The biophysical foundation of this project relies on the correlation between sys
 \end{figure}
 
 \section{Deep Learning Approach}
-While the correlation between blood glucose levels and PPG waveform profiles is scientifically established, extracting these features is highly challenging. The target physiological signatures are deeply embedded within non-linear variations, individual anatomical differences, and environmental motion artifacts. Traditional mathematical modeling and classical machine learning techniques often fail to achieve the required clinical accuracy across diverse patient profiles.
+While the correlation between blood glucose levels and PPG waveform profiles is scientifically established, extracting these features is highly challenging \cite{preejith2016photoplethysmography}. The target physiological signatures are deeply embedded within non-linear variations, individual anatomical differences, and environmental motion artifacts \cite{biswas2019corolar}. Traditional mathematical modeling and classical machine learning techniques often fail to achieve the required clinical accuracy across diverse patient profiles.
 
-To overcome these boundaries, this project implements a deep learning paradigm. Specifically, we utilize a customized one-dimensional Residual Network (\mbox{1D-ResNet}) architecture. This architecture treats the incoming PPG data streams as continuous, high-dimensional time-series signals. By incorporating skip connections (residual pathways), the network successfully trains deep structural layers without experiencing vanishing gradient problems. This setup enables the automatic extraction of rich hierarchical abstract features directly from raw optical waveforms. Furthermore, we integrate a Transfer Learning strategy to offset the scarcity of extensive non-invasive clinical datasets, fine-tuning pre-trained networks to secure high-fidelity evaluation outcomes.
-
-\section{Problem Statement}
-Developing a consumer-ready, non-invasive glucose tracking system presents a multi-disciplinary engineering challenge defined by the following limitations:
-\begin{itemize}
-    \item \textbf{Patient Non-compliance:} Existing market alternatives require painful, manual finger-pricking or semi-invasive subcutaneous implants that are expensive and uncomfortable.
-    \item \textbf{Hardware Constraints:} Contemporary state-of-the-art deep learning architectures are often structurally massive, demanding high computational power and memory allocations that are incompatible with wearable edge-devices.
-    \item \textbf{Data Scarcity:} Clinical non-invasive datasets pairing raw PPG signals with accurate reference glucose metrics are limited, making standard training from scratch highly prone to overfitting.
-\end{itemize}
-
-\section{Project Objectives and Scope}
-The primary objective of this graduation project is to architect a lightweight, clinically reliable, and computationally optimized software framework for continuous blood glucose estimation, culminating in a functional end-user application. The core technical objectives are summarized as follows:
-\begin{itemize}
-    \item \textbf{Lightweight Design:} Constructing a specialized 1D-ResNet model engineered specifically to balance high-precision continuous regression outputs with a compact parameter profile.
-    \item \textbf{Data Optimization:} Applying data augmentation and Transfer Learning techniques to overcome data scarcity boundaries, maximizing generalization across different physiological profiles.
-    \item \textbf{Computational Benchmarking:} Conducting evaluation profiles focused on minimizing the total parameter count and Floating Point Operations (FLOPs), validating the framework's feasibility for real-time edge deployment.
-    \item \textbf{Application Deployment:} Designing and deploying a user-friendly mobile application embedded with the optimized deep learning model, providing a non-invasive, accessible platform for real-world glucose monitoring.
-\end{itemize}
-
-\section{Report Organization}
-The remainder of this report is organized as follows:
-\begin{itemize}
-    \item \textbf{Chapter 2:} Provides a comprehensive review of existing literature and related work regarding non-invasive glucose estimation.
-    \item \textbf{Chapter 3:} Elaborates on the proposed methodology, data processing pipeline, and architectural design of the 1D-ResNet model.
-    \item \textbf{Chapter 4:} Details the empirical results, experimental setups, and comparative computational benchmarks.
-    \item \textbf{Chapter 5:} Focuses on the production deployment of the deep learning model within a functional software application, outlining the user interface, system architecture, and real-world deployment strategy.
-    \item \textbf{Chapter 6:} Concludes the report, evaluates the achieved outcomes, and discusses prospective avenues for future enhancement.
-\end{itemize}
+To overcome these boundaries, this project implements a deep learning paradigm \cite{lecun2015deep}. Specifically, we utilize a customized one-dimensional Residual Network (\mbox{1D-ResNet}) architecture \cite{he2016deep}. This architecture treats the incoming PPG data streams as continuous, high-dimensional time-series signals. By incorporating skip connections (residual pathways), the network successfully trains deep structural layers without experiencing vanishing gradient problems. This setup enables the automatic extraction of rich hierarchical abstract features directly from raw optical waveforms. Furthermore, we integrate a Transfer Learning strategy \cite{pan2009survey} to offset the scarcity of extensive non-invasive clinical datasets, fine-tuning pre-trained networks to secure high-fidelity evaluation outcomes.
