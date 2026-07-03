@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -rf build
+
 # 1. Force-create the build directory if it doesn't exist
 mkdir -p build
 

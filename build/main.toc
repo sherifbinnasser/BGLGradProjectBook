@@ -3,86 +3,93 @@
 \contentsline {chapter}{Acknowledgment}{1}{section*.3}%
 \contentsline {chapter}{Abstract}{2}{section*.4}%
 \contentsline {chapter}{List of Figures}{3}{section*.5}%
-\contentsline {chapter}{Table of Contents}{4}{section*.6}%
-\contentsline {chapter}{\numberline {1}Introduction}{8}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Project Motivation}{8}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Photoplethysmography Technology}{9}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Deep Learning Approach}{10}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Problem Statement}{11}{section.1.4}%
-\contentsline {section}{\numberline {1.5}Project Objectives and Scope}{11}{section.1.5}%
-\contentsline {section}{\numberline {1.6}Report Organization}{12}{section.1.6}%
-\contentsline {chapter}{\numberline {2}Related Work}{13}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Introduction}{13}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Hybrid Architectures}{13}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Classical Approaches}{14}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Deep Learning}{14}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Research Gap}{15}{section.2.5}%
-\contentsline {chapter}{\numberline {3}Methodology}{16}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Introduction}{16}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Phase 1: Data Acquisition}{17}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}The Data Collection Campaign at University Hospital}{17}{subsection.3.2.1}%
-\contentsline {subsubsection}{Medical Equipment Provided by Faculty}{17}{section*.10}%
-\contentsline {subsubsection}{Hospital Environment and Ethics}{17}{section*.11}%
-\contentsline {subsection}{\numberline {3.2.2}Our Android Application: DiabetesCollector}{18}{subsection.3.2.2}%
-\contentsline {subsubsection}{How the App was Built}{18}{section*.12}%
-\contentsline {subsubsection}{Using the Camera (CameraX API)}{18}{section*.13}%
-\contentsline {subsection}{\numberline {3.2.3}Patient Profiles and Ground Truth Entry}{19}{subsection.3.2.3}%
-\contentsline {subsubsection}{Entering Demographic Information}{19}{section*.14}%
-\contentsline {subsubsection}{Logging the Reference Glucose Level}{19}{section*.15}%
-\contentsline {subsubsection}{Tracking Different Phone Hardware}{20}{section*.17}%
-\contentsline {subsection}{\numberline {3.2.4}Handling Data without Overlaps (UUID Strategy)}{21}{subsection.3.2.4}%
-\contentsline {subsection}{\numberline {3.2.5}The Signal Recording Process (The 20-Second Rule)}{21}{subsection.3.2.5}%
-\contentsline {subsection}{\numberline {3.2.6}Exporting and Merging the Final Dataset}{22}{subsection.3.2.6}%
-\contentsline {subsubsection}{File Structure on the Phone}{22}{section*.19}%
-\contentsline {subsubsection}{The Metadata CSV File}{24}{section*.21}%
-\contentsline {subsubsection}{Final Dataset Aggregation}{24}{section*.23}%
-\contentsline {section}{\numberline {3.3}Phase 2: Data Preprocessing}{25}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Video Orientation Normalization}{25}{subsection.3.3.1}%
-\contentsline {subsubsection}{The Challenge with Standard Video Editors}{25}{section*.24}%
-\contentsline {subsubsection}{The Automated FFmpeg Command-Line Solution}{25}{section*.25}%
-\contentsline {subsection}{\numberline {3.3.2}Hierarchical Dataset Re-organization}{26}{subsection.3.3.2}%
-\contentsline {subsubsection}{Individual Patient CSV Schema Specification}{27}{section*.26}%
-\contentsline {subsection}{\numberline {3.3.3}Quality Control and Data Filtering}{28}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3.3.4}Automation Python Script for Restructuring}{28}{subsection.3.3.4}%
-\contentsline {section}{\numberline {3.4}Phase 3: rPPG Extraction}{29}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Raw Temporal RGB Extraction and Algorithmic Frameworks}{30}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Frame Rate Normalization Strategies}{31}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{34}{subsection.3.4.3}%
-\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{36}{subsection.3.4.4}%
-\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{36}{subsection.3.4.5}%
-\contentsline {subsection}{\numberline {3.4.6}Experimental PCA Signal Extraction Execution and Visualization}{39}{subsection.3.4.6}%
-\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{44}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Temporal Sliding Window and Data Preparation}{44}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3.5.2}The 1D-ResNet Architecture Core (Baseline Model)}{45}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.5.3}Robust Time-Series Data Augmentation Pipeline}{48}{subsection.3.5.3}%
-\contentsline {subsection}{\numberline {3.5.4}Advanced Parallel Hybrid Bi-LSTM CNN Regression Architecture}{49}{subsection.3.5.4}%
-\contentsline {subsection}{\numberline {3.5.5}Cross-Domain Transfer Learning Optimization}{49}{subsection.3.5.5}%
-\contentsline {subsection}{\numberline {3.5.6}Multi-Task Shared-Backbone Classification Network}{53}{subsection.3.5.6}%
-\contentsline {subsubsection}{Clinical Dataset Distribution and Stratification}{54}{section*.34}%
-\contentsline {chapter}{\numberline {4}Results}{58}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Evaluation Metrics}{58}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Mean Absolute Error (MAE)}{58}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Mean Squared Error (MSE)}{59}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Root Mean Squared Error (RMSE)}{59}{subsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.1.4}Max Absolute Error}{59}{subsection.4.1.4}%
-\contentsline {subsection}{\numberline {4.1.5}Coefficient of Determination ($R^2$ Score)}{59}{subsection.4.1.5}%
-\contentsline {section}{\numberline {4.2}Computational Complexity}{60}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Experimental Results}{61}{section.4.3}%
-\contentsline {chapter}{\numberline {5}Deployment}{62}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Overview}{62}{section.5.1}%
-\contentsline {section}{\numberline {5.2}System Framework}{62}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Signal Stabilization}{63}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Image Analysis Framework}{65}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Data Acquisition}{65}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Mathematical Signal Integration}{69}{section.5.6}%
-\contentsline {section}{\numberline {5.7}Concurrency Management}{69}{section.5.7}%
-\contentsline {section}{\numberline {5.8}Presentation State Management}{70}{section.5.8}%
-\contentsline {section}{\numberline {5.9}Data and Repository Layer}{75}{section.5.9}%
-\contentsline {section}{\numberline {5.10}Backend Infrastructure}{78}{section.5.10}%
-\contentsline {section}{\numberline {5.11}Filtering Metrics}{84}{section.5.11}%
-\contentsline {section}{\numberline {5.12}UI/UX Failure Recovery}{85}{section.5.12}%
-\contentsline {section}{\numberline {5.13}Presentation Layer}{86}{section.5.13}%
-\contentsline {chapter}{\numberline {6}Conclusion and Future Work}{89}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Project Conclusion}{89}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Future Work}{90}{section.6.2}%
-\contentsline {chapter}{References}{91}{section*.40}%
+\contentsline {chapter}{List of Tables}{5}{section*.6}%
+\contentsline {chapter}{List of Listings}{6}{section*.7}%
+\contentsline {chapter}{Contents}{6}{section*.9}%
+\contentsline {chapter}{\numberline {1}Introduction}{10}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Project Motivation}{10}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Photoplethysmography Technology}{11}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Deep Learning Approach}{12}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Problem Statement}{13}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Project Objectives and Scope}{13}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Report Organization}{14}{section.1.6}%
+\contentsline {chapter}{\numberline {2}Related Work}{15}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Introduction}{15}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Hybrid Architectures}{15}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Classical Approaches}{16}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Deep Learning}{16}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Research Gap}{17}{section.2.5}%
+\contentsline {chapter}{\numberline {3}Methodology}{18}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introduction}{18}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Phase 1: Data Acquisition}{19}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}The Data Collection Campaign at University Hospital}{19}{subsection.3.2.1}%
+\contentsline {subsubsection}{Medical Equipment Provided by Faculty}{19}{section*.13}%
+\contentsline {subsubsection}{Hospital Environment and Ethics}{19}{section*.14}%
+\contentsline {subsection}{\numberline {3.2.2}Our Android Application: DiabetesCollector}{20}{subsection.3.2.2}%
+\contentsline {subsubsection}{How the App was Built}{20}{section*.15}%
+\contentsline {subsubsection}{Using the Camera (CameraX API)}{20}{section*.16}%
+\contentsline {subsection}{\numberline {3.2.3}Patient Profiles and Ground Truth Entry}{21}{subsection.3.2.3}%
+\contentsline {subsubsection}{Entering Demographic Information}{21}{section*.17}%
+\contentsline {subsubsection}{Logging the Reference Glucose Level}{21}{section*.18}%
+\contentsline {subsubsection}{Tracking Different Phone Hardware}{22}{section*.20}%
+\contentsline {subsection}{\numberline {3.2.4}Handling Data without Overlaps (UUID Strategy)}{23}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}The Signal Recording Process (The 20-Second Rule)}{23}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}Exporting and Merging the Final Dataset}{24}{subsection.3.2.6}%
+\contentsline {subsubsection}{File Structure on the Phone}{24}{section*.22}%
+\contentsline {subsubsection}{The Metadata CSV File}{26}{section*.24}%
+\contentsline {subsubsection}{Final Dataset Aggregation}{26}{section*.26}%
+\contentsline {section}{\numberline {3.3}Phase 2: Data Preprocessing}{27}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Video Orientation Normalization}{27}{subsection.3.3.1}%
+\contentsline {subsubsection}{The Challenge with Standard Video Editors}{27}{section*.27}%
+\contentsline {subsubsection}{The Automated FFmpeg Command-Line Solution}{27}{section*.28}%
+\contentsline {subsection}{\numberline {3.3.2}Hierarchical Dataset Re-organization}{28}{subsection.3.3.2}%
+\contentsline {subsubsection}{Individual Patient CSV Schema Specification}{29}{section*.29}%
+\contentsline {subsection}{\numberline {3.3.3}Quality Control and Data Filtering}{30}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Automation Python Script for Restructuring}{30}{subsection.3.3.4}%
+\contentsline {section}{\numberline {3.4}Phase 3: rPPG Extraction}{31}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Raw Temporal RGB Extraction and Algorithmic Frameworks}{32}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Frame Rate Normalization Strategies}{33}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Digital Signal Detrending, Normalization, and Filtering}{36}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Stratified Dataset Splitting}{38}{subsection.3.4.4}%
+\contentsline {subsection}{\numberline {3.4.5}Signal Extraction and Processing Implementation}{38}{subsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.4.6}Experimental PCA Signal Extraction Execution and Visualization}{41}{subsection.3.4.6}%
+\contentsline {section}{\numberline {3.5}Phase 4: AI Modeling}{46}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Temporal Sliding Window and Data Preparation}{46}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}The 1D-ResNet Architecture Core (Baseline Model)}{47}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Robust Time-Series Data Augmentation Pipeline}{50}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.5.4}Advanced Parallel Hybrid Bi-LSTM CNN Regression Architecture}{51}{subsection.3.5.4}%
+\contentsline {subsection}{\numberline {3.5.5}Cross-Domain Transfer Learning Optimization}{51}{subsection.3.5.5}%
+\contentsline {subsection}{\numberline {3.5.6}Multi-Task Shared-Backbone Classification Network}{55}{subsection.3.5.6}%
+\contentsline {subsubsection}{Clinical Dataset Distribution and Stratification}{56}{section*.37}%
+\contentsline {chapter}{\numberline {4}Results and Discussion}{60}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Evaluation Metrics}{60}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Mean Absolute Error (MAE)}{61}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Mean Squared Error (MSE)}{61}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Root Mean Squared Error (RMSE)}{61}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Coefficient of Determination ($R^2$ Score)}{61}{subsection.4.1.4}%
+\contentsline {subsection}{\numberline {4.1.5}Classification Accuracy}{62}{subsection.4.1.5}%
+\contentsline {subsection}{\numberline {4.1.6}F1-Score}{62}{subsection.4.1.6}%
+\contentsline {section}{\numberline {4.2}Complexity Metrics}{62}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Benchmarking}{63}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Regression Performance}{63}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Glycemic State Classification Performance}{66}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}Hardware Complexity}{69}{section.4.4}%
+\contentsline {chapter}{\numberline {5}Deployment}{72}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Overview}{72}{section.5.1}%
+\contentsline {section}{\numberline {5.2}System Framework}{72}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Signal Stabilization}{73}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Image Analysis Framework}{75}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Data Acquisition}{75}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Mathematical Signal Integration}{79}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Concurrency Management}{79}{section.5.7}%
+\contentsline {section}{\numberline {5.8}Presentation State Management}{80}{section.5.8}%
+\contentsline {section}{\numberline {5.9}Data and Repository Layer}{85}{section.5.9}%
+\contentsline {section}{\numberline {5.10}Backend Infrastructure}{88}{section.5.10}%
+\contentsline {section}{\numberline {5.11}Filtering Metrics}{94}{section.5.11}%
+\contentsline {section}{\numberline {5.12}UI/UX Failure Recovery}{95}{section.5.12}%
+\contentsline {section}{\numberline {5.13}Presentation Layer}{96}{section.5.13}%
+\contentsline {section}{\numberline {5.14}Field Testing}{96}{section.5.14}%
+\contentsline {chapter}{\numberline {6}Conclusion and Future Work}{100}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Project Conclusion}{100}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{101}{section.6.2}%
+\contentsline {chapter}{References}{102}{chapter*.55}%

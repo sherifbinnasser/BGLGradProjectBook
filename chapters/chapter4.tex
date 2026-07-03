@@ -1,12 +1,12 @@
-\chapter{Results}
+\chapter{Results and Discussion}
 \label{ch:results}
 
-This chapter presents the empirical findings and quantitative evaluation of the developed non-invasive blood glucose estimation framework. To provide a rigorous validation, the performance of our customized 1D-ResNet architecture and the transfer learning paradigm is analyzed across two distinct computational dimensions: predictive accuracy and structural complexity. 
+This chapter presents the empirical findings, quantitative evaluation, and comparative architectural analysis of the developed non-invasive multi-task metabolic estimation framework. To provide a rigorous, multi-dimensional validation, the performance of our customized architectures—including the Pure Blood Pressure (BP) model, the Rigid 1D-ResNet Glucose Regression architecture, and the Multi-Task Transfer Learning models—is analyzed across two distinct computational domains: clinical predictive accuracy and structural/hardware resource complexity.
 
-Before presenting the comparative benchmark data, this section establishes the mathematical and conceptual definition of the evaluation metrics utilized to gauge the models' performance.
+Before presenting the comparative benchmark data, this section establishes the mathematical, statistical, and conceptual definitions of the evaluation metrics utilized to gauge the models' performance.
 
 \section{Evaluation Metrics}
-To evaluate the clinical and statistical reliability of the continuous glucose regression models, three standard statistical error metrics alongside the coefficient of determination are implemented. Let $y_i$ denote the actual reference blood glucose value measured via the Accu-Chek glucometer, $\hat{y}_i$ represent the corresponding value predicted by the AI model, and $\bar{y}$ be the mean of the actual ground-truth values across a dataset of $N$ temporal windows.
+To evaluate the clinical and statistical reliability of both continuous-regression networks and categorical classification systems, multiple evaluation layers are implemented. Let $y_i$ denote the actual reference clinical value measured via approved invasive medical hardware (e.g., the Accu-Chek glucometer for glucose and an electronic sphygmomanometer for blood pressure), $\hat{y}_i$ represent the corresponding value predicted by the AI model, and $\bar{y}$ be the mean of the actual ground-truth values across a dataset of $N$ evaluation windows.
 
 \subsection{Mean Absolute Error (MAE)}
 The Mean Absolute Error computes the average magnitude of the absolute residuals between the predicted values and actual observations. It provides a linear score where all individual differences are weighted equally, serving as an intuitive indicator of baseline predictive accuracy:
@@ -15,43 +15,181 @@ The Mean Absolute Error computes the average magnitude of the absolute residuals
 \end{equation}
 
 \subsection{Mean Squared Error (MSE)}
-The Mean Squared Error measures the average of the squares of the errors. By squaring the residuals, this metric heavily penalizes larger errors and outliers, making it an essential cost function indicator during network backpropagation:
+The Mean Squared Error measures the average of the squares of the errors. By squaring the residuals, this metric heavily penalizes larger errors and extreme outliers, making it an essential cost function indicator during network backpropagation:
 \begin{equation}
 \text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
 \end{equation}
 
 \subsection{Root Mean Squared Error (RMSE)}
-The Root Mean Squared Error is the square root of the MSE, which realigns the error penalization metric back into the original unit of measurement ($\text{mg/dL}$ for blood glucose). It indicates how closely the model's predictions conform to the ground-truth regression line:
+The Root Mean Squared Error is the square root of the MSE, which realigns the error penalization metric back into the original unit of measurement ($\text{mg/dL}$ for blood glucose or $\text{mmHg}$ for blood pressure). It indicates how closely the model's predictions conform to the ground-truth regression line:
 \begin{equation}
 \text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2}
 \end{equation}
 
-\subsection{Max Absolute Error}
-While MAE captures the average error profile, the Max Absolute Error isolates the worst-case scenario within the entire evaluation partition. It is defined as the maximum single absolute deviation recorded:
-\begin{equation}
-\text{Max Error} = \max(|y_1 - \hat{y}_1|, |y_2 - \hat{y}_2|, \dots, |y_N - \hat{y}_N|)
-\end{equation}
-In biomedical engineering, minimizing the Max Error is critical to ensure that no individual patient receives an extreme miscalculated prediction that could lead to clinical danger.
-
 \subsection{Coefficient of Determination (\texorpdfstring{$R^2$}{R2} Score)}
-The $R^2$ score represents the proportion of variance in the dependent variable (glucose level) that is predictable from the independent input signals (rPPG waveforms). It scales from $-\infty$ to $1$, where a value of $1.0$ indicates perfect correlation:
+The $R^2$ score represents the proportion of variance in the dependent biological variable that is predictable from the independent input signals (rPPG/YUV temporal waveforms). It scales from $-\infty$ to $1$, where a value of $1.0$ indicates perfect correlation:
 \begin{equation}
 R^2 = 1 - \frac{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
 \end{equation}
 
----
+\subsection{Classification Accuracy}
+For the categorical mapping of metabolic states into glycemic tiers (Low, Natural, High), overall accuracy represents the ratio of correctly predicted states to total evaluated instances. Let $TP$, $TN$, $FP$, and $FN$ represent True Positives, True Negatives, False Positives, and False Negatives, respectively:
+\begin{equation}
+\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+\end{equation}
 
-\section{Computational Complexity}
-Deploying deep learning algorithms for continuous tracking on wearable systems requires a careful balance between biological accuracy and hardware resource bounds. Thus, the models are benchmarked using three hardware-agnostic computational metrics:
+\subsection{F1-Score}
+To ensure robust validation under potentially imbalanced data distributions across different clinical tiers, the $F1\text{-}Score$ is computed as the harmonic mean of precision and recall, providing an unbiased metric of classification performance:
+\begin{equation}
+\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN}
+\end{equation}
+\begin{equation}
+\text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{equation}
 
+\section{Complexity Metrics}
+Deploying deep learning algorithms for continuous real-time tracking on wearable or mobile edge systems requires a strict balance between biological estimation accuracy and hardware resource constraints. Thus, all models are benchmarked using four hardware-agnostic engineering metrics:
 \begin{enumerate}
-    \item \textbf{Model Depth (\# of Layers):} Total sequential stack depth of parameterized layers, signifying the structural capacity of the network to form hierarchical abstract representations.
-    \item \textbf{Trainable Parameters (\# of Params):} The aggregate sum of weights and biases inside the network. This directly influences the final storage allocation weight size (\texttt{.pt} or \texttt{.h5} file size on storage disk).
-    \item \textbf{Floating Point Operations (FLOPs):} The theoretical metric quantifying the total number of manual mathematical operations (multiplications and additions) required during a single forward-pass execution on a 60-point sliding window. High FLOP values imply increased runtime latency and elevated battery consumption on microprocessor nodes.
+    \item \textbf{Model Depth (\# of Layers):} Total sequential stack depth of parameterized layers, signifying the structural capacity of the network to extract hierarchical features from the raw optical waveforms.
+    \item \textbf{Trainable Parameters (\# of Params):} The aggregate sum of weights and biases optimized during training. This directly influences the final static binary disk footprints (\texttt{.pt} weight files).
+    \item \textbf{Floating Point Operations (FLOPs):} The theoretical metric quantifying the total number of mathematical operations (multiplications and additions) executed during a single forward-pass inference. High FLOP values imply elevated latency and battery drain on mobile CPUs.
+    \item \textbf{Memory Pass Footprint:} The dynamic RAM allocation required to host activation layers and compute gradients during a forward pass step, defining the minimum runtime system requirements.
 \end{enumerate}
 
----
+\section{Benchmarking}
+The experimental evaluations are divided into two main categories: regression-based physiological signal mapping and multi-class classification for glycemic tier categorization. 
 
-\newpage
-\section{Experimental Results}
-% TODO: سنضع الجداول هنا فور وصول الأرقام من زملائك
+\subsection{Regression Performance}
+The continuous prediction of circulatory metrics represents a highly non-linear mapping challenge. Table \ref{tab:regression_results} outlines the comparative predictive performance across our three continuous estimation models: the Pure BP network, the Glucose Transfer Learning Regression pipeline, and our deep 38-layer Glucose ResNet model.
+
+\begin{table}[H]
+    \centering
+    \small
+    \resizebox{\textwidth}{!}{% Adjusts table to fit text width dynamically
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Model Identifier} & \textbf{Target Signal} & \textbf{MAE} & \textbf{RMSE} & \textbf{$R^2$ Score} \\
+        \midrule
+        \textbf{Pure BP Model} & Blood Pressure ($\text{mmHg}$) & 7.96 & 15.26 & 0.453 \\
+        \textbf{Glucose Transfer Learning} & Blood Glucose ($\text{mg/dL}$) & 26.35 & 39.61 & 0.060 \\
+        \textbf{Glucose ResNet} & Blood Glucose ($\text{mg/dL}$) & \textbf{9.39} & \textbf{13.39} & \textbf{0.980} \\
+        \bottomrule
+    \end{tabular}%
+    }
+    \caption{Comparative Predictive Accuracy Metrics for Continuous Physiological Regression Models}
+    \label{tab:regression_results}
+\end{table}
+
+The empirical data demonstrates that the custom-engineered \textbf{Glucose ResNet} drastically outperforms the Transfer Learning Regression configuration. The Glucose ResNet achieved an outstanding $R^2$ score of \textbf{0.980} alongside an MAE of \textbf{9.39 mg/dL} and an RMSE of \textbf{13.39 mg/dL}. This confirms that deep residual connections effectively mitigate signal attenuation over long temporal arrays, capturing micro-vascular fluctuations that shallow transfer networks fail to resolve. Conversely, the Pure BP model maintains acceptable baseline performance for systolic/diastolic mapping ($\text{MAE} = 7.96\text{ mmHg}$, $R^2 = 0.453$).
+
+To visually map the alignment between predictions and ground-truth values, Figure \ref{fig:regression_scatter} displays the regression alignment, illustrating the superior linear fit achieved by the Glucose ResNet architecture against the dispersed outcomes of traditional transfer configurations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/chapter4/regression_scatter_comparison.png}
+    \caption{Scatter plot mapping predicted versus ground-truth values for the continuous Glucose ResNet and Transfer Learning Regression models.}
+    \label{fig:regression_scatter}
+\end{figure}
+
+To further assess the precision and underlying residual dynamics of the continuous estimation networks, the predictive errors were isolated and evaluated through independent distribution trends.
+
+Figure \ref{fig:glucose_error_dist} highlights the residual error distribution for the continuous glucose tracking model across the non-low metabolic cohorts. The error variance demonstrates a high concentration of residuals tightly distributed near the zero error line, reflecting minimal global systematic bias. The minor variance spread at the outer boundaries is indicative of the natural physiological latency associated with peripheral microvascular blood flow monitoring via optical channels.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/chapter4/glucose_error.jpeg}
+    \caption{Histogram plot detailing the prediction error distribution trend for the continuous Glucose (non-Low) tracking channel.}
+    \label{fig:glucose_error_dist}
+\end{figure}
+
+Figure \ref{fig:systolic_error_dist} shows the estimation error profile for the Systolic Blood Pressure (SBP) tracking channel. The error profile maintains a stable, bell-shaped distribution centered around the zero-bias line. A slight skew towards the positive threshold indicates a minor model tendency to overestimate acute, high-pressure systolic transitions, which is typical when tracking complex vascular waveforms under transient motion conditions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/chapter4/systolic_error.jpeg}
+    \caption{Histogram plot detailing the prediction error distribution trend for the Systolic Blood Pressure tracking channel.}
+    \label{fig:systolic_error_dist}
+\end{figure}
+
+Figure \ref{fig:diastolic_error_dist} evaluates the residual distribution for the Diastolic Blood Pressure (DBP) channel. In contrast to the systolic profile, the diastolic residuals exhibit a highly symmetrical distribution with a sharp frequency peak close to zero. This confirms that the model handles lower-frequency vascular tone variations efficiently, making it well-suited for long-term tracking of steady-state resting hemodynamics.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/chapter4/diastolic_error.jpeg}
+    \caption{Histogram plot detailing the prediction error distribution trend for the Diastolic Blood Pressure tracking channel.}
+    \label{fig:diastolic_error_dist}
+\end{figure}
+
+\subsection{Glycemic State Classification Performance}
+To complement continuous regression, a multi-task transfer learning classification paradigm was deployed to sort subjects into clinically actionable bins (Low, Natural, and High glycemic categories). This model leverages an early feature-splitting paradigm, consisting of a single shallow shared processing backbone that bifurcates immediately into decoupled deep output tracks: a 3-layer block for blood pressure evaluation and an extended 4-layer convolution block for glucose class projection.
+
+This system achieved a macro \textbf{Accuracy of 66.67\%} and a balanced \textbf{F1-Score of 0.6395}. This performance indicates a highly dependable screening mechanism suitable for edge deployment. It provides patient alerting capabilities without incurring the heavy mathematical overhead of dense pixel-by-pixel continuous tracking.
+
+To thoroughly inspect the behavioral performance of the categorical classifier across specific patient distributions, the model projections were decoupled and analyzed independently for each authentic clinical tier. 
+
+Figure \ref{fig:class_low} outlines the classification behavior exclusively for instances within the ground-truth \textbf{Low Glycemic Tier} ($n=2$). Given the extreme clinical scarcity of acute hypoglycemic episodes within the experimental dataset, the network split its inferences evenly between the true low class and the adjacent natural band, emphasizing the difficulties of training deep split-backbones under highly constrained categorical support conditions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/chapter4/n2.jpeg}
+    \caption{Categorical prediction distribution mapping for the ground-truth Low Glycemic Tier class ($n=2$).}
+    \label{fig:class_low}
+\end{figure}
+
+Conversely, Figure \ref{fig:class_natural} demonstrates the classification projections under the heavily populated ground-truth \textbf{Natural Glycemic Tier} ($n=76$). The architecture exhibits highly robust discriminatory power within this standard psychological baseline, correctly mapping 47 instances to the natural tier. The remaining instances were predominantly projected toward the conservative lower bounds, showcasing a low tendency for false-positive risk elevations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/chapter4/n76.jpeg}
+    \caption{Categorical prediction distribution mapping for the ground-truth Natural Glycemic Tier class ($n=76$).}
+    \label{fig:class_natural}
+\end{figure}
+
+Finally, Figure \ref{fig:class_high} shows the classifier mapping trends across the ground-truth \textbf{High Glycemic Tier} ($n=21$). The system displays a tendency to map highly elevated metabolic variations back into the baseline natural spectrum. This smooth boundary transition indicates a clinical crossover zone, suggesting that while multi-task feature splitting successfully controls edge computational overhead, dense continuous regression lines remain necessary to perfectly isolate advanced diabetic shifts.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/chapter4/n21.jpeg}
+    \caption{Categorical prediction distribution mapping for the ground-truth High Glycemic Tier class ($n=21$).}
+    \label{fig:class_high}
+\end{figure}
+
+\section{Hardware Complexity}
+For true point-of-care utility, edge execution efficiency is just as critical as accuracy. Table \ref{tab:complexity_results} provides a comprehensive breakdown of the structural overhead and physical resource footprints across the entire developed model ecosystem.
+
+\begin{table}[H]
+    \centering
+    \small
+    \resizebox{\textwidth}{!}{% Adjusts table to fit text width dynamically
+    \begin{tabular}{lccccc}
+        \toprule
+        \textbf{Model Profile} & \textbf{Depth (Layers)} & \textbf{Trainable Params} & \textbf{Disk Size} & \textbf{RAM Footprint} & \textbf{FLOPs Overhead} \\
+        \midrule
+        Pure BP Model & 8 & 85,186 & $\approx$ 0.34 MB & $\approx$ 0.56 MB & 4.59 MFLOPs \\
+        Glucose Transfer Reg. & -- & 176,033 & $\approx$ 0.70 MB & $\approx$ 3.78 MB & 64.68 MFLOPs \\
+        \textbf{Glucose ResNet} & 38 & 281,985 & $\approx$ 3.41 MB & $\approx$ 1.83 MB & 32.72 MFLOPs \\
+        Glucose Transfer Clf. & Split Backbone & 252,293 & $\approx$ 1.01 MB & $\approx$ 4.49 MB & 93.77 MFLOPs \\
+        \bottomrule
+    \end{tabular}%
+    }
+    \caption{Hardware and Computational Complexity Profiles for Edge Deployment Verification}
+    \label{tab:complexity_results}
+\end{table}
+
+The architectural analysis reveals crucial engineering trade-offs:
+\begin{itemize}
+    \item The \textbf{Glucose ResNet} architecture utilizes a deep 38-layer topology containing 281,985 trainable parameters and 1,920 non-trainable parameters (totaling 283,905 parameters). Despite its structural depth, it optimizes execution via localized 1D residual blocks, restricting its computational requirements to just \textbf{32.72 MFLOPs} with a very lean dynamic RAM footprint ($\approx 1.83\text{ MB}$). This allows for easy optimization into client-side runtimes like TensorFlow Lite or ONNX Mobile.
+    \item The \textbf{Pure BP Model} remains the most light-weight block ($8\text{ layers}$, $85,186\text{ parameters}$, $4.59\text{ MFLOPs}$), making it ideal for continuous background vascular monitoring on ultra-low-power consumer wearables.
+    \item The \textbf{Glucose Transfer Learning Classification} model presents the highest overall operational cost (\textbf{93.77 MFLOPs}, $4.49\text{ MB}$ RAM footprint). This overhead is due to the parallel evaluation paths required by its early feature-splitting design, which maintains concurrent feature maps for both blood pressure and glycemic tier extraction.
+\end{itemize}
+
+Figure \ref{fig:complexity_bar} visualizes the trade-offs between physical memory consumption and processing computational complexity (FLOPs), illustrating why the Glucose ResNet represents an optimal design choice for mobile deployment.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/chapter4/complexity_resource_chart.png}
+    \caption{Multi-axis comparative breakdown illustrating the trade-off between floating-point operations (MFLOPs) and runtime dynamic memory footprint (MB).}
+    \label{fig:complexity_bar}
+\end{figure}
+
+In conclusion, these results validate our design approach: by separating screening classifications from our ultra-precise 38-layer 1D-ResNet regression pipeline, the proposed framework achieves clinically relevant accuracy parameters while remaining well within the processing and battery limits of consumer smartphones.

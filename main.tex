@@ -11,17 +11,23 @@
 \usepackage{wrapfig}
 \usepackage[outputdir=build]{minted}
 \usepackage[super]{nth}
+\usepackage{booktabs} 
+\usepackage{float}    
+
+% --- حزمة إدارة الفهرس التلقائية ---
+\usepackage{tocbibind} 
+\renewcommand{\listingscaption}{Listing} 
+\renewcommand{\listoflistingscaption}{List of Listings} 
 
 \input{PackagesAndSettings}
 
 \begin{document}
 
-% --- English Title Page ---
+% --- Front Matter ---
 \phantomsection
-\addcontentsline{toc}{chapter}{Cover Page} % إدراج الغلاف الإنجليزي في القائمة الجانبية
+\addcontentsline{toc}{chapter}{Cover Page} 
 \include{TitlePage}
 
-% --- Front Matter ---
 \phantomsection
 \addcontentsline{toc}{chapter}{Acknowledgment}
 \include{Acknowledgment}
@@ -30,25 +36,18 @@
 \addcontentsline{toc}{chapter}{Abstract}
 \include{Abstract}
 
-\phantomsection
-\addcontentsline{toc}{chapter}{List of Figures}
+% الحزمة تتكفل بهذين السطرين تلقائياً (لا تضف لهم addcontentsline)
 \listoffigures
+\listoftables
 
-%\phantomsection
-%\addcontentsline{toc}{chapter}{List of Tables}
-%\listoftables
-
-% \phantomsection
-% \addcontentsline{toc}{chapter}{List of Abbreviations}
-% \include{listofabbreviations}
-
+% --- الحل هنا: إضافة قائمة الأكواد يدوياً مع رابطها الذكي لأن الحزمة لا تراها تلقائياً ---
+\clearpage
 \phantomsection
-\addcontentsline{toc}{chapter}{Table of Contents}
-\tableofcontents
+\addcontentsline{toc}{chapter}{\listoflistingscaption}
+\listoflistings
 
-% \phantomsection
-% \addcontentsline{toc}{chapter}{Glossary}
-% \printglossary[type=\acronymtype]
+% الحزمة تتكفل بالـ Table of Contents والمراجع تلقائياً
+\tableofcontents
 
 \clearpage
 
@@ -62,19 +61,9 @@
 
 % --- References and Appendices ---
 \clearpage
-\phantomsection
-\addcontentsline{toc}{chapter}{References}
+% تم حذف الـ \addcontentsline اليدوية للمراجع هنا منعاً للتكرار
 \renewcommand{\bibname}{References}
 \bibliographystyle{IEEEtran}
 \bibliography{References.bib}
-
-% \include{Appendices}
-
-% --- Arabic Title Page (End of Book) ---
-% \clearpage
-% \thispagestyle{empty}
-% \phantomsection
-% \addcontentsline{toc}{chapter}{Arabic Cover Page}
-% \includepdf[pages={1}]{arabic_cover.pdf} % استدعاء الملف الجاهز مباشرة
 
 \end{document}

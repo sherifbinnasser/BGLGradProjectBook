@@ -1,0 +1,13 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Comparative Synthesis of Existing Literature vs. Our Proposed Work}}{17}{table.caption.12}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces The Structure of the Exported \texttt {patients.csv} File}}{26}{table.caption.25}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Structural Layout and Attributes of an Individual Patient CSV File}}{29}{table.caption.30}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Distribution of Patient Records Across Glycemic Tiers}}{38}{table.caption.33}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Comparative Predictive Accuracy Metrics for Continuous Physiological Regression Models}}{63}{table.caption.39}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Hardware and Computational Complexity Profiles for Edge Deployment Verification}}{69}{table.caption.47}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }

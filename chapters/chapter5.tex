@@ -795,14 +795,7 @@ If the internal preprocessing pipeline detects that the computed hardware freque
 The frontend client intercepts these network anomalies within a safe presentation wrapper, catching exceptions before they reach the main UI context. Instead of presenting uncalibrated or unstable estimations, the application updates the UI state to display an intuitive error recovery card. This module provides actionable feedback, prompting the user to adjust their sensor placement or relocate to an environment with better ambient lighting before re-initializing the diagnostic loop.
 
 \section{Presentation Layer}
-Once the server processes the data, it returns a structured JSON object containing the unified vital estimations. The application parses this response on a secure background worker thread and immediately updates the state to render the final clinical output screen.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\textwidth]{figures/chapter5/ai_glucose_result.png}
-    \caption{Final clinical presentation interface showcasing concurrent Blood Pressure estimations ($\text{mmHg}$), stratified Glycemic Tier classifications, and dynamic user accuracy guidelines.}
-    \label{fig:glucose_result}
-\end{figure}
+Once the server processes the data, it returns a structured JSON object containing the unified vital estimations. The application parses this response on a secure background worker thread and immediately updates the state to render the final clinical output screen, as illustrated later in Figure \ref{fig:ai_glucose_result}.
 
 The finalized production interface exposes multiple parameters processed by the deep learning pipeline:
 \begin{itemize}
@@ -811,4 +804,38 @@ The finalized production interface exposes multiple parameters processed by the 
     \item \textbf{Clinical Safety Guardrails:} The interface embeds a dynamic biomedical accuracy notice. This component educates patients on external physical boundary conditions—such as systemic hypothermia (cold fingers), improper lens coverage, excessive finger pressure, or sub-optimal ambient lighting—that could skew optical absorption profiles.
 \end{itemize}
 
-By engaging the prominent ``Done'' control, the internal caching memory stacks are securely purged, returning the application to its clean initialization state. This comprehensive client-server deployment achieves our engineering objective: transforming complex optical signal engineering principles into a non-invasive, accessible mobile health solution.
+By engaging the prominent ``Done'' control, the internal caching memory stacks are securely purged, returning the application to its clean initialization state.
+
+\section{Field Testing}
+To demonstrate the real-world accuracy and functional reliability of the deployed GlucoAI application, cross-validation field tests were conducted by comparing the client application's inference outputs directly against standard, clinically approved invasive and oscillometric reference hardware. This evaluation assesses the network's predictive capabilities during live edge-testing scenarios.
+
+Figure \ref{fig:real_bp} displays the reference blood pressure verification captured via a gold-standard Omron electronic sphygmomanometer, establishing the benchmark cardiovascular state of the test subject with a resting blood pressure of $114/63\text{ mmHg}$ and a pulse rate of $78\text{ bpm}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/chapter5/real_bp.png}
+    \caption{Reference clinical baseline measurement obtained via an Omron oscillometric blood pressure monitor displaying a ground-truth value of 114/63 mmHg.}
+    \label{fig:real_bp}
+\end{figure}
+
+Simultaneously, the metabolic blood glucose profile was established using an invasive capillary blood finger-prick test. Figure \ref{fig:real_gluc} demonstrates the reference glycemic level recorded via an Accu-Chek Active glucometer, indicating an acute hypoglycemic state of $44\text{ mg/dL}$, which serves as a critical test instance for evaluating model safety triggers under extreme physiological conditions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/chapter5/real_gluc.png}
+    \caption{Reference invasive blood glucose measurement captured via an Accu-Chek Active glucometer indicating a ground-truth value of 44 mg/dL.}
+    \label{fig:real_gluc}
+\end{figure}
+
+When evaluating the identical operational window using the non-invasive smartphone application interface, illustrated in Figure \ref{fig:ai_glucose_result}, the framework successfully mapped the client's vital signs. The multi-task network projected a blood pressure estimation of $110/59\text{ mmHg}$, aligning closely with the Omron hardware limits and yielding minor absolute deviations ($\Delta\text{SYS} = 4\text{ mmHg}$, $\Delta\text{DIA} = 4\text{ mmHg}$). 
+
+Furthermore, the system handled the metabolic shift successfully; since the fine-tuned multi-task classification backbone identified an acute outlier state, it triggered a safety response. Rather than displaying an uncalibrated regression number, it correctly threw an automated ``Low'' categorical classification alert. This action safely flagged the critical hypoglycemic event while prompting the user with explicit biomedical safety notes regarding external factors that could affect transillumination profiles.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/chapter5/ai_glucose_result.png}
+    \caption{Final clinical presentation interface showcasing concurrent Blood Pressure estimations ($\text{mmHg}$), stratified Glycemic Tier classifications, and dynamic user accuracy guidelines.}
+    \label{fig:ai_glucose_result}
+\end{figure}
+
+This comprehensive client-server deployment achieves our primary engineering objective: transforming complex optical signal engineering principles into a non-invasive, accessible, and highly responsive mobile health solution.

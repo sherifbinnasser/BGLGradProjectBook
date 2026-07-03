@@ -1,22 +1,32 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Traditional invasive blood glucose testing via needle-based finger pricking.}}{9}{figure.caption.7}%
-\contentsline {figure}{\numberline {1.2}{\ignorespaces Cross-sectional architectural view of a smartwatch PPG sensor capturing arterial blood flow variations via optical emission.}}{10}{figure.caption.8}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Traditional invasive blood glucose testing via needle-based finger pricking.}}{11}{figure.caption.10}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Cross-sectional architectural view of a smartwatch PPG sensor capturing arterial blood flow variations via optical emission.}}{12}{figure.caption.11}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces The New Record Form interface where patient demographics and Accu-Chek readings are entered.}}{20}{figure.caption.16}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces The user interfaces designed for checking the finger alignment and executing the 20-second signal capture sequence.}}{22}{figure.caption.18}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Data management screens showing local storage monitoring and the final data export engine workflow.}}{23}{figure.caption.20}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}}{33}{figure.caption.28}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}}{35}{figure.caption.29}%
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Clean Extracted rPPG Signal Waveform via the Algorithmic Extraction Stack for Patient 1.}}{43}{figure.caption.31}%
-\contentsline {figure}{\numberline {3.7}{\ignorespaces 2D Vector Diagram of the Developed Deep 1D-ResNet Layer Stack including sliding window input and functional residual blocks.}}{46}{figure.caption.32}%
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}}{51}{figure.caption.33}%
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Architectural pipeline of the Multi-Task Shared-Backbone Network, detailing the shared convolutional baseline, the calibrated Blood Pressure regression branch, and the expanded 3-class glycemic risk classification head.}}{57}{figure.caption.35}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces The New Record Form interface where patient demographics and Accu-Chek readings are entered.}}{22}{figure.caption.19}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces The user interfaces designed for checking the finger alignment and executing the 20-second signal capture sequence.}}{24}{figure.caption.21}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Data management screens showing local storage monitoring and the final data export engine workflow.}}{25}{figure.caption.23}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Vertical Comparison of Raw, Unfiltered Temporal R, G, B Waveforms across Different Sampling Rate Transformations.}}{35}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Vertical Comparison of Filtered and Conditioned Temporal R, G, B Waveforms showcasing clear exposed cardiac pulse properties.}}{37}{figure.caption.32}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Clean Extracted rPPG Signal Waveform via the Algorithmic Extraction Stack for Patient 1.}}{45}{figure.caption.34}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces 2D Vector Diagram of the Developed Deep 1D-ResNet Layer Stack including sliding window input and functional residual blocks.}}{48}{figure.caption.35}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Functional block workflow illustrating the Cross-Domain Transfer Learning scheme from Blood Pressure feature extractors to continuous Blood Glucose parameters.}}{53}{figure.caption.36}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Architectural pipeline of the Multi-Task Shared-Backbone Network, detailing the shared convolutional baseline, the calibrated Blood Pressure regression branch, and the expanded 3-class glycemic risk classification head.}}{59}{figure.caption.38}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Scatter plot mapping predicted versus ground-truth values for the continuous Glucose ResNet and Transfer Learning Regression models.}}{64}{figure.caption.40}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Histogram plot detailing the prediction error distribution trend for the continuous Glucose (non-Low) tracking channel.}}{65}{figure.caption.41}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Histogram plot detailing the prediction error distribution trend for the Systolic Blood Pressure tracking channel.}}{65}{figure.caption.42}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Histogram plot detailing the prediction error distribution trend for the Diastolic Blood Pressure tracking channel.}}{66}{figure.caption.43}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Categorical prediction distribution mapping for the ground-truth Low Glycemic Tier class ($n=2$).}}{67}{figure.caption.44}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Categorical prediction distribution mapping for the ground-truth Natural Glycemic Tier class ($n=76$).}}{68}{figure.caption.45}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Categorical prediction distribution mapping for the ground-truth High Glycemic Tier class ($n=21$).}}{69}{figure.caption.46}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Multi-axis comparative breakdown illustrating the trade-off between floating-point operations (MFLOPs) and runtime dynamic memory footprint (MB).}}{70}{figure.caption.48}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Official GlucoAI system logo representing the integration of optical arterial pulses with deep learning networks.}}{63}{figure.caption.36}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces The real-time pre-measurement interface showcasing orientation-agnostic resolution bindings, frame rate selectors, and live optical waveform stability monitoring.}}{64}{figure.caption.37}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Active data collection interface capturing continuous full-frame raw optical arrays over a fixed 25-second operational window.}}{66}{figure.caption.38}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Final clinical presentation interface showcasing concurrent Blood Pressure estimations ($\text {mmHg}$), stratified Glycemic Tier classifications, and dynamic user accuracy guidelines.}}{87}{figure.caption.39}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Official GlucoAI system logo representing the integration of optical arterial pulses with deep learning networks.}}{73}{figure.caption.49}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces The real-time pre-measurement interface showcasing orientation-agnostic resolution bindings, frame rate selectors, and live optical waveform stability monitoring.}}{74}{figure.caption.50}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Active data collection interface capturing continuous full-frame raw optical arrays over a fixed 25-second operational window.}}{76}{figure.caption.51}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Reference clinical baseline measurement obtained via an Omron oscillometric blood pressure monitor displaying a ground-truth value of 114/63 mmHg.}}{97}{figure.caption.52}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Reference invasive blood glucose measurement captured via an Accu-Chek Active glucometer indicating a ground-truth value of 44 mg/dL.}}{98}{figure.caption.53}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Final clinical presentation interface showcasing concurrent Blood Pressure estimations ($\text {mmHg}$), stratified Glycemic Tier classifications, and dynamic user accuracy guidelines.}}{99}{figure.caption.54}%
 \addvspace {10\p@ }
