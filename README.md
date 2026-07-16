@@ -2,10 +2,12 @@
 
 This repository contains the LaTeX source for the BGL graduate project book, plus supporting figures and assets.
 
-## Download links
+## links
 
 - Banner PDF: https://github.com/sherifbinnasser/BGLGradProjectBook/raw/main/assets/Banner.pdf
 - Book PDF: https://github.com/sherifbinnasser/BGLGradProjectBook/raw/main/assets/Book.pdf
+- Our GlucoAI App: https://github.com/sherifbinnasser/GlucoAI
+- Our Diabetes Samples Collecting App: https://github.com/sherifbinnasser/DiabetesCollector
 
 ## Local build output
 
